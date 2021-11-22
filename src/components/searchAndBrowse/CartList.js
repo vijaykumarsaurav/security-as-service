@@ -13,7 +13,6 @@ import { resolveResponse } from "../utils/ResponseHandler";
 class CartDetails extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             categoryName: '',
             quantity:0,
