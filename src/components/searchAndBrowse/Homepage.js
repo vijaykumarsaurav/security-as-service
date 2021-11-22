@@ -69,7 +69,7 @@ class Homepage extends Component {
 
                     <Grid item xs={12} sm={12} >
                         <Typography variant="h5" component="p" >
-                            Other Categories
+                            Other Same Categories
                         </Typography>
                     </Grid>
 
