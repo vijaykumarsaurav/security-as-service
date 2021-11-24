@@ -116,7 +116,11 @@ class ProductDetails extends Component {
                         <br /> <br />
                         <Button variant="contained" onClick={() => this.addToCart(productDetails)}> Add To Cart </Button>
 
-                        <br /><br /> {this.state.message}
+                        <br /><br /> <b> {this.state.message} </b>
+                        <br /> <br />
+                        <Typography variant="h6" component="p" >
+                        {productDetails.description}
+                        </Typography> 
 
                     </Grid>
 
