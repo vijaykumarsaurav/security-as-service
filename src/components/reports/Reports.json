@@ -1,0 +1,342 @@
+[
+    {
+        "check_section": "IP.1.1.2",
+        "check_description": "Windows Maximum Password Age must be set to 60 days or less(also for all PSO objects).",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "OK",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-03T07:57:15.000+00:00",
+                "violations": []
+            },
+            {
+                "check_status": "OK",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": []
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.5",
+        "check_description": "Password complexity must meet complexity requirements.",
+        "severity": "Medium",
+        "hosts": [
+            {
+                "check_status": "OK",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-03T07:57:15.000+00:00",
+                "violations": []
+            },
+            {
+                "check_status": "OK",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": []
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.8",
+        "check_description": "Windows Account Lockout Threshold must be set to 5 or less  but not 0.",
+        "severity": "Low",
+        "hosts": [
+            {
+                "check_status": "OK",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": []
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout threshold setting: 6, must be set to 5 or less"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.7",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "High",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.9",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.10",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.11",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.12",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.13",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.14",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.15",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.16",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.17",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    },
+    {
+        "check_section": "IP.1.1.18",
+        "check_description": "Windows Account Lockout Duration must be set to 15 and to 0.00:15:00 for all PSO objects.",
+        "severity": "Critical",
+        "hosts": [
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s02",
+                "ip": "9.212.148.152",
+                "scan_date": "2022-06-04T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            },
+            {
+                "check_status": "KO",
+                "hostname": "bf-uat-w2k19s03",
+                "ip": "9.212.148.153",
+                "scan_date": "2022-06-05T07:57:15.000+00:00",
+                "violations": [
+                    " Invalid Account lockout duration setting: 10, must be set to 15"
+                ]
+            }
+        ]
+    }
+]
