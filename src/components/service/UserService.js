@@ -5,18 +5,9 @@ import  * as apiConstant from "../utils/config";
 
 class UserService {
   
-    getCategory() {
-          return axios.get(apiConstant.CATEGORIES_API, AuthService.getHeader());
+    async getDeviations () {
+        return axios.get(apiConstant.GET_DEVIATIONS, '');
     }
-
-    getProductCategory(queryStr) {
-        return axios.get(apiConstant.CATEGORY_PRODUCT_API+queryStr, AuthService.getHeader());
-   }
-
-   getProductDetails(productId) {
-    return axios.get(apiConstant.PRODUCT_DETAILS_API+productId, AuthService.getHeader());
-   }
-   
 
 } 
 

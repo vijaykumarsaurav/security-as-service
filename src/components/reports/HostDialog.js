@@ -63,7 +63,7 @@ export default function CustomizedDialogs(props) {
     return (
         <div>
             <Button size='small' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
-                {props.hosts.length} Hosts
+                {props?.hosts?.length} Hosts
             </Button>
             <BootstrapDialog
                 onClose={handleClose}
@@ -75,14 +75,14 @@ export default function CustomizedDialogs(props) {
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
 
-                    {props.hosts.map((host) => {
+                    {props?.hosts?.map((host) => {
                         return (
                             <div>
-                                <b> Hostname: </b>  {host.hostname} <br />
-                                <b> Check Status: </b> {host.check_status} <br />
-                                <b>IP Address: </b>  {host.ip}<br />
-                                <b>  Scan Date:  </b> {host.scan_date}<br />
-                                <b> Violations:  </b>{host.violations.map(violation => violation )} <br /><br />
+                                <b> Hostname: </b>  {host?.hostname} <br />
+                                <b> Check Status: </b> {host?.check_status} <br />
+                                <b>IP Address: </b>  {host?.ip}<br />
+                                <b>  Scan Date:  </b> {host?.scan_date}<br />
+                                <b> Violations:  </b>{host?.violations.map(violation => violation?.message)} <br /><br />
                             </div>
                         );
                     })}

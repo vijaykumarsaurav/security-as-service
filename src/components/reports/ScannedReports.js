@@ -23,7 +23,9 @@ import DoneIcon from '@mui/icons-material/Done';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import HeaderNavbar from '../HeaderNavbar'
-import rows from './Reports.json'
+//import rows from './Reports.json'; 
+import UserService from '../service/UserService';
+import CircularProgress from '@mui/material/CircularProgress';
 import ExpandHosts from './ExpandHosts'
 import HostDialog from './HostDialog'
 import { Button } from '@mui/material';
@@ -109,6 +111,7 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
+            style={{fontWeight: "bold"}}
             align={headCell.numeric ? 'left' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
@@ -209,7 +212,22 @@ export default function EnhancedTable() {
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5); 
+  const [rows, setRows] = React.useState([]); 
+  const [rowsWait, setRowsWait] = React.useState(true); 
+
+
+  React.useEffect(()=> {
+    UserService.getDeviations().then((results) => {
+      if(results.status === 200){ 
+        console.log("results", results.data);
+        setRowsWait(false);
+        setRows(results.data);
+      }
+    }).catch((error)=> console.log("error", error));
+
+  }, []);
+
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -284,6 +302,16 @@ export default function EnhancedTable() {
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
+             {rowsWait  && (
+                <TableRow>
+                  <TableCell colSpan={4}>
+                      <Typography> 
+                         <CircularProgress />
+                          {/* Loading data,  pls wait... */}
+                      </Typography>  
+                      </TableCell>
+                </TableRow>
+              )}
             <TableBody>
               {/* if you don't need to support IE11, you can replace the `stableSort` call with:
                  rows.slice().sort(getComparator(order, orderBy)) */}
@@ -325,7 +353,7 @@ export default function EnhancedTable() {
                       <TableCell align="left">
                         {/* <ExpandHosts hosts={row.hosts}/> */}
 
-                        <HostDialog hosts={row.hosts}/>
+                        <HostDialog hosts={row?.hosts}/>
                         {/* {row.hosts.map((host) => {
                           return( <div> 
                             <span> {host.ip} </span> <br /> 
@@ -345,6 +373,7 @@ export default function EnhancedTable() {
                   <TableCell colSpan={6} />
                 </TableRow>
               )}
+              
             </TableBody>
           </Table>
         </TableContainer>
