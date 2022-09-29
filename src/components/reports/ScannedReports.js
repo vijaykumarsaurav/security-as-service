@@ -27,7 +27,9 @@ import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
 import CircularProgress from '@mui/material/CircularProgress';
 import ExpandHosts from './ExpandHosts'
-import HostDialog from './HostDialog'
+import HostDialog from './HostDialog';
+import PolicySelectList from './PolicySelectList'
+
 import { Button } from '@mui/material';
 import RuleIcon from '@mui/icons-material/Rule';
 function descendingComparator(a, b, orderBy) {
@@ -174,7 +176,7 @@ const EnhancedTableToolbar = (props) => {
           id="tableTitle"
           component="div"
         >
-          Scanned Reports
+          Scanned Reports <PolicySelectList />
         </Typography>
       )}
 
@@ -345,8 +347,9 @@ export default function EnhancedTable() {
                         id={labelId}
                         scope="row"
                         padding="none"
+                        title={row.check_section} 
                       >
-                        {row.check_section}
+                      {row.check_section.substring(0, 50)}
                       </TableCell>
                       <TableCell align="left">{row.severity}</TableCell>
                       <TableCell align="left">{row.check_description}</TableCell>

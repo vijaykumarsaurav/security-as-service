@@ -9,6 +9,7 @@ import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
+import ExpandListItem from './ExpandListItem';
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
@@ -80,9 +81,15 @@ export default function CustomizedDialogs(props) {
                             <div>
                                 <b> Hostname: </b>  {host?.hostname} <br />
                                 <b> Check Status: </b> {host?.check_status} <br />
-                                <b>IP Address: </b>  {host?.ip}<br />
-                                <b>  Scan Date:  </b> {host?.scan_date}<br />
-                                <b> Violations:  </b>{host?.violations.map(violation => violation?.message)} <br /><br />
+                                <b> IP Address: </b>  {host?.ip}<br />
+                                <b> Scan Date:  </b> {host?.scan_date}<br />
+                                <b> Violations:  </b>{host?.violations.map(violation => violation?.message)} <br />
+                                <b> Policy Parameters:  </b>{host?.policy_parameters.map(policy_parameter => policy_parameter)} <br />
+                                {/* <b> Measure Values:  </b>{host?.measure_values.map(measure_value => measure_value)} <br /><br /> */}
+                                {host?.measure_values.length ? <ExpandListItem measure_values={host?.measure_values} /> : "" }
+
+                                <br />
+                                
                             </div>
                         );
                     })}
