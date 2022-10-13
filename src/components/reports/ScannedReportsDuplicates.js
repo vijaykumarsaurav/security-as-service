@@ -132,7 +132,7 @@ const headCells = [
 ];
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isFilterEnable } =
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isFilterEnable, handleFilter } =
     props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -152,7 +152,7 @@ function EnhancedTableHead(props) {
             }}
           />
         </TableCell>
-        {headCells.map((headCell) => (
+        {headCells.map((headCell, i) => (
           <TableCell
             key={headCell.id}
             style={{fontWeight: "bold"}}
@@ -173,7 +173,7 @@ function EnhancedTableHead(props) {
                 </Box>
               ) : null}
             </TableSortLabel>
-            {isFilterEnable ? <input  /> : ""}  
+            {isFilterEnable ? <input onChange={handleFilter} name={headCell.id} /> : ""}  
           </TableCell>
         ))}
       </TableRow>
@@ -270,7 +270,7 @@ export default function EnhancedTable() {
   const [allRows, setAllRows] = React.useState([]); 
   
   const [rowsWait, setRowsWait] = React.useState(true); 
-  const [isFilterEnable, setIsFilterEnable] = React.useState(false); 
+  const [isFilterEnable, setIsFilterEnable] = React.useState(true); 
   const [globalSearchText, setGlobalSearchText] = React.useState(''); 
 
   React.useEffect(() => {
@@ -339,7 +339,8 @@ export default function EnhancedTable() {
   }, []);
 
   const lowercase = (text) => {
-    return text.toLowerCase(); 
+    let str = text ? text.toLowerCase() : ""; 
+    return str; 
   };
 
  const duplicateDeviationsData = (devData) => {
@@ -417,6 +418,28 @@ export default function EnhancedTable() {
     setDense(event.target.checked);
   };
 
+  const handleFilter = (e) => {
+    let val = e.target.value; 
+    let name = e.target.name; 
+    let tempSearch = []; 
+
+    console.log("filer", name, val)
+   // let filterData = rows.filter(item => item[name].includes(val)); 
+
+    if(val.length === 0){
+      setRows(allRows);
+    }else{
+      rows.forEach(element => {
+        if(element[name] && lowercase(element[name]).includes(lowercase(val)) ){
+            tempSearch.push(element);
+        }
+      });
+      setRows(tempSearch);
+    }
+
+   // setRows(filterData);
+  }
+
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -443,6 +466,7 @@ export default function EnhancedTable() {
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
               isFilterEnable={isFilterEnable}
+              handleFilter={handleFilter}
             />
              {rowsWait  && (
                 <TableRow>
