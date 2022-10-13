@@ -27,11 +27,15 @@ import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
 import CircularProgress from '@mui/material/CircularProgress';
 import ExpandHosts from './ExpandHosts'
-import HostDialog from './HostDialog';
-import PolicySelectList from './PolicySelectList'
-
-import { Button } from '@mui/material';
+import ItemsDialog from './ItemsDialog';
+import PolicySelectList from './PolicySelectList';
+import moment from 'moment';
+import './ScannedReports.css';
+import { Button, TextField } from '@mui/material';
 import RuleIcon from '@mui/icons-material/Rule';
+import ApplyFilter from './ApplyFilter';
+
+
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -82,15 +86,53 @@ const headCells = [
     label: 'Check Description',
   },
   {
-    id: 'hosts',
+    id: 'hostname',
     numeric: true,
     disablePadding: false,
-    label: 'Hosts Details',
-  }
+    label: 'Hostname',
+  },
+
+  {
+    id: 'check_status',
+    numeric: true,
+    disablePadding: false,
+    label: 'Check status',
+  },
+  {
+    id: 'ip',
+    numeric: true,
+    disablePadding: false,
+    label: 'IP address',
+  },
+  {
+    id: 'scan_date',
+    numeric: true,
+    disablePadding: false,
+    label: 'Scan Date',
+  },
+
+  {
+    id: 'violation',
+    numeric: true,
+    disablePadding: false,
+    label: 'Violation',
+  },
+  {
+    id: 'measure_values',
+    numeric: true,
+    disablePadding: false,
+    label: 'Measure Values',
+  }, 
+  {
+    id: 'policy_parameters',
+    numeric: true,
+    disablePadding: false,
+    label: 'Policy Parameters',
+  }  
 ];
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, isFilterEnable } =
     props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
@@ -118,6 +160,7 @@ function EnhancedTableHead(props) {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
+           
             <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
@@ -130,6 +173,7 @@ function EnhancedTableHead(props) {
                 </Box>
               ) : null}
             </TableSortLabel>
+            {isFilterEnable ? <input  /> : ""}  
           </TableCell>
         ))}
       </TableRow>
@@ -147,7 +191,7 @@ EnhancedTableHead.propTypes = {
 };
 
 const EnhancedTableToolbar = (props) => {
-  const { numSelected } = props;
+  const { numSelected, setIsFilterEnable, globalSearchText, setGlobalSearchText,rowsLength } = props;
 
   return (
     <Toolbar
@@ -175,8 +219,17 @@ const EnhancedTableToolbar = (props) => {
           variant="h6"
           id="tableTitle"
           component="div"
+          //color={'primary'}
         >
-          Scanned Reports <PolicySelectList />
+          Reports({rowsLength}) <PolicySelectList />
+           <TextField 
+            style={{width:'50%'}}
+            variant="standard"
+            label="Global Search"
+            value={globalSearchText}
+            placeholder="Search in check section, desc, ip and violation"
+            onChange={(e) => setGlobalSearchText(e.target.value)}
+           />
         </Typography>
       )}
 
@@ -195,9 +248,7 @@ const EnhancedTableToolbar = (props) => {
       </span>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
+           <ApplyFilter setIsFilterEnable={setIsFilterEnable} />
         </Tooltip>
       )}
     </Toolbar>
@@ -216,15 +267,67 @@ export default function EnhancedTable() {
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5); 
   const [rows, setRows] = React.useState([]); 
+  const [allRows, setAllRows] = React.useState([]); 
+  
   const [rowsWait, setRowsWait] = React.useState(true); 
+  const [isFilterEnable, setIsFilterEnable] = React.useState(false); 
+  const [globalSearchText, setGlobalSearchText] = React.useState(''); 
 
+  React.useEffect(() => {
+    
+    if(globalSearchText.length === 0){
+      setRows(allRows);
+    }else{
+      let tempSearch = []; 
+      
+      allRows.forEach(element => {
+        if(lowercase(element.check_section).includes(lowercase(globalSearchText)) || 
+        lowercase(element.check_description).includes(lowercase(globalSearchText)) ||
+        lowercase(element.hostname).includes(lowercase(globalSearchText)) ||
+        lowercase(element.ip).includes(lowercase(globalSearchText)) ||
+        lowercase(element.violation).includes(lowercase(globalSearchText))){
+            tempSearch.push(element);
+        }
+
+        //let keys = Object.keys(element); 
+        // for (let index = 0; index < keys.length; index++) {
+        //   const key = keys[index];
+        //  // let searchExp = /${globalSearchText}/i;
+        //   console.log("keys", key, element[key])
+        //   if(element[keys[index]].includes(globalSearchText)){
+        //     tempSearch.push(element);
+        //     break; 
+        //   } 
+        // }
+
+        // keys.forEach(key => {
+        //     let searchExp = /${globalSearchText}/i;
+        //     console.log("keys", key, element[key])
+        //     //searchExp.test(element[key])
+        //     //        text.match(pattern);
+        //     //element[key].includes(globalSearchText)
+        //     if(element[key].includes(globalSearchText)){
+        //       tempSearch.push(element);
+        //       return; 
+        //     }
+        // });
+  
+        // if(Array.isArray(element)){
+        // }else if(){
+        // }
+      });
+      setRows(tempSearch);
+    }
+
+  
+  }, [globalSearchText]);
 
   React.useEffect(()=> {
     UserService.getDeviations().then((results) => {
       if(results.status === 200){ 
         console.log("results", results.data);
         setRowsWait(false);
-        setRows(results.data);
+        duplicateDeviationsData(results.data);
       }
     }).catch((error)=> {
       console.log("error", error)
@@ -234,6 +337,37 @@ export default function EnhancedTable() {
     });
 
   }, []);
+
+  const lowercase = (text) => {
+    return text.toLowerCase(); 
+  };
+
+ const duplicateDeviationsData = (devData) => {
+      let tempDevData = [];
+      devData.forEach(element => {
+          element.hosts.forEach(host => {
+            element.hostname = host.hostname;
+            element.check_status = host.check_status;
+            element.ip = host.ip;
+            element.scan_date = host.scan_date;
+            
+            if(host.violations.length > 0){
+              host.violations.forEach(violation => {
+                element.violation = violation.message;
+                element.measure_values = host.measure_values;
+                element.policy_parameters = host.policy_parameters;
+                tempDevData.push(element); 
+              })
+            }else{
+              element.violation = '';
+              tempDevData.push(element); 
+            }
+            
+          })
+      });
+      setAllRows(tempDevData);
+      setRows(tempDevData);
+  };
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -293,7 +427,8 @@ export default function EnhancedTable() {
     <Box sx={{ width: '100%' }}>
       <HeaderNavbar />
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar rowsLength={rows.length} setGlobalSearchText={setGlobalSearchText} globalSearchText={globalSearchText} setIsFilterEnable={setIsFilterEnable} numSelected={selected.length} />
+
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -307,6 +442,7 @@ export default function EnhancedTable() {
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
+              isFilterEnable={isFilterEnable}
             />
              {rowsWait  && (
                 <TableRow>
@@ -324,7 +460,7 @@ export default function EnhancedTable() {
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.check_section);
+                  const isItemSelected = isSelected(row.check_section + '_'+ index);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
@@ -333,12 +469,12 @@ export default function EnhancedTable() {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.check_section}
+                      key={row.check_section + '_'+ index}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
-                         onClick={(event) => handleClick(event, row.check_section)}
+                         onClick={(event) => handleClick(event, row.check_section  + '_'+ index)}
                           color="primary"
                           checked={isItemSelected}
                           inputProps={{
@@ -356,18 +492,26 @@ export default function EnhancedTable() {
                       {row.check_section.substring(0, 50)}
                       </TableCell>
                       <TableCell align="left">{row.severity}</TableCell>
-                      <TableCell align="left">{row.check_description}</TableCell>
-                      <TableCell align="left">
-                        {/* <ExpandHosts hosts={row.hosts}/> */}
+                      <TableCell width={"400px"} align="left">{row.check_description}</TableCell>
 
-                        <HostDialog hosts={row?.hosts}/>
-                        {/* {row.hosts.map((host) => {
-                          return( <div> 
-                            <span> {host.ip} </span> <br /> 
-                          </div>
-                          ); 
-                        })} */}
+                      <TableCell align="left">{row.hostname}</TableCell>
+                      <TableCell align="left">{row.check_status}</TableCell>
+                      <TableCell align="left">{row.ip}</TableCell>
+                      <TableCell align="left">{moment(row.scan_date).format('DD-MMM-YYYY, hh:mm a')}</TableCell>
+
+                      <TableCell align="left">
+                        {row?.violation}
                       </TableCell>
+
+                      <TableCell align="left">
+                        {row?.measure_values?.length > 0 ?  <ItemsDialog items={row?.measure_values} title="Values"/>: ""}
+                      </TableCell>
+
+                      <TableCell align="left">
+                      {row?.policy_parameters?.length > 0 ?  <ItemsDialog items={row?.policy_parameters} title="Parameters"/>: ""}
+
+                      </TableCell>
+                      
                     </TableRow>
                   );
                 })}

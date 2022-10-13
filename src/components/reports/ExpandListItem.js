@@ -11,6 +11,8 @@ import SendIcon from '@mui/icons-material/Send';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import StarBorder from '@mui/icons-material/StarBorder';
+import Checkbox from '@mui/material/Checkbox';
+
 
 export default function NestedList({measure_values}) {
   const [open, setOpen] = React.useState(false);
@@ -38,7 +40,15 @@ export default function NestedList({measure_values}) {
 
             {measure_values.map(item => {
             return ( <ListItemButton sx={{ pl: 4 }}>
-              <ListItemText primary={item} />
+                
+                 <Checkbox
+                  color="primary"
+                  inputProps={{
+                    'aria-label': 'select all desserts',
+                  }} />
+
+                  <ListItemText primary={item} />
+
               </ListItemButton>)
           
           })}

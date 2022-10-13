@@ -115,8 +115,8 @@ export default function PrimarySearchAppBar(props) {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Menu 1</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Menu 2</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/scanned-reports-duplicate')}>Like Excel</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/scanned-reports')}>Unique Report</MenuItem>
 
     </Menu>
   );

@@ -1,6 +1,7 @@
 import { HashRouter as Router, Route, Switch} from 'react-router-dom'
 import React from "react";
 import ScannedReports from './reports/ScannedReports';
+import ScannedReportsDuplicates from './reports/ScannedReportsDuplicates';
 
 
 const AppRouter = () => {
@@ -11,6 +12,7 @@ const AppRouter = () => {
                 <Switch>
                     <Route path="/" exact component={ScannedReports}/>
                     <Route path="/scanned-reports" component={ScannedReports}/>
+                    <Route path="/scanned-reports-duplicate" component={ScannedReportsDuplicates}/>
                     <Route path="*" component={ScannedReports} />
                      
                 </Switch>
