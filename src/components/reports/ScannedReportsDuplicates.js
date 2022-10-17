@@ -270,7 +270,7 @@ export default function EnhancedTable() {
   const [allRows, setAllRows] = React.useState([]); 
   
   const [rowsWait, setRowsWait] = React.useState(true); 
-  const [isFilterEnable, setIsFilterEnable] = React.useState(true); 
+  const [isFilterEnable, setIsFilterEnable] = React.useState(false); 
   const [globalSearchText, setGlobalSearchText] = React.useState(''); 
 
   React.useEffect(() => {
@@ -279,13 +279,26 @@ export default function EnhancedTable() {
       setRows(allRows);
     }else{
       let tempSearch = []; 
+
       
       allRows.forEach(element => {
-        if(lowercase(element.check_section).includes(lowercase(globalSearchText)) || 
+
+        // || 
+        // lowercase(element.check_description).includes(lowercase(globalSearchText)) ||
+        // lowercase(element.hostname).includes(lowercase(globalSearchText)) ||
+        // lowercase(element.ip).includes(lowercase(globalSearchText)) ||
+        // lowercase(element.violation).includes(lowercase(globalSearchText))
+
+        if(lowercase(element.check_section).includes(lowercase(globalSearchText))
+           || 
         lowercase(element.check_description).includes(lowercase(globalSearchText)) ||
         lowercase(element.hostname).includes(lowercase(globalSearchText)) ||
         lowercase(element.ip).includes(lowercase(globalSearchText)) ||
-        lowercase(element.violation).includes(lowercase(globalSearchText))){
+        lowercase(element.violation).includes(lowercase(globalSearchText))
+        ){
+
+          console.log("globalSearchText", globalSearchText, lowercase(element.check_section), element)
+
             tempSearch.push(element);
         }
 
@@ -316,6 +329,7 @@ export default function EnhancedTable() {
         // }else if(){
         // }
       });
+      console.log("tempSearch", tempSearch)
       setRows(tempSearch);
     }
 
@@ -339,37 +353,71 @@ export default function EnhancedTable() {
   }, []);
 
   const lowercase = (text) => {
-    let str = text ? text.toLowerCase() : ""; 
+    return text.toLowerCase(); 
+  };
+
+
+  const u = (text) => {
+    let str = typeof text  === 'string ' ? text.toLowerCase() : ""; 
     return str; 
   };
 
+const copyViolations =(violations, hostData) => {
+    let copyRows = [], temp = {}; 
+    for (let index = 0; index < violations.length; index++) {
+      const element = violations[index];
+      temp = { ...hostData};
+      temp.violation = element.message; 
+      copyRows.push(temp);
+    }
+    return copyRows; 
+  }
+
  const duplicateDeviationsData = (devData) => {
       let tempDevData = [];
-      devData.forEach(element => {
-          element.hosts.forEach(host => {
-            element.hostname = host.hostname;
-            element.check_status = host.check_status;
-            element.ip = host.ip;
-            element.scan_date = host.scan_date;
-            
-            if(host.violations.length > 0){
-              host.violations.forEach(violation => {
-                element.violation = violation.message;
-                element.measure_values = host.measure_values;
-                element.policy_parameters = host.policy_parameters;
-                tempDevData.push(element); 
-              })
-            }else{
-              element.violation = '';
-              tempDevData.push(element); 
-            }
-            
-          })
-      });
+
+
+      for (let index = 0; index < devData.length; index++) {
+        const element = devData[index];
+               
+
+        element?.hosts.forEach(host => {
+          let hostData = {
+            check_section: element.check_section,
+            check_description: element.check_description,
+            severity: element.severity,
+            hostname : host.hostname,
+            check_status : host.check_status,
+            ip : host.ip,
+            scan_date : host.scan_date,
+            violation : '', 
+            measure_values : host.measure_values,
+            policy_parameters : host.policy_parameters
+          }
+
+          if(host.check_status === 'OK'){
+            tempDevData.push(hostData);
+          }else if(host.check_status === 'KO'){
+            host.violations.forEach(violation => {
+              let seperateHostdata = {...hostData}; 
+              seperateHostdata.violation = violation.message;
+              tempDevData.push(seperateHostdata); 
+            })
+          }
+          
+        });
+
+
+        
+
+      }
+
+      console.log("tempDevData", tempDevData)
       setAllRows(tempDevData);
       setRows(tempDevData);
   };
 
+  
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -506,17 +554,24 @@ export default function EnhancedTable() {
                           }}
                         />
                       </TableCell>
-                      <TableCell
+                      {/* <TableCell
                         component="th"
                         id={labelId}
-                        scope="row"
+                        //scope="row"
                         padding="none"
+                        width={'40%'}
                         title={row.check_section} 
                       >
-                      {row.check_section.substring(0, 50)}
-                      </TableCell>
+                      {row.check_section}
+                      </TableCell> */}
+                      <TableCell align="left">
+                        <div style={{maxWidth: "100%", overflowX:'auto'}}>
+                        {row.check_section}
+                        </div>
+                       </TableCell>
+
                       <TableCell align="left">{row.severity}</TableCell>
-                      <TableCell width={"400px"} align="left">{row.check_description}</TableCell>
+                      <TableCell align="left">{row.check_description}</TableCell>
 
                       <TableCell align="left">{row.hostname}</TableCell>
                       <TableCell align="left">{row.check_status}</TableCell>
