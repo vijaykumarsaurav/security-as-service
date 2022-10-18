@@ -117,7 +117,9 @@ export default function PrimarySearchAppBar(props) {
       <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
       <MenuItem onClick={() => window.location.replace('#/scanned-reports-duplicate')}>Like Excel</MenuItem>
       <MenuItem onClick={() => window.location.replace('#/scanned-reports')}>Unique Report</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/scanned-reports-datagrid')}>Like Excel - Datagrid</MenuItem>
 
+      
     </Menu>
   );
 
