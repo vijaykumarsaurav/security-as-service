@@ -84,6 +84,16 @@ const headCells = [
        sortable: true,
     editable: true,
     headerName: 'Policy Parameters',
+    renderCell: (params) => {
+      const onClick = (e) => {
+        const currentRow = params.row;
+        return alert(JSON.stringify(currentRow, null, 4));
+      };
+      
+      return (
+        <button variant="outlined" color="error" size="small" onClick={onClick}>View Json</button>
+      );
+  },
   }  
 ];
 
