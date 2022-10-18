@@ -125,11 +125,11 @@ const duplicateDeviationsData = (devData, setRows) => {
       }
       else if(host.check_status === 'KO'){
         host.violations.forEach(violation => {
-          id++; 
           let seperateHostdata = {...hostData}; 
           seperateHostdata.id =  id;
           seperateHostdata.violation1 = violation.message;
           tempDevData.push(seperateHostdata); 
+          id++; 
         })
       }
       

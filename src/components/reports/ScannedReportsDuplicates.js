@@ -374,7 +374,7 @@ const copyViolations =(violations, hostData) => {
   }
 
  const duplicateDeviationsData = (devData) => {
-      let tempDevData = [];
+      let tempDevData = [], id=0;
 
 
       for (let index = 0; index < devData.length; index++) {
@@ -383,7 +383,7 @@ const copyViolations =(violations, hostData) => {
 
         element?.hosts.forEach(host => {
           let hostData = {
-            check_section: element.check_section,
+            check_section: element.check_section,            
             check_description: element.check_description,
             severity: element.severity,
             hostname : host.hostname,
@@ -392,16 +392,20 @@ const copyViolations =(violations, hostData) => {
             scan_date : host.scan_date,
             violation : '', 
             measure_values : host.measure_values,
-            policy_parameters : host.policy_parameters
+            policy_parameters : host.policy_parameters,
+            id: id    
           }
 
           if(host.check_status === 'OK'){
             tempDevData.push(hostData);
+            id++; 
           }else if(host.check_status === 'KO'){
             host.violations.forEach(violation => {
               let seperateHostdata = {...hostData}; 
               seperateHostdata.violation = violation.message;
+              seperateHostdata.id =  id;
               tempDevData.push(seperateHostdata); 
+              id++; 
             })
           }
           
@@ -554,20 +558,12 @@ const copyViolations =(violations, hostData) => {
                           }}
                         />
                       </TableCell>
-                      {/* <TableCell
-                        component="th"
-                        id={labelId}
-                        //scope="row"
-                        padding="none"
-                        width={'40%'}
-                        title={row.check_section} 
-                      >
-                      {row.check_section}
-                      </TableCell> */}
-                      <TableCell align="left">
-                        <div style={{maxWidth: "100%", overflowX:'auto'}}>
-                        {row.check_section}
-                        </div>
+                      <TableCell align="left" title={row.check_section}>
+                       <Button onClick={() => {
+                        navigator.clipboard.writeText(row.check_section);
+                       }}> 
+                        {row.check_section.split(';').join(' ')}  
+                        </Button>
                        </TableCell>
 
                       <TableCell align="left">{row.severity}</TableCell>

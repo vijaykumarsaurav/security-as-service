@@ -336,15 +336,15 @@ export default function EnhancedTable() {
                       key={row.check_section}
                       selected={isItemSelected}
                     >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                         onClick={(event) => handleClick(event, row.check_section)}
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                        />
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        onClick={(event) => handleClick(event, row.check_section)}
+                        color="primary"
+                        checked={isItemSelected}
+                        inputProps={{
+                          'aria-labelledby': labelId,
+                        }}
+                      />
                       </TableCell>
                       <TableCell
                         component="th"
@@ -353,7 +353,8 @@ export default function EnhancedTable() {
                         padding="none"
                         title={row.check_section} 
                       >
-                      {row.check_section.substring(0, 50)}
+                      {row.check_section}
+                      
                       </TableCell>
                       <TableCell align="left">{row.severity}</TableCell>
                       <TableCell align="left">{row.check_description}</TableCell>
