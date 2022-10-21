@@ -115,9 +115,10 @@ export default function PrimarySearchAppBar(props) {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
-      <MenuItem onClick={() => window.location.replace('#/scanned-reports-duplicate')}>Like Excel</MenuItem>
-      <MenuItem onClick={() => window.location.replace('#/scanned-reports')}>Unique Report</MenuItem>
-      <MenuItem onClick={() => window.location.replace('#/scanned-reports-datagrid')}>Like Excel - Datagrid</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/scanned-reports-datagrid')}>Deviations Reports (Finalized)</MenuItem>
+
+      <MenuItem onClick={() => window.location.replace('#/scanned-reports-duplicate')}>Reports - Will Delete</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/scanned-reports')}>Unique Report - Will Delete</MenuItem>
 
       
     </Menu>
@@ -191,7 +192,7 @@ export default function PrimarySearchAppBar(props) {
               title="Scanned Reports"
              >
 
-            <Badge onClick={() => window.location.replace('#/scanned-reports')} badgeContent={props.totalItem || cartList.length} color="error">
+            <Badge onClick={() => window.location.replace('#/scanned-reports-datagrid')} badgeContent={props.totalItem || cartList.length} color="error">
               <AssignmentIcon/>
             </Badge>
           

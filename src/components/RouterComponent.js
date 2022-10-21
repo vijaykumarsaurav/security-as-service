@@ -11,12 +11,12 @@ const AppRouter = () => {
         <React.Fragment>
             <Router>
                 <Switch>
-                    <Route path="/" exact component={ScannedReports}/>
+                    <Route path="/" exact component={ScannedReportsDataGrid}/>
                     <Route path="/scanned-reports" component={ScannedReports}/>
                     <Route path="/scanned-reports-duplicate" component={ScannedReportsDuplicates}/>
                     <Route path="/scanned-reports-datagrid" component={ScannedReportsDataGrid}/>
 
-                    <Route path="*" component={ScannedReports} />
+                    <Route path="*" component={ScannedReportsDataGrid} />
                      
                 </Switch>
             </Router>
