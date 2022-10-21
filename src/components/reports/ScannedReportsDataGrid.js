@@ -179,11 +179,14 @@ export default function DataGridDemo() {
       <DataGrid
         rows={rows}
         columns={headCells}
-        pageSize={20}
-        rowsPerPageOptions={[5, 10, 20, 50]}
+        //pageSize={20}
+       // rowsPerPageOptions={[5, 10, 20, 50]}
         checkboxSelection
+        autoPageSize
         disableSelectionOnClick
         experimentalFeatures={{ newEditingApi: true }}
+        density="compact"
+       // editMode="row"
       />
     </Box>
   );
