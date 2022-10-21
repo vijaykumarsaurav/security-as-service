@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
+import ItemsDialog from './ItemsDialog';
 
 const headCells = [
   {
@@ -77,6 +78,10 @@ const headCells = [
        sortable: true,
     editable: true,
     headerName: 'Measure Values',
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <ItemsDialog items={currentRow?.measure_values} title="Values"/>
+    }
   }, 
   {
     field: 'policy_parameters',
@@ -84,16 +89,20 @@ const headCells = [
        sortable: true,
     editable: true,
     headerName: 'Policy Parameters',
-    renderCell: (params) => {
-      const onClick = (e) => {
-        const currentRow = params.row;
-        return alert(JSON.stringify(currentRow, null, 4));
-      };
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <ItemsDialog items={currentRow?.policy_parameters} title="Values"/>
+    }
+  //   renderCell: (params) => {
+  //     const onClick = (e) => {
+  //       const currentRow = params.row;
+  //       return alert(JSON.stringify(currentRow, null, 4));
+  //     };
       
-      return (
-        <button variant="outlined" color="error" size="small" onClick={onClick}>View Json</button>
-      );
-  },
+  //     return (
+  //       <button variant="outlined" color="error" size="small" onClick={onClick}>View Json</button>
+  //     );
+  // },
   }  
 ];
 

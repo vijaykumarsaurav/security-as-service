@@ -84,6 +84,8 @@ export default function CustomizedDialogs({ items, title }) {
                         );
                     })}
                     </Paper>
+
+                    {items?.length == 0? " No data found " : ""}
                 </DialogContent>
                 <DialogActions>
                     <Button autoFocus onClick={handleClose}>
