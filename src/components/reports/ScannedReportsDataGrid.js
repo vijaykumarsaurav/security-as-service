@@ -1,6 +1,8 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid,
+  GridToolbarContainer,
+  GridToolbarDensitySelector, } from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
 import ItemsDialog from './ItemsDialog';
@@ -106,6 +108,14 @@ const headCells = [
   }  
 ];
 
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer>
+      <GridToolbarDensitySelector />
+    </GridToolbarContainer>
+  );
+}
+
 
 const duplicateDeviationsData = (devData, setRows) => {
   let tempDevData = [];
@@ -170,7 +180,6 @@ export default function DataGridDemo() {
   }, []);
   
 
-  
   return (
 
     <Box sx={{ height: 500, width: '100%' }}>
@@ -186,6 +195,9 @@ export default function DataGridDemo() {
         disableSelectionOnClick
         experimentalFeatures={{ newEditingApi: true }}
         density="compact"
+        components={{
+          Toolbar: CustomToolbar,
+        }}
        // editMode="row"
       />
     </Box>
