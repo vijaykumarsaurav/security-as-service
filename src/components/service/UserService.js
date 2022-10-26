@@ -13,6 +13,16 @@ class UserService {
         return axios.get(apiConstant.GET_POLICIES, '');
     }
 
+    async getHCCycles() {
+        return axios.get(apiConstant.GET_HC_CYCLES, '');
+    }
+    
+    async getScannedDates() {
+        return axios.get(apiConstant.GET_SCANNED_DATES, '');
+    }
+
+    
+
 } 
 
 export default new UserService();

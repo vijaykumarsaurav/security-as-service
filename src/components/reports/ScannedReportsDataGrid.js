@@ -6,6 +6,10 @@ import { DataGrid,
 import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
 import ItemsDialog from './ItemsDialog';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 const headCells = [
   {
@@ -108,9 +112,101 @@ const headCells = [
   }  
 ];
 
+
+
+function HCcyclesSelect() {
+  const [age, setAge] = React.useState('');
+  const [rows, setRows] = React.useState([]); 
+
+  React.useEffect(()=> {
+    UserService.getHCCycles().then((results) => {
+      if(results.status === 200){ 
+        // console.log("results", results.data);
+        setRows(results);
+      }
+    }).catch((error)=> {
+      console.log("error", error)
+     // setRowsWait(false);
+      alert("Error" + error);
+
+    });
+
+  }, []);
+
+  const handleChange = (event) => {
+    setAge(event.target.value);
+  };
+
+  return (
+    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+      <InputLabel id="demo-select-small">HC cycles</InputLabel>
+      <Select
+        labelId="demo-select-small"
+        id="demo-select-small"
+        value={age}
+        title="Health Check cycles"
+        label="HC cycles"
+        onChange={handleChange}
+      >
+         {/* {rows.length ? rows?.map((item, i) => {
+              return (
+                  <MenuItem value={item.name}>{item.name}</MenuItem>
+              );
+          }) : ""} */}
+
+        <MenuItem value={'New HCS'}>New HCS</MenuItem>
+        <MenuItem value={'New HCS 2'}>New HCS 2</MenuItem>
+      </Select>
+    </FormControl>
+  );
+}
+
+function ScanDateSelect() {
+  const [age, setAge] = React.useState('');
+  const [rows, setRows] = React.useState([]); 
+
+  React.useEffect(()=> {
+    UserService.getScannedDates().then((results) => {
+      if(results.status === 200){ 
+        // console.log("results", results.data);
+        setRows(results);
+      }
+    }).catch((error)=> {
+      console.log("error", error)
+     // setRowsWait(false);
+      alert("Error" + error);
+
+    });
+
+  }, []);
+  const handleChange = (event) => {
+    setAge(event.target.value);
+  };
+
+  return (
+    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+      <InputLabel id="demo-select-small">Scan Date</InputLabel>
+      <Select
+        labelId="demo-select-small"
+        id="demo-select-small"
+        value={age}
+        title="Health Check cycles"
+        label="Scan Date"
+        onChange={handleChange}
+      >
+        <MenuItem value={'20220101(#2)'}>20220101(#2)</MenuItem>
+        <MenuItem value={'20220102(#1)'}>20220102(#1)</MenuItem>
+      </Select>
+    </FormControl>
+  );
+}
+
+
 function CustomToolbar() {
   return (
     <GridToolbarContainer>
+            <HCcyclesSelect />
+            <ScanDateSelect />
       <GridToolbarDensitySelector />
     </GridToolbarContainer>
   );
@@ -198,6 +294,7 @@ export default function DataGridDemo() {
         components={{
           Toolbar: CustomToolbar,
         }}
+        
        // editMode="row"
       />
     </Box>
