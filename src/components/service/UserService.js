@@ -5,8 +5,8 @@ import  * as apiConstant from "../utils/config";
 
 class UserService {
   
-    async getDeviations() {
-        return axios.get(apiConstant.GET_DEVIATIONS, '');
+    async getDeviations(hccycleName, policyName) {
+        return axios.get(apiConstant.GET_DEVIATIONS+ policyName +"?hc_cycle="+hccycleName, '');
     }
 
     async getPolicies() {
@@ -19,6 +19,10 @@ class UserService {
     
     async getScannedDates() {
         return axios.get(apiConstant.GET_SCANNED_DATES, '');
+    }
+
+    async createHCCycle(param) {
+        return axios.post(apiConstant.CREATE_HC_CYCLE, param);
     }
 
     

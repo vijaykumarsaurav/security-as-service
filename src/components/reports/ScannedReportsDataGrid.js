@@ -1,15 +1,23 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid,
+import {
+  DataGrid,
   GridToolbarContainer,
-  GridToolbarDensitySelector, } from '@mui/x-data-grid';
+  GridToolbarDensitySelector,
+} from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
 import ItemsDialog from './ItemsDialog';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import { Select, Button } from '@mui/material';
+import MergetoHCcycles from './MergetoHCcycles';
+import Notify from '../utils/Notify';
+import HCcyclesSelect from './HCcyclesSelect';
+import ScanDateSelect from './ScanDateSelect';
+import PolicySelect from './PolicySelect';
+
 
 const headCells = [
   {
@@ -40,7 +48,7 @@ const headCells = [
     field: 'hostname',
     numeric: true,
     width: 150,
-       sortable: true,
+    sortable: true,
     editable: true,
     headerName: 'Hostname',
   },
@@ -49,7 +57,7 @@ const headCells = [
     field: 'check_status',
     numeric: true,
     width: 150,
-       sortable: true,
+    sortable: true,
     editable: true,
     headerName: 'Check status',
   },
@@ -57,14 +65,14 @@ const headCells = [
     field: 'ip',
     numeric: true,
     width: 150,
-       sortable: true,
+    sortable: true,
     editable: true,
     headerName: 'IP address',
   },
   {
     field: 'scan_date',
     width: 150,
-       sortable: true,
+    sortable: true,
     editable: true,
     headerName: 'Scan Date',
   },
@@ -76,146 +84,48 @@ const headCells = [
     editable: true,
     headerName: 'Violation',
     valueGetter: (params) =>
-    `${params.row.violation1 || ''}`,
+      `${params.row.violation1 || ''}`,
   },
   {
     field: 'measure_values',
     width: 150,
-       sortable: true,
+    sortable: true,
     editable: true,
     headerName: 'Measure Values',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <ItemsDialog items={currentRow?.measure_values} title="Values"/>
+      return <ItemsDialog items={currentRow?.measure_values} title="Values" />
     }
-  }, 
+  },
   {
     field: 'policy_parameters',
     width: 150,
-       sortable: true,
+    sortable: true,
     editable: true,
     headerName: 'Policy Parameters',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <ItemsDialog items={currentRow?.policy_parameters} title="Values"/>
+      return <ItemsDialog items={currentRow?.policy_parameters} title="Values" />
     }
-  //   renderCell: (params) => {
-  //     const onClick = (e) => {
-  //       const currentRow = params.row;
-  //       return alert(JSON.stringify(currentRow, null, 4));
-  //     };
-      
-  //     return (
-  //       <button variant="outlined" color="error" size="small" onClick={onClick}>View Json</button>
-  //     );
-  // },
-  }  
+    //   renderCell: (params) => {
+    //     const onClick = (e) => {
+    //       const currentRow = params.row;
+    //       return alert(JSON.stringify(currentRow, null, 4));
+    //     };
+
+    //     return (
+    //       <button variant="outlined" color="error" size="small" onClick={onClick}>View Json</button>
+    //     );
+    // },
+  }
 ];
-
-
-
-function HCcyclesSelect() {
-  const [age, setAge] = React.useState('');
-  const [rows, setRows] = React.useState([]); 
-
-  React.useEffect(()=> {
-    UserService.getHCCycles().then((results) => {
-      if(results.status === 200){ 
-        // console.log("results", results.data);
-        setRows(results);
-      }
-    }).catch((error)=> {
-      console.log("error", error)
-     // setRowsWait(false);
-      alert("Error" + error);
-
-    });
-
-  }, []);
-
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
-
-  return (
-    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-      <InputLabel id="demo-select-small">HC cycles</InputLabel>
-      <Select
-        labelId="demo-select-small"
-        id="demo-select-small"
-        value={age}
-        title="Health Check cycles"
-        label="HC cycles"
-        onChange={handleChange}
-      >
-         {/* {rows.length ? rows?.map((item, i) => {
-              return (
-                  <MenuItem value={item.name}>{item.name}</MenuItem>
-              );
-          }) : ""} */}
-
-        <MenuItem value={'New HCS'}>New HCS</MenuItem>
-        <MenuItem value={'New HCS 2'}>New HCS 2</MenuItem>
-      </Select>
-    </FormControl>
-  );
-}
-
-function ScanDateSelect() {
-  const [age, setAge] = React.useState('');
-  const [rows, setRows] = React.useState([]); 
-
-  React.useEffect(()=> {
-    UserService.getScannedDates().then((results) => {
-      if(results.status === 200){ 
-        // console.log("results", results.data);
-        setRows(results);
-      }
-    }).catch((error)=> {
-      console.log("error", error)
-     // setRowsWait(false);
-      alert("Error" + error);
-
-    });
-
-  }, []);
-  const handleChange = (event) => {
-    setAge(event.target.value);
-  };
-
-  return (
-    <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-      <InputLabel id="demo-select-small">Scan Date</InputLabel>
-      <Select
-        labelId="demo-select-small"
-        id="demo-select-small"
-        value={age}
-        title="Health Check cycles"
-        label="Scan Date"
-        onChange={handleChange}
-      >
-        <MenuItem value={'20220101(#2)'}>20220101(#2)</MenuItem>
-        <MenuItem value={'20220102(#1)'}>20220102(#1)</MenuItem>
-      </Select>
-    </FormControl>
-  );
-}
-
-
-function CustomToolbar() {
-  return (
-    <GridToolbarContainer>
-            <HCcyclesSelect />
-            <ScanDateSelect />
-      <GridToolbarDensitySelector />
-    </GridToolbarContainer>
-  );
-}
 
 
 const duplicateDeviationsData = (devData, setRows) => {
   let tempDevData = [];
-  let id =0;       
+  let id = 0;
+  console.log("tempDevData", devData)
+
 
   for (let index = 0; index < devData.length; index++) {
     const element = devData[index];
@@ -224,68 +134,133 @@ const duplicateDeviationsData = (devData, setRows) => {
         check_section: element.check_section,
         check_description: element.check_description,
         severity: element.severity,
-        hostname : host.hostname,
-        check_status : host.check_status,
-        ip : host.ip,
-        scan_date : host.scan_date,
-        violation1 : host.measure_values,
-        measure_values : host.measure_values,
-        policy_parameters : host.policy_parameters,
-        id: id    
+        hostname: host.hostname,
+        check_status: host.check_status,
+        ip: host.ip,
+        scan_date: host.scan_date,
+        violation1: host.measure_values,
+        measure_values: host.measure_values,
+        policy_parameters: host.policy_parameters,
+        id: id
       }
 
-      if(host.check_status === 'OK'){
+      if (host.check_status === 'OK') {
         tempDevData.push(hostData);
-        id++; 
+        id++;
       }
-      else if(host.check_status === 'KO'){
+      else if (host.check_status === 'KO') {
         host.violations.forEach(violation => {
-          let seperateHostdata = {...hostData}; 
-          seperateHostdata.id =  id;
+          let seperateHostdata = { ...hostData };
+          seperateHostdata.id = id;
           seperateHostdata.violation1 = violation.message;
-          tempDevData.push(seperateHostdata); 
-          id++; 
+          tempDevData.push(seperateHostdata);
+          id++;
         })
       }
-      
-    });  
+
+    });
 
   }
 
-  console.log("tempDevData", tempDevData)
   setRows(tempDevData);
 };
 
 
-export default function DataGridDemo() {
-  const [rows, setRows] = React.useState([]); 
-
-  React.useEffect(()=> {
-    UserService.getDeviations().then((results) => {
-      if(results.status === 200){ 
-        // console.log("results", results.data);
-        duplicateDeviationsData(results.data, setRows);
-      }
-    }).catch((error)=> {
-      console.log("error", error)
-     // setRowsWait(false);
-      alert("Error" + error);
-
-    });
-
-  }, []);
+export default function ScannedReportsDataGrid() {
+  const [rows, setRows] = React.useState([]);
+  const [hccycleName, setHccycleName] = React.useState('');
+  const [policies, setPolicies] = React.useState([]);
+  const [policyName, setPolicyName] = React.useState('');
+  const [hcrows, setHcrows] = React.useState([]);
+  const [scansRows, setScansRows] = React.useState([]);
   
+    React.useEffect(() => {
+      UserService.getScannedDates().then((results) => {
+        if (results.status === 200) {
+          // console.log("results", results.data);
+          setScansRows(results);
+        }
+      }).catch((error) => {
+        console.log("error", error)
+        // setRowsWait(false);
+        alert("Error" + error);
+  
+      });
+  
+    }, []);
+
+  React.useEffect(() => {
+    UserService.getHCCycles().then((results) => {
+      if (results.status === 200) {
+        setHcrows(results.data);
+
+        let allPolicies = [];
+      //  let hcCycle = results.data.filter((item) => item.name === healthCheckName);
+          results.data?.forEach(scan => {
+          scan?.scans.forEach(scan => {
+            scan?.policies.forEach(element => {
+              allPolicies.push(element.name);
+            });
+          })
+        })
+        setPolicies(allPolicies)
+      }
+    }).catch((error) => {
+      console.log("error", error)
+      alert("Error" + error);
+    });
+  }, []);
+
+  React.useEffect(() => {
+      console.log("hccycleName", hccycleName);
+      console.log("policyName", policyName);
+      
+    if(hccycleName && policyName){
+      UserService.getDeviations(hccycleName, policyName).then((results) => {
+        if (results.status === 200) {
+          // console.log("results", results.data);
+          duplicateDeviationsData(results.data, setRows);
+        }
+      }).catch((error) => {
+        console.log("error", error)
+        // setRowsWait(false);
+       // alert("Error" + error);
+        Notify.showError('Error' + error)
+  
+      });
+    }
+
+  }, [hccycleName, policyName]);
+
+
+
+  function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarDensitySelector />
+        <HCcyclesSelect hcrows={hcrows} setHccycleName={setHccycleName}/>
+        <ScanDateSelect scansRows={scansRows} />
+
+        <PolicySelect policies={policies} setPolicyName={setPolicyName} />
+
+        <div style={{ marginLeft: '40%' }}>
+          <MergetoHCcycles />
+        </div>
+
+      </GridToolbarContainer>
+    );
+  }
 
   return (
 
     <Box sx={{ height: 500, width: '100%' }}>
-          <HeaderNavbar />
+      <HeaderNavbar />
 
       <DataGrid
         rows={rows}
         columns={headCells}
         //pageSize={20}
-       // rowsPerPageOptions={[5, 10, 20, 50]}
+        // rowsPerPageOptions={[5, 10, 20, 50]}
         checkboxSelection
         autoPageSize
         disableSelectionOnClick
@@ -294,8 +269,8 @@ export default function DataGridDemo() {
         components={{
           Toolbar: CustomToolbar,
         }}
-        
-       // editMode="row"
+
+      // editMode="row"
       />
     </Box>
   );
