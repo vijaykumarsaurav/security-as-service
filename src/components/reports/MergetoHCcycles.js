@@ -55,9 +55,7 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs(props) {
-
-    console.log(props)
+export default function CustomizedDialogs({setReloadHCcycle}) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState('');
@@ -112,16 +110,19 @@ export default function CustomizedDialogs(props) {
         setOpen(false);
     };
     const handleSubmit = () => {
-        alert(name + desc+ checkedScans.join())
         let param = {
             "name": name,
             "description": desc,
             "scans": checkedScans
         }
+        
         UserService.createHCCycle(param).then((results) => {
+            setReloadHCcycle(true);
+            alert('HC Cycle successfully created');
             if (results.status === 200) {
               // console.log("results", results.data);
               Notify.showSuccess("HC Cycle successfully created"); 
+             
               setOpen(false);
             }
           }).catch((error) => {

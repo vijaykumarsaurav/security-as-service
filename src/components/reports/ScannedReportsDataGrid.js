@@ -174,22 +174,10 @@ export default function ScannedReportsDataGrid() {
   const [policies, setPolicies] = React.useState([]);
   const [policyName, setPolicyName] = React.useState('');
   const [hcrows, setHcrows] = React.useState([]);
-  const [scansRows, setScansRows] = React.useState([
-    {
-        "id": 3,
-        "date": "2022-06-05T07:57:15.000+00:00",
-        "jobId": 13431,
-        "policies": [
-            {
-                "id": 1,
-                "name": "Windows-2019-ITSSCSD-2.9"
-            }
-        ]
-    }
-] );
+  const [scansRows, setScansRows] = React.useState([]);
   const [scanDate, setScanDate] = React.useState('');
-
   const [loader, setLoader] = React.useState(false);
+  const [reloadHCcycle, setReloadHCcycle] = React.useState(false);
 
   React.useEffect(() => {
     UserService.getHCCycles().then((results) => {
@@ -200,7 +188,7 @@ export default function ScannedReportsDataGrid() {
       console.log("error", error)
       alert("Error" + error);
     });
-  }, []);
+  }, [reloadHCcycle]);
 
   React.useEffect(() => {
     UserService.getScannedDates().then((results) => {
@@ -281,7 +269,7 @@ React.useEffect(() => {
     return (
       <GridToolbarContainer>
         <GridToolbarDensitySelector />
-        <MergetoHCcycles />
+        <MergetoHCcycles setReloadHCcycle={setReloadHCcycle} />
         &nbsp;&nbsp;
         
         <HCcyclesSelect hcrows={hcrows} hccycleName={hccycleName} setHccycleName={setHccycleName} setScanDate={setScanDate}/>
