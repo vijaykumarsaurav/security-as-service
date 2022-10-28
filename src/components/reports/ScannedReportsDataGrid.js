@@ -230,6 +230,9 @@ React.useEffect(() => {
         return self.indexOf(value) === index;
       });
       setPolicies(allPolicies)
+      if(allPolicies?.length === 1){
+        setPolicyName(allPolicies[0])
+      }
   }
 }, [hccycleName]);
 
@@ -247,6 +250,9 @@ React.useEffect(() => {
         return self.indexOf(value) === index;
       });
       setPolicies(allPolicies)
+      if(allPolicies?.length === 1){
+        setPolicyName(allPolicies[0])
+      }
   }
 }, [scanDate]);
 
