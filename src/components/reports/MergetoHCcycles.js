@@ -191,7 +191,7 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
                             <div>
                                 
                              <FormGroup>
-                                <FormControlLabel control={<Checkbox value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (Job #${scan.id})`  }  />
+                                <FormControlLabel control={<Checkbox value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (Job #${scan.jobId})`  }  />
                             </FormGroup>
                             </div>
                         );

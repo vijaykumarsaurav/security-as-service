@@ -193,14 +193,14 @@ export default function ScannedReportsDataGrid() {
   React.useEffect(() => {
     UserService.getScannedDates().then((results) => {
       if (results.status === 200) {
-        setScansRows(results);
+        setScansRows(results.data);
       }
     }).catch((error) => {
       console.log("error", error)
       alert("Error" + error);
     });
 
-  }, []);
+  }, [reloadHCcycle]);
   
 React.useEffect(() => {
   console.log("hccycleName", hccycleName);
@@ -273,7 +273,7 @@ React.useEffect(() => {
         &nbsp;&nbsp;
         
         <HCcyclesSelect hcrows={hcrows} hccycleName={hccycleName} setHccycleName={setHccycleName} setScanDate={setScanDate}/>
-        OR 
+        
         <ScanDateSelect scansRows={scansRows} scanDate={scanDate} setScanDate={setScanDate}  setHccycleName={setHccycleName}/>
 
         <PolicySelect policies={policies} policyName={policyName} setPolicyName={setPolicyName} />
