@@ -121,7 +121,7 @@ const headCells = [
 ];
 
 
-const duplicateDeviationsData = (devData, setRows) => {
+const duplicateDeviationsData = (devData, setRows,  setLoader) => {
   let tempDevData = [];
   let id = 0;
   console.log("tempDevData", devData)
@@ -163,7 +163,9 @@ const duplicateDeviationsData = (devData, setRows) => {
   }
 
   setRows(tempDevData);
+  setLoader(false);
 };
+
 
 
 export default function ScannedReportsDataGrid() {
@@ -172,38 +174,27 @@ export default function ScannedReportsDataGrid() {
   const [policies, setPolicies] = React.useState([]);
   const [policyName, setPolicyName] = React.useState('');
   const [hcrows, setHcrows] = React.useState([]);
-  const [scansRows, setScansRows] = React.useState([]);
-  
-    React.useEffect(() => {
-      UserService.getScannedDates().then((results) => {
-        if (results.status === 200) {
-          // console.log("results", results.data);
-          setScansRows(results);
-        }
-      }).catch((error) => {
-        console.log("error", error)
-        // setRowsWait(false);
-        alert("Error" + error);
-  
-      });
-  
-    }, []);
+  const [scansRows, setScansRows] = React.useState([
+    {
+        "id": 3,
+        "date": "2022-06-05T07:57:15.000+00:00",
+        "jobId": 13431,
+        "policies": [
+            {
+                "id": 1,
+                "name": "Windows-2019-ITSSCSD-2.9"
+            }
+        ]
+    }
+] );
+  const [scanDate, setScanDate] = React.useState('');
+
+  const [loader, setLoader] = React.useState(false);
 
   React.useEffect(() => {
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
         setHcrows(results.data);
-
-        let allPolicies = [];
-      //  let hcCycle = results.data.filter((item) => item.name === healthCheckName);
-          results.data?.forEach(scan => {
-          scan?.scans.forEach(scan => {
-            scan?.policies.forEach(element => {
-              allPolicies.push(element.name);
-            });
-          })
-        })
-        setPolicies(allPolicies)
       }
     }).catch((error) => {
       console.log("error", error)
@@ -212,25 +203,71 @@ export default function ScannedReportsDataGrid() {
   }, []);
 
   React.useEffect(() => {
+    UserService.getScannedDates().then((results) => {
+      if (results.status === 200) {
+        setScansRows(results);
+      }
+    }).catch((error) => {
+      console.log("error", error)
+      alert("Error" + error);
+    });
+
+  }, []);
+  
+React.useEffect(() => {
+  console.log("hccycleName", hccycleName);
+  if(hccycleName){
+    let allPolicies = [];
+      let hcCycle = hcrows.filter((item) => item.name === hccycleName);
+        hcCycle.forEach(scan => {
+        scan?.scans.forEach(scan => {
+          scan?.policies.forEach(element => {
+            allPolicies.push(element.name);
+          });
+        })
+      })
+      allPolicies =  allPolicies.filter((value, index, self) => {
+        return self.indexOf(value) === index;
+      });
+      setPolicies(allPolicies)
+  }
+}, [hccycleName]);
+
+React.useEffect(() => {
+  console.log("scanDate", scanDate);
+  if(scanDate){
+    let allPolicies = [];
+    let scansRow = scansRows.filter((item) => item.jobId === scanDate);
+      scansRow.forEach(scan => {
+        scan?.policies.forEach(element => {
+            allPolicies.push(element.name);
+          });
+      })
+      allPolicies =  allPolicies.filter((value, index, self) => {
+        return self.indexOf(value) === index;
+      });
+      setPolicies(allPolicies)
+  }
+}, [scanDate]);
+
+  React.useEffect(() => {
       console.log("hccycleName", hccycleName);
       console.log("policyName", policyName);
-      
-    if(hccycleName && policyName){
-      UserService.getDeviations(hccycleName, policyName).then((results) => {
+
+    if((hccycleName || scanDate) && policyName){
+      setLoader(true);
+      UserService.getDeviations(hccycleName, scanDate, policyName).then((results) => {
         if (results.status === 200) {
-          // console.log("results", results.data);
-          duplicateDeviationsData(results.data, setRows);
+          duplicateDeviationsData(results.data, setRows,  setLoader);
         }
       }).catch((error) => {
         console.log("error", error)
-        // setRowsWait(false);
        // alert("Error" + error);
         Notify.showError('Error' + error)
   
       });
     }
-
-  }, [hccycleName, policyName]);
+  }, [hccycleName, scanDate, policyName]);
 
 
 
@@ -238,14 +275,19 @@ export default function ScannedReportsDataGrid() {
     return (
       <GridToolbarContainer>
         <GridToolbarDensitySelector />
-        <HCcyclesSelect hcrows={hcrows} setHccycleName={setHccycleName}/>
-        <ScanDateSelect scansRows={scansRows} />
+        <MergetoHCcycles />
+        &nbsp;&nbsp;
+        
+        <HCcyclesSelect hcrows={hcrows} hccycleName={hccycleName} setHccycleName={setHccycleName} setScanDate={setScanDate}/>
+        OR 
+        <ScanDateSelect scansRows={scansRows} scanDate={scanDate} setScanDate={setScanDate}  setHccycleName={setHccycleName}/>
 
-        <PolicySelect policies={policies} setPolicyName={setPolicyName} />
+        <PolicySelect policies={policies} policyName={policyName} setPolicyName={setPolicyName} />
 
-        <div style={{ marginLeft: '40%' }}>
+       
+        {/* <div style={{ marginLeft: '30%' }}>
           <MergetoHCcycles />
-        </div>
+        </div> */}
 
       </GridToolbarContainer>
     );
@@ -263,6 +305,7 @@ export default function ScannedReportsDataGrid() {
         // rowsPerPageOptions={[5, 10, 20, 50]}
         checkboxSelection
         autoPageSize
+        loading={loader}
         disableSelectionOnClick
         experimentalFeatures={{ newEditingApi: true }}
         density="compact"

@@ -5,8 +5,12 @@ import  * as apiConstant from "../utils/config";
 
 class UserService {
   
-    async getDeviations(hccycleName, policyName) {
-        return axios.get(apiConstant.GET_DEVIATIONS+ policyName +"?hc_cycle="+hccycleName, '');
+    async getDeviations(hccycleName, scanDate, policyName) {
+        if(hccycleName && policyName){
+            return axios.get(apiConstant.GET_DEVIATIONS+ policyName +"?hc_cycle="+hccycleName, '');
+        }else if(scanDate && policyName){
+            return axios.get(apiConstant.GET_DEVIATIONS+ policyName +"?job_id="+scanDate, '');
+        }
     }
 
     async getPolicies() {

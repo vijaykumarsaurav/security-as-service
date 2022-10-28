@@ -148,7 +148,7 @@ export default function CustomizedDialogs(props) {
 
     return (
         <div>
-            <Button size='small' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
+            <Button size='mediam' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
                Create new HC cycle
             </Button>
             <BootstrapDialog
@@ -190,7 +190,7 @@ export default function CustomizedDialogs(props) {
                             <div>
                                 
                              <FormGroup>
-                                <FormControlLabel control={<Checkbox value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (job #${scan.id})`  }  />
+                                <FormControlLabel control={<Checkbox value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (Job #${scan.id})`  }  />
                             </FormGroup>
                             </div>
                         );

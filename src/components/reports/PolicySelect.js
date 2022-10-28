@@ -5,8 +5,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import { Select } from '@mui/material';
 
-export default function PolicySelect({ policies, setPolicyName }) {
-    const [policy, setPolicy] = React.useState('');
+export default function PolicySelect({ policies,policyName, setPolicyName }) {
+    const [policy, setPolicy] = React.useState(policyName || '');
     //const [policies, setPolicies] = React.useState(localStorage.getItem("policies") && JSON.parse(localStorage.getItem("policies")));
   
     // React.useEffect(() => {

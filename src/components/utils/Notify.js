@@ -7,11 +7,11 @@ class Notify {
     }
 
     showSuccess(msg) {
-        console.log(msg); 
+        console.log("showSuccess", msg); 
         toast.success(msg , this.options());
     }
 
-    showWarning(msg) {
+showWarning(msg) {
         toast.warn(msg , this.options());
     }
 

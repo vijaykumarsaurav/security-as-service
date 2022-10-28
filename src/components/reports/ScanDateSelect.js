@@ -5,11 +5,13 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import { Select } from '@mui/material';
 
-export default function ScanDateSelect({scansRows}) {
-    const [age, setAge] = React.useState('');  
+export default function ScanDateSelect({scansRows,  scanDate, setScanDate, setHccycleName}) {
+    const [age, setAge] = React.useState(scanDate || '');  
    
     const handleChange = (event) => {
       setAge(event.target.value);
+      setScanDate(event.target.value)
+      setHccycleName('')
     };
   
     return (
@@ -25,7 +27,7 @@ export default function ScanDateSelect({scansRows}) {
         >
             {scansRows?.length ? scansRows?.map((item, i) => {
             return (
-              <MenuItem value={item.jobId}>{item.date}</MenuItem>
+              <MenuItem value={item.jobId}>{`${new Date(item.date).toLocaleString()} (Job #${item.jobId})`  } </MenuItem>
             );
           }) : ""}
           {/* <MenuItem value={'20220101(#2)'}>20220101(#2)</MenuItem>
