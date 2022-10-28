@@ -110,6 +110,16 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
         setOpen(false);
     };
     const handleSubmit = () => {
+
+        if(!name){
+            alert("Name can't be empty!"); 
+            return; 
+        }
+        if(checkedScans?.length === 0){
+            alert("Select the scans!"); 
+            return; 
+        }
+        
         let param = {
             "name": name,
             "description": desc,
@@ -170,6 +180,7 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
                     id="outlined-name"
                     label="Name"
                     value={name}
+                    required
                     fullWidth
                     onChange={(e) => setName(e.target.value)}
                     />
@@ -185,7 +196,7 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
                     rows={2}
                     />
                     <br />
-                    Scan Dates: 
+                    Scan Dates*: 
                     {scans?.map((scan) => {
                         return (
                             <div>
