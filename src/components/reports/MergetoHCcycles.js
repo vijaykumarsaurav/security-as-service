@@ -62,30 +62,7 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
     const [desc, setDesc] = React.useState('');
     const [checkedScans, setCheckedScans] = React.useState([]);
 
-    const [scans, setScans] = React.useState([
-        {
-            "id": 1,
-            "date": "2022-06-05T07:57:15.000+00:00",
-            "jobId": 1,
-            "policies": [
-                {
-                    "id": 1,
-                    "name": "Windows-2019-ITSSCSD-2.9"
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "date": "2022-06-06T07:57:15.000+00:00",
-            "jobId": 1,
-            "policies": [
-                {
-                    "id": 1,
-                    "name": "Windows-2019-ITSSCSD-2.9"
-                }
-            ]
-        }
-    ] );
+    const [scans, setScans] = React.useState([]);
 
   
     const handleClickOpen = () => {
