@@ -115,6 +115,8 @@ export default function PrimarySearchAppBar(props) {
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/dashboard')}>Dashboard</MenuItem>
+
       <MenuItem onClick={() => window.location.replace('#/scanned-reports-datagrid')}>Deviations Reports (Finalized)</MenuItem>
 
       <MenuItem onClick={() => window.location.replace('#/scanned-reports-duplicate')}>Reports - Will Delete</MenuItem>

@@ -186,7 +186,7 @@ export default function ScannedReportsDataGrid() {
       }
     }).catch((error) => {
       console.log("error", error)
-      alert("Error" + error);
+      alert("Fail to connect get HC API " + error);
     });
   }, [reloadHCcycle]);
 
@@ -198,6 +198,8 @@ export default function ScannedReportsDataGrid() {
     }).catch((error) => {
       console.log("error", error)
       alert("Error" + error);
+      alert("Fail to connect get Scan Dates API " + error);
+
     });
 
   }, [reloadHCcycle]);

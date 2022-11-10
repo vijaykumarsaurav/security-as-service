@@ -136,7 +136,7 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
 
     return (
         <div>
-            <Button size='mediam' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
+            <Button size='size' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
                Create new HC cycle
             </Button>
             <BootstrapDialog
@@ -173,7 +173,7 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
                     rows={2}
                     />
                     <br />
-                    Scan Dates*: 
+                    Scan Dates * 
                     {scans?.map((scan) => {
                         return (
                             <div>
