@@ -7,7 +7,7 @@ import {
 } from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
-import ItemsDialog from './ItemsDialog';
+import DashboardDialog from './DashboardDialog';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -20,6 +20,7 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import MergetoHCcycles from './MergetoHCcycles';
 import Tooltip from '@mui/material/Tooltip';
+import moment from 'moment';
 
 const headCells = [
   {
@@ -31,12 +32,18 @@ const headCells = [
     headerName: 'Id',
   },
   {
-    field: 'cycle_name',
+    field:  'name',
     numeric: true,
     width: 150,
     sortable: true,
     editable: true,
     headerName: 'Cycle Name',
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <Tooltip title={currentRow?.name}>
+      <span> {currentRow?.name}</span>
+    </Tooltip>
+    }
   },
   {
     field: 'policies',
@@ -47,12 +54,13 @@ const headCells = [
     headerName: 'Policies',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <StylePolicy policies={currentRow?.policies} />
+      return <Tooltip title={currentRow?.policies.join()}>
+      <span> {currentRow?.policies.join()}</span>
+    </Tooltip>//<bigTextDisplay policies={currentRow?.policies} />
     }
     // valueGetter: (params) =>
     //   `${params.row?.policy?.join() || ''}`,
   },
-
   {
     field: 'scanRange',
     numeric: true,
@@ -62,7 +70,9 @@ const headCells = [
     headerName: 'Scan Range',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <span> {currentRow?.scanRange}</span>  //<StylePolicy policies={currentRow?.policies} /> //
+      return   <Tooltip title={currentRow?.scanRange}>
+      <span> {currentRow?.scanRange}</span>
+    </Tooltip>
     }
   },
   {
@@ -73,22 +83,22 @@ const headCells = [
     editable: true,
     headerName: 'Status',
   },
-
-
   {
     field: 'hostname',
     width: 85,
     sortable: true,
     editable: true,
     headerName: 'Hostnames',
+    // renderCell: (param) => {
+    //   const currentRow = param.row;
+    //   return <a size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.hostnames}</a>
+    // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <a size='small' variant="outlined" href="#/dashboard" >{currentRow?.hostname}</a>
+      return <DashboardDialog count={currentRow?.statistic?.hostnames} id={currentRow?.id} title="Hostnames" />
     }
     ,
   },
-
-
   {
     field: 'ADPS',
     width: 75,
@@ -99,6 +109,8 @@ const headCells = [
     //   const currentRow = param.row;
     //   return   <a href="#/dashboard" >{currentRow?.ADPS }</a>
     // }
+     valueGetter: (params) =>
+      `${params.row?.statistic?.adps || ''}`,
   },
   {
     id: 'checks',
@@ -106,11 +118,13 @@ const headCells = [
     sortable: true,
     editable: true,
     headerName: 'Checks',
-    valueGetter: (params) =>
-      `${params.row.checks || ''}`,
+    // renderCell: (param) => {
+    //   const currentRow = param.row;
+    //   return <a href="#/dashboard" >{currentRow?.statistic?.checks}</a>
+    // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <a href="#/dashboard" >{currentRow?.checks}</a>
+      return <DashboardDialog count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -121,15 +135,17 @@ const headCells = [
     headerName: 'Violations',
     valueGetter: (params) =>
       `${params.row.violations || ''}`,
+    // renderCell: (param) => {
+    //   const currentRow = param.row;
+    //   return <Button size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.violations}</Button>
+    // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Button size='small' variant="outlined" href="#/dashboard" >{currentRow?.violations}</Button>
+      return <DashboardDialog count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
-
   },
-
   {
-    field: 'hcCycleDueDate',
+    field: 'dueDate',
     width: 150,
     sortable: true,
     editable: true,
@@ -209,7 +225,7 @@ const headCellsUnassignedScan = [
   },
 ];
 
-const StylePolicy = ({ policies }) => {
+const bigTextDisplay = ({ array }) => {
 
   // let policiesList = []
   //   policies.forEach(element => {
@@ -220,8 +236,8 @@ const StylePolicy = ({ policies }) => {
 
   return (
 
-    <Tooltip title={policies.join()}>
-      <span> {policies.join()}</span>
+    <Tooltip title={array.join()}>
+      <span> {array.join()}</span>
     </Tooltip>
 
     // <Stack title={policies.join()} direction="row" spacing={1}>
@@ -347,16 +363,31 @@ export default function ScannedReportsDataGrid() {
   const [loader, setLoader] = React.useState(false);
   const [reloadHCcycle, setReloadHCcycle] = React.useState(false);
 
-  // React.useEffect(() => {
-  //   UserService.getHCCycles().then((results) => {
-  //     if (results.status === 200) {
-  //       setHcrows(results.data);
-  //     }
-  //   }).catch((error) => {
-  //     console.log("error", error)
-  //     alert("Fail to connect get HC API " + error);
-  //   });
-  // }, [reloadHCcycle]);
+  React.useEffect(() => {
+    UserService.getHCCycles().then((results) => {
+      if (results.status === 200) {
+        let policiesList = results.data; 
+        
+        let allPolicies = [], scanDates = []; 
+        policiesList.forEach(policy => {
+          policy?.scans.forEach(scan => {
+            scanDates.push(moment(scan.date)); 
+            scan?.policies.forEach(element => {
+              allPolicies.push(element.name);
+            });
+          })
+          scanDates.sort((a, b)=> moment(b) - moment(a)); 
+          policy.scanRange = scanDates[0].format('DD-MMM-YYYY') + " " + scanDates[scanDates.length-1].format('DD-MMM-YYYY');  
+          policy.policies = allPolicies; 
+        })
+
+        setHcrows(policiesList);
+      }
+    }).catch((error) => {
+      console.log("error", error)
+      alert("Fail to connect get HC API " + error);
+    });
+  }, [reloadHCcycle]);
 
   // React.useEffect(() => {
   //   UserService.getScannedDates().then((results) => {
@@ -456,7 +487,7 @@ export default function ScannedReportsDataGrid() {
 
         <DataGrid
         
-          rows={rows}
+          rows={hcrows}
           columns={headCells}
           autoPageSize
           loading={loader}

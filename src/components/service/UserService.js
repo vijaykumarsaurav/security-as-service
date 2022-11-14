@@ -21,6 +21,10 @@ class UserService {
         return axios.get(apiConstant.GET_HC_CYCLES, '');
     }
     
+    async getCycleDetails(id) {
+        return axios.get(apiConstant.GET_CYCLE_DETAILS + id, '');
+    }
+
     async getScannedDates() {
         return axios.get(apiConstant.GET_SCANNED_DATES, '');
     }

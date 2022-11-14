@@ -14,7 +14,14 @@ import Typography from '@mui/material/Typography';
 import ExpandListItem from './ExpandListItem';
 import UserService from '../service/UserService';
 import Notify from '../utils/Notify';
+import DataTable from './DataTable';
+import Tooltip from '@mui/material/Tooltip';
 
+import {
+    DataGrid,
+    GridToolbarContainer,
+    GridToolbarDensitySelector,
+  } from '@mui/x-data-grid';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -27,6 +34,38 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     },
 }));
 
+const columnsList = [
+    {
+      field: 'id',
+      numeric: false,
+      width: 80,
+      sortable: true,
+      editable: true,
+      headerName: 'Sr.',
+    //   renderCell:(index) => index, 
+    //   valueGetter: (params) =>
+    //   `${params.row || ''}`,
+    },
+    {
+      field: 'name',
+      numeric: true,
+      minWidth: 300,
+      maxWidth: 500,
+
+      sortable: true,
+      editable: true,
+      headerName: 'Name',
+      renderCell: (param) => {
+        const currentRow = param.row;
+        return <Tooltip placement="bottom" title={currentRow?.name}>
+        <span> {currentRow?.name}</span>
+      </Tooltip>
+      }
+    },
+   
+  ];
+
+  
 const BootstrapDialogTitle = (props) => {
     const { children, onClose, ...other } = props;
     return (
@@ -55,12 +94,13 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs({setReloadHCcycle}) {
+export default function CustomizedDialogs({id,  count, title}) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState('');
     const [desc, setDesc] = React.useState('');
     const [checkedScans, setCheckedScans] = React.useState([]);
+    const [loader, setLoader] = React.useState(false);
 
     const [scans, setScans] = React.useState([]);
 
@@ -70,19 +110,68 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
         setName(''); 
         setDesc('')
         setCheckedScans([]); 
+        setLoader(true)
 
-        UserService.getScannedDates().then((results) => {
+        UserService.getCycleDetails(id).then((results) => {
             if (results.status === 200) {
                console.log("results", results.data);
-              setScans(results.data);
+              
+              if(title == 'Violations'){
+                findViolations(results.data?.[0]?.checks)  
+              }
+
+              if(title == 'Checks'){
+                findChecks(results.data?.[0]?.checks)  
+              }
+              if(title == 'Hostnames'){
+                findHostnames(results.data?.[0]?.checks)  
+              }
+              setLoader(false)
             }
           }).catch((error) => {
             console.log("error", error)
             Notify.showError("Error" + error); 
-
-      
           });
     };
+
+    const findViolations = (checks) => {
+        let violationsList = []; 
+        for (let index = 0; index < checks.length; index++) {
+            const element = checks[index];
+            element?.hosts.forEach(host => {
+                host?.violations?.forEach((violation, i) => {
+                    violationsList.push({name : violation.message, id: violationsList.length+1} );
+                  })
+            });
+        }
+        setScans(violationsList);
+    };
+
+    const findChecks = (checks) => {
+        let checksList = []; 
+        for (let index = 0; index < checks.length; index++) {
+            const element = checks[index];
+            checksList.push({name : element.check_description, id: checksList.length+1} );
+        }
+        setScans(checksList);
+    };
+
+    const findHostnames = (checks) => {
+        let hostnamesList = []; 
+        for (let index = 0; index < checks.length; index++) {
+            const element = checks[index];
+            element?.hosts.forEach(host => {
+                
+                let found = hostnamesList.filter(item => item.name == host.hostname); 
+                if(!found.length){
+                    hostnamesList.push({name : host.hostname, id: hostnamesList.length+1} );
+                }
+            });
+        }
+        setScans(hostnamesList);
+    };
+    
+
     const handleClose = () => {
         setOpen(false);
     };
@@ -106,7 +195,7 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
         }
         
         UserService.createHCCycle(param).then((results) => {
-            setReloadHCcycle(true);
+            // setReloadHCcycle(true);
             alert('HC Cycle successfully created');
             if (results.status === 200) {
               // console.log("results", results.data);
@@ -137,9 +226,10 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
 
     return (
         <div>
-            <Button size='size' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
+            {/* <Button size='size' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
                Create new HC cycle
-            </Button>
+            </Button> */}
+            <Button size='small' variant="outlined" href="#/dashboard" onClick={handleClickOpen}>{count}</Button>
             <BootstrapDialog
                 onClose={handleClose}
                 aria-labelledby="customized-dialog-title"
@@ -148,52 +238,30 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
                  fullWidth
                 
             >
-                <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                 Create new HC cycle
+                <BootstrapDialogTitle color="primary"  id="customized-dialog-title" onClose={handleClose}>
+                 {title} ({scans.length})
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
-
-                    <TextField
-                    variant='standard'
-                    id="outlined-name"
-                    label="Name"
-                    value={name}
-                    required
-                    fullWidth
-                    onChange={(e) => setName(e.target.value)}
-                    />
-                    <br />
-                    <TextField
-                    fullWidth
-                     variant='standard'
-                    id="outlined-uncontrolled"
-                    label="Description"
-                    value={desc}
-                    onChange={(e) => setDesc(e.target.value)}
-                    multiline
-                    rows={2}
-                    />
-                    <br />
-                    Scan Dates * 
-                    {scans?.map((scan) => {
+                    {/* {scans?.map((item, i) => {
                         return (
                             <div>
-                                
-                             <FormGroup>
-                                <FormControlLabel control={<Checkbox value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (Job #${scan.jobId})`  }  />
-                            </FormGroup>
+                            {`${i+1}. ${item.name}`  } 
                             </div>
                         );
-                    })}
+                    })} */}
 
+                <DataTable rows={scans} columns={columnsList}/>
                 </DialogContent>
                 <DialogActions> 
                 {/* contained */}
-                    <Button variant="outlined" color="secondary"   onClick={handleClose}>
+                    {/* <Button variant="outlined" color="secondary"   onClick={handleClose}>
                         Cancel
-                    </Button>
-                    <Button variant="outlined"  color="primary"   onClick={handleSubmit}>
+                    </Button> */}
+                    {/* <Button variant="outlined"  color="primary"   onClick={handleSubmit}>
                         Submit
+                    </Button> */}
+                    <Button variant="outlined"  autoFocus onClick={handleClose}>
+                        Okey
                     </Button>
                 </DialogActions>
             </BootstrapDialog>
