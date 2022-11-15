@@ -25,6 +25,10 @@ class UserService {
         return axios.get(apiConstant.GET_CYCLE_DETAILS + id, '');
     }
 
+    async getCycleHostnames(id) {
+        return axios.get(apiConstant.GET_CYCLE_HOSTNAMES + id + '/hosts', '');
+    }
+
     async getScannedDates() {
         return axios.get(apiConstant.GET_SCANNED_DATES, '');
     }

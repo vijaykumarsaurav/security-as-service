@@ -95,7 +95,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <DashboardDialog count={currentRow?.statistic?.hostnames} id={currentRow?.id} title="Hostnames" />
+      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.hostnames} id={currentRow?.id} title="Hostnames" />
     }
     ,
   },
@@ -124,7 +124,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <DashboardDialog count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
+      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -141,7 +141,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <DashboardDialog count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
+      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
   },
   {
@@ -364,6 +364,7 @@ export default function ScannedReportsDataGrid() {
   const [reloadHCcycle, setReloadHCcycle] = React.useState(false);
 
   React.useEffect(() => {
+    setLoader(true); 
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
         let policiesList = results.data; 
@@ -382,6 +383,7 @@ export default function ScannedReportsDataGrid() {
         })
 
         setHcrows(policiesList);
+        setLoader(false)
       }
     }).catch((error) => {
       console.log("error", error)

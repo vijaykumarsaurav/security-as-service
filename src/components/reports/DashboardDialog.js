@@ -15,7 +15,6 @@ import ExpandListItem from './ExpandListItem';
 import UserService from '../service/UserService';
 import Notify from '../utils/Notify';
 import DataTable from './DataTable';
-import Tooltip from '@mui/material/Tooltip';
 
 import {
     DataGrid,
@@ -34,38 +33,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     },
 }));
 
-const columnsList = [
-    {
-      field: 'id',
-      numeric: false,
-      width: 80,
-      sortable: true,
-      editable: true,
-      headerName: 'Sr.',
-    //   renderCell:(index) => index, 
-    //   valueGetter: (params) =>
-    //   `${params.row || ''}`,
-    },
-    {
-      field: 'name',
-      numeric: true,
-      minWidth: 300,
-      maxWidth: 500,
 
-      sortable: true,
-      editable: true,
-      headerName: 'Name',
-      renderCell: (param) => {
-        const currentRow = param.row;
-        return <Tooltip placement="bottom" title={currentRow?.name}>
-        <span> {currentRow?.name}</span>
-      </Tooltip>
-      }
-    },
-   
-  ];
-
-  
 const BootstrapDialogTitle = (props) => {
     const { children, onClose, ...other } = props;
     return (
@@ -94,12 +62,9 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs({id,  count, title}) {
+export default function CustomizedDialogs({id, cycle_name,  count, title}) {
 
     const [open, setOpen] = React.useState(false);
-    const [name, setName] = React.useState('');
-    const [desc, setDesc] = React.useState('');
-    const [checkedScans, setCheckedScans] = React.useState([]);
     const [loader, setLoader] = React.useState(false);
 
     const [scans, setScans] = React.useState([]);
@@ -107,31 +72,48 @@ export default function CustomizedDialogs({id,  count, title}) {
   
     const handleClickOpen = () => {
         setOpen(true);
-        setName(''); 
-        setDesc('')
-        setCheckedScans([]); 
         setLoader(true)
+        setScans([]);
 
-        UserService.getCycleDetails(id).then((results) => {
-            if (results.status === 200) {
-               console.log("results", results.data);
-              
-              if(title == 'Violations'){
-                findViolations(results.data?.[0]?.checks)  
-              }
+        if(title == 'Violations' || title == 'Checks'){
+            UserService.getCycleDetails(id).then((results) => {
+                if (results.status === 200) {
+                   console.log("results", results.data);
+                  
+                  if(title == 'Violations'){
+                    findViolations(results.data?.[0]?.checks)  
+                  }
+    
+                  if(title == 'Checks'){
+                    findChecks(results.data?.[0]?.checks)  
+                  }
+                 
+                  setLoader(false)
+                }
+              }).catch((error) => {
+                console.log("error", error)
+                Notify.showError("Error" + error); 
+              });
+        } else  if(title == 'Hostnames'){
+            UserService.getCycleHostnames(id).then((results) => {
+                if (results.status === 200) {
+                   console.log("results", results.data);
+                   
+                   results.data.forEach((element, i) => {
+                    element.id = i; 
+                   });
 
-              if(title == 'Checks'){
-                findChecks(results.data?.[0]?.checks)  
-              }
-              if(title == 'Hostnames'){
-                findHostnames(results.data?.[0]?.checks)  
-              }
-              setLoader(false)
-            }
-          }).catch((error) => {
-            console.log("error", error)
-            Notify.showError("Error" + error); 
-          });
+                  setLoader(false)
+                  setScans(results.data);
+                  
+                }
+              }).catch((error) => {
+                console.log("error", error)
+                Notify.showError("Error" + error); 
+              });
+            
+          }
+        
     };
 
     const findViolations = (checks) => {
@@ -139,9 +121,11 @@ export default function CustomizedDialogs({id,  count, title}) {
         for (let index = 0; index < checks.length; index++) {
             const element = checks[index];
             element?.hosts.forEach(host => {
-                host?.violations?.forEach((violation, i) => {
-                    violationsList.push({name : violation.message, id: violationsList.length+1} );
-                  })
+                if( host.check_status === 'KO') {
+                    host?.violations?.forEach((violation, i) => {
+                        violationsList.push({name : violation.message, id: violationsList.length+1} );
+                      })
+                }
             });
         }
         setScans(violationsList);
@@ -175,60 +159,9 @@ export default function CustomizedDialogs({id,  count, title}) {
     const handleClose = () => {
         setOpen(false);
     };
-    const handleSubmit = () => {
-
-        if(!name){
-            alert("Name can't be empty!"); 
-            return; 
-        }
-        if(checkedScans?.length === 0){
-            alert("Select the scans!"); 
-            return; 
-        }
-        
-        let param = {
-            "name": name,
-            "description": desc,
-            "scans": checkedScans, 
-            "dueDate":"2022-10-10T07:57:15.000+00:00",
-            "assignee":"Dima"
-        }
-        
-        UserService.createHCCycle(param).then((results) => {
-            // setReloadHCcycle(true);
-            alert('HC Cycle successfully created');
-            if (results.status === 200) {
-              // console.log("results", results.data);
-              Notify.showSuccess("HC Cycle successfully created"); 
-             
-              setOpen(false);
-            }
-          }).catch((error) => {
-            console.log("error", error)
-            Notify.showError("Error" + error); 
-          });
-
-        
-    };
-    const handleCheckbox = (event) => {
-        console.log(event.target)
-        if(event.target.checked){
-            if(!checkedScans.filter(item => item == event.target.value).length){
-                checkedScans.push(event.target.value)
-            }
-        }else {
-            var index = checkedScans.findIndex(data => data === event.target.value)
-            checkedScans.splice(index, 1);
-        }
-
-        setCheckedScans(checkedScans); 
-      };
 
     return (
         <div>
-            {/* <Button size='size' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
-               Create new HC cycle
-            </Button> */}
             <Button size='small' variant="outlined" href="#/dashboard" onClick={handleClickOpen}>{count}</Button>
             <BootstrapDialog
                 onClose={handleClose}
@@ -239,7 +172,7 @@ export default function CustomizedDialogs({id,  count, title}) {
                 
             >
                 <BootstrapDialogTitle color="primary"  id="customized-dialog-title" onClose={handleClose}>
-                 {title} ({scans.length})
+                {cycle_name}'s {title} ({scans.length})
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                     {/* {scans?.map((item, i) => {
@@ -249,17 +182,10 @@ export default function CustomizedDialogs({id,  count, title}) {
                             </div>
                         );
                     })} */}
-
-                <DataTable rows={scans} columns={columnsList}/>
+                
+                <DataTable loader={loader} rows={scans} title={title}/>
                 </DialogContent>
                 <DialogActions> 
-                {/* contained */}
-                    {/* <Button variant="outlined" color="secondary"   onClick={handleClose}>
-                        Cancel
-                    </Button> */}
-                    {/* <Button variant="outlined"  color="primary"   onClick={handleSubmit}>
-                        Submit
-                    </Button> */}
                     <Button variant="outlined"  autoFocus onClick={handleClose}>
                         Okey
                     </Button>
