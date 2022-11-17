@@ -25,8 +25,13 @@ class UserService {
         return axios.get(apiConstant.GET_CYCLE_DETAILS + id, '');
     }
 
-    async getCycleHostnames(id) {
-        return axios.get(apiConstant.GET_CYCLE_HOSTNAMES + id + '/hosts', '');
+    async getCycleHostnames(id, dashboardType) {
+        if(dashboardType === "unassignedScan"){
+            return axios.get(apiConstant.GET_SCANNED_HOSTNAMES + id + '/hosts', '');
+
+        }else{
+            return axios.get(apiConstant.GET_CYCLE_HOSTNAMES + id + '/hosts', '');
+        }
     }
 
     async getScannedDates() {

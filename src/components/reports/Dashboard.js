@@ -48,7 +48,8 @@ const headCells = [
   {
     field: 'policies',
     numeric: true,
-    width: 210,
+    minWidth: 175,
+    
     sortable: true,
     editable: true,
     headerName: 'Policies',
@@ -124,7 +125,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
+      return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?hc="+currentRow?.name+"&sort=check_status"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -141,7 +142,8 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
+       return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?hc="+currentRow?.name+"&sort=violation_name" } >{currentRow?.statistic?.violations}</Button>
+      //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
   },
   {
@@ -166,12 +168,12 @@ const headCells = [
 
 const headCellsUnassignedScan = [
   {
-    field: 'id',
+    field: 'jobId',
     numeric: false,
-    width: 50,
+    width: 80,
     sortable: true,
     editable: true,
-    headerName: 'Id',
+    headerName: 'JobId',
   },
   {
     field: 'Ansible_Job',
@@ -182,22 +184,25 @@ const headCellsUnassignedScan = [
     headerName: 'Ansible Job',
   },
   {
-    field: 'Scan_Date',
+    field: 'name',
     numeric: true,
-    width: 210,
+    width: 150,
+    sortable: true,
+    editable: true,
+    headerName: 'Policies',
+  },
+  
+  {
+    field: 'date',
+    numeric: true,
+    width: 100,
     sortable: true,
     editable: true,
     headerName: 'Scan Date',
+    valueGetter: (params) =>
+      `${moment(params.row.scan_date).format('DD-MM-YYYY') || ''}`,
+    
    
-  },
-  {
-    field: 'checks',
-    numeric: true,
-    width: 175,
-    sortable: true,
-    editable: true,
-    headerName: 'Checks',
-  
   },
   {
     field: 'hostname',
@@ -205,9 +210,29 @@ const headCellsUnassignedScan = [
     sortable: true,
     editable: true,
     headerName: 'Hostnames',
+    // renderCell: (param) => {
+    //   const currentRow = param.row;
+    //   return <a size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.hostnames}</a>
+    // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <a size='small' variant="outlined" href="#/dashboard" >{currentRow?.hostname}</a>
+      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.hostnames} id={currentRow?.id} title="Hostnames" dashboardType={"unassignedScan"} />
+    }
+    ,
+  },
+  {
+    id: 'checks',
+    width: 75,
+    sortable: true,
+    editable: true,
+    headerName: 'Checks',
+    // renderCell: (param) => {
+    //   const currentRow = param.row;
+    //   return <a href="#/dashboard" >{currentRow?.statistic?.checks}</a>
+    // }
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?jobid="+currentRow?.jobId+"&sort=check_status"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -218,9 +243,14 @@ const headCellsUnassignedScan = [
     headerName: 'Violations',
     valueGetter: (params) =>
       `${params.row.violations || ''}`,
+    // renderCell: (param) => {
+    //   const currentRow = param.row;
+    //   return <Button size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.violations}</Button>
+    // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Button size='small' variant="outlined" href="#/dashboard" >{currentRow?.violations}</Button>
+       return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?hc="+currentRow?.jobId+"&sort=violation_name" } >{currentRow?.statistic?.violations}</Button>
+      //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
   },
 ];
@@ -369,17 +399,25 @@ export default function ScannedReportsDataGrid() {
       if (results.status === 200) {
         let policiesList = results.data; 
         
-        let allPolicies = [], scanDates = []; 
         policiesList.forEach(policy => {
+          let scanDates = []; 
           policy?.scans.forEach(scan => {
+            let allPolicies = [];
             scanDates.push(moment(scan.date)); 
             scan?.policies.forEach(element => {
-              allPolicies.push(element.name);
+              let found = allPolicies.filter(name => name == element.name); 
+              console.log("found", found)
+              if(!found.length){
+                let policyName = element.name.split('-'); 
+                allPolicies.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
+              }
+              
             });
+            policy.policies = allPolicies; 
+
           })
-          scanDates.sort((a, b)=> moment(b) - moment(a)); 
+          scanDates.sort((a, b)=> moment(a) - moment(b)); 
           policy.scanRange = scanDates[0].format('DD-MMM-YYYY') + " " + scanDates[scanDates.length-1].format('DD-MMM-YYYY');  
-          policy.policies = allPolicies; 
         })
 
         setHcrows(policiesList);
@@ -391,19 +429,19 @@ export default function ScannedReportsDataGrid() {
     });
   }, [reloadHCcycle]);
 
-  // React.useEffect(() => {
-  //   UserService.getScannedDates().then((results) => {
-  //     if (results.status === 200) {
-  //       setScansRows(results.data);
-  //     }
-  //   }).catch((error) => {
-  //     console.log("error", error)
-  //     alert("Error" + error);
-  //     alert("Fail to connect get Scan Dates API " + error);
+  React.useEffect(() => {
+    UserService.getScannedDates().then((results) => {
+      if (results.status === 200) {
+        setScansRows(results.data);
+      }
+    }).catch((error) => {
+      console.log("error", error)
+      alert("Error" + error);
+      alert("Fail to connect get Scan Dates API " + error);
 
-  //   });
+    });
 
-  // }, [reloadHCcycle]);
+  }, [reloadHCcycle]);
 
   React.useEffect(() => {
     console.log("hccycleName", hccycleName);
@@ -478,12 +516,12 @@ export default function ScannedReportsDataGrid() {
 
         <Grid container >
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-          <Typography color="primary" style={{paddingLeft: "5px"}}>  Active Health Check cycles</Typography>
+          <Typography color="primary" style={{padding: "5px"}}>  Active Health Check cycles</Typography>
           </Grid>
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">
           
-          <MergetoHCcycles />
+          <MergetoHCcycles setReloadHCcycle={setReloadHCcycle}/>
           </Grid>
         </Grid>
 
@@ -501,17 +539,17 @@ export default function ScannedReportsDataGrid() {
       </Paper>
 
       <br />
-      <Paper style={{ paddingLeft: "10px", height:"200px", paddingBottom: "25px", width: '60%' }}>
+      <Paper style={{ paddingLeft: "10px", height:"200px", paddingBottom: "25px", width: '99%' }}>
 
         <Grid justify="space-between" container>
 
           <Grid item>
-            <Typography color="primary">Unassigned Scans</Typography>
+            <Typography style={{padding: "5px"}} color="primary">Unassigned Scans</Typography>
           </Grid>
         </Grid>
 
         <DataGrid
-          rows={rowsUnassignedScan}
+          rows={scansRows}
           columns={headCellsUnassignedScan}
           autoPageSize
           loading={loader}

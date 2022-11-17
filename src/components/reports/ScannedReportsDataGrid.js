@@ -17,6 +17,7 @@ import Notify from '../utils/Notify';
 import HCcyclesSelect from './HCcyclesSelect';
 import ScanDateSelect from './ScanDateSelect';
 import PolicySelect from './PolicySelect';
+import moment from 'moment';
 
 
 const headCells = [
@@ -75,16 +76,26 @@ const headCells = [
     sortable: true,
     editable: true,
     headerName: 'Scan Date',
+     valueGetter: (params) =>
+      `${moment(params.row.scan_date).format('DD-MM-YYYY') || ""}`,
   },
 
+  // {
+  //   id: 'violationName',
+  //   width: 150,
+  //   sortable: true,
+  //   editable: true,
+  //   headerName: 'Violation',
+  //   valueGetter: (params) =>
+  //     `${params.row.violationName || ""}`,
+  // },
   {
-    id: 'violation1',
+    field: 'violation_name',
+    numeric: true,
     width: 150,
     sortable: true,
     editable: true,
     headerName: 'Violation',
-    valueGetter: (params) =>
-      `${params.row.violation1 || ''}`,
   },
   {
     field: 'measure_values',
@@ -138,10 +149,10 @@ const duplicateDeviationsData = (devData, setRows,  setLoader) => {
         check_status: host.check_status,
         ip: host.ip,
         scan_date: host.scan_date,
-        violation1: host.measure_values,
         measure_values: host.measure_values,
         policy_parameters: host.policy_parameters,
-        id: id
+        id: id,
+        violation_name : ""
       }
 
       if (host.check_status === 'OK') {
@@ -152,7 +163,7 @@ const duplicateDeviationsData = (devData, setRows,  setLoader) => {
         host.violations.forEach(violation => {
           let seperateHostdata = { ...hostData };
           seperateHostdata.id = id;
-          seperateHostdata.violation1 = violation.message;
+          seperateHostdata.violation_name = violation.message;
           tempDevData.push(seperateHostdata);
           id++;
         })
@@ -178,11 +189,20 @@ export default function ScannedReportsDataGrid() {
   const [scanDate, setScanDate] = React.useState('');
   const [loader, setLoader] = React.useState(false);
   const [reloadHCcycle, setReloadHCcycle] = React.useState(false);
+  const [urlHCcycle, setUrlHCcycle] = React.useState(decodeURIComponent(window.location.href.split('?')[1]?.split('=')[1])?.split("&")[0]);
+  const [urlFilterProps, setUrlFilterProps] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[1]?.split('=')[1]));
 
   React.useEffect(() => {
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
         setHcrows(results.data);
+        for (let index = 0; index < results.data.length; index++) {
+          const element = results.data[index];
+          if(element.name === urlHCcycle){
+            setHccycleName(urlHCcycle)
+            break; 
+          }
+        }
       }
     }).catch((error) => {
       console.log("error", error)
@@ -194,6 +214,13 @@ export default function ScannedReportsDataGrid() {
     UserService.getScannedDates().then((results) => {
       if (results.status === 200) {
         setScansRows(results.data);
+        for (let index = 0; index < results.data.length; index++) {
+          const element = results.data[index];
+          if(element.jobId == urlHCcycle){
+            setScanDate(element.jobId)
+            break; 
+          }
+        }
       }
     }).catch((error) => {
       console.log("error", error)
@@ -289,12 +316,14 @@ React.useEffect(() => {
     );
   }
 
+  console.log("urlFilterProps", urlFilterProps)
   return (
 
     <Box sx={{ height: 500, width: '100%' }}>
       <HeaderNavbar />
 
       <DataGrid
+       
         rows={rows}
         columns={headCells}
         //pageSize={20}
@@ -306,7 +335,13 @@ React.useEffect(() => {
         experimentalFeatures={{ newEditingApi: true }}
         density="compact"
         components={{
-          Toolbar: CustomToolbar,
+          Toolbar: urlHCcycle == 'undefined' ? CustomToolbar : "",
+        }}
+
+        filterModel={{
+          items: [
+            { columnField: urlFilterProps, operatorValue: 'isNotEmpty', value: 'isNotEmpty' },
+            { columnField: 'severity', operatorValue: 'equals', value: 'Critical' }],
         }}
 
       // editMode="row"

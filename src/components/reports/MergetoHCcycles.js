@@ -63,6 +63,8 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
     const [checkedScans, setCheckedScans] = React.useState([]);
 
     const [scans, setScans] = React.useState([]);
+    const [dueDate, setDueDate] = React.useState(new Date());
+    const [assignee, setAssignee] = React.useState('');
 
   
     const handleClickOpen = () => {
@@ -70,6 +72,8 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
         setName(''); 
         setDesc('')
         setCheckedScans([]); 
+        setDueDate('')
+        setAssignee('')
 
         UserService.getScannedDates().then((results) => {
             if (results.status === 200) {
@@ -92,17 +96,26 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
             alert("Name can't be empty!"); 
             return; 
         }
+        alert(checkedScans?.length)
         if(checkedScans?.length === 0){
             alert("Select the scans!"); 
             return; 
         }
-        
+        if(!dueDate){
+            alert("Select Due Date!"); 
+            return; 
+        }
+        if(!assignee){
+            alert("Type Assigee name!"); 
+            return; 
+        }
+
         let param = {
             "name": name,
             "description": desc,
             "scans": checkedScans, 
-            "dueDate":"2022-10-10T07:57:15.000+00:00",
-            "assignee":"Dima"
+            "dueDate": dueDate,
+            "assignee":assignee
         }
         
         UserService.createHCCycle(param).then((results) => {
@@ -185,6 +198,30 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
                             </div>
                         );
                     })}
+
+                
+                <TextField  
+                type="date"
+                variant='standard'
+                InputLabelProps={{
+                    shrink: true,
+                  }}
+                required 
+                label="Select Due Date:"
+                value={dueDate}              
+                onChange={(e) => setDueDate(e.target.value)}
+                />
+                
+              
+                <TextField
+                    variant='standard'
+                    id="outlined-name"
+                    label="Type Assignee Name"
+                    value={assignee}
+                    required
+                    fullWidth
+                    onChange={(e) => setAssignee(e.target.value)}
+                    />
 
                 </DialogContent>
                 <DialogActions> 

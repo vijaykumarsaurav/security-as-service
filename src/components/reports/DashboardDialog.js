@@ -62,14 +62,11 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs({id, cycle_name,  count, title}) {
+export default function CustomizedDialogs({id, cycle_name,  count, title, dashboardType}) {
 
     const [open, setOpen] = React.useState(false);
     const [loader, setLoader] = React.useState(false);
-
     const [scans, setScans] = React.useState([]);
-
-  
     const handleClickOpen = () => {
         setOpen(true);
         setLoader(true)
@@ -95,7 +92,7 @@ export default function CustomizedDialogs({id, cycle_name,  count, title}) {
                 Notify.showError("Error" + error); 
               });
         } else  if(title == 'Hostnames'){
-            UserService.getCycleHostnames(id).then((results) => {
+            UserService.getCycleHostnames(id, dashboardType).then((results) => {
                 if (results.status === 200) {
                    console.log("results", results.data);
                    
@@ -135,7 +132,7 @@ export default function CustomizedDialogs({id, cycle_name,  count, title}) {
         let checksList = []; 
         for (let index = 0; index < checks.length; index++) {
             const element = checks[index];
-            checksList.push({name : element.check_description, id: checksList.length+1} );
+            checksList.push({name : element.check_section, id: checksList.length+1} );
         }
         setScans(checksList);
     };

@@ -31,14 +31,6 @@ const columnsList = [
 
 const hostColumnsList = [
   {
-    field: 'ip',
-    numeric: false,
-    width: 150,
-    sortable: true,
-    editable: true,
-    headerName: 'IP',
-  },
-  {
     field: 'hostname',
     numeric: true,
     minWidth: 300,
@@ -49,6 +41,15 @@ const hostColumnsList = [
     valueGetter: (params) =>
     `${params.row?.hostname || ''}`,
   },
+  {
+    field: 'ip',
+    numeric: false,
+    width: 150,
+    sortable: true,
+    editable: true,
+    headerName: 'IP',
+  }
+  
 ];
 export default function DataTable( { rows, loader, title}) {
 
