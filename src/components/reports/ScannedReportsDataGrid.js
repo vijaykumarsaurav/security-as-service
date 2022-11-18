@@ -339,6 +339,11 @@ React.useEffect(() => {
         components={{
           Toolbar: urlHCcycle == 'undefined' ? CustomToolbar : "",
         }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: 'check_status', sort: 'desc' }],
+          },
+        }}
 
         filterModel={{
           items: [

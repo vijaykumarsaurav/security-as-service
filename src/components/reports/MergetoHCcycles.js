@@ -55,7 +55,7 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs({setReloadHCcycle}) {
+export default function CustomizedDialogs({setReloadHCcycle, setReloadScanApi}) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState('');
@@ -121,8 +121,9 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
             setReloadHCcycle(true);
             let data = results.data; 
             if (data.ok) {
-                setReloadHCcycle(true);
                 alert(data.message);
+                setReloadHCcycle(true);
+                setReloadScanApi(true); 
               // console.log("results", results.data);
               Notify.showSuccess("HC Cycle successfully created"); 
              

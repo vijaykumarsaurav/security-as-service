@@ -155,7 +155,8 @@ const headCells = [
     editable: true,
     headerName: 'HC Cycle Due Date',
     valueGetter: (params) =>
-      `${params.row.hcCycleDueDate || ''}`,
+    `${moment(params.row.dueDate).format('DD-MM-YYYY') || ''}`,
+
   },
   {
     field: 'assignee',
@@ -165,7 +166,7 @@ const headCells = [
     headerName: 'Assignee',
   },
   {
-    field: 'Edit',
+    field: 'Action',
     width: 100,
     sortable: true,
     editable: true,
@@ -533,7 +534,7 @@ export default function ScannedReportsDataGrid() {
 
   headCells[headCells.length-1].renderCell = (param) => {
     const currentRow = param.row;
-     return <EditHCcycles setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />
+     return <EditHCcycles setReloadHCcycle={setReloadHCcycle}  currentRow={currentRow} />
   }
 
   console.log("scanDate", headCells[headCells.length-1]);
@@ -555,7 +556,7 @@ export default function ScannedReportsDataGrid() {
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">
           
-          <MergetoHCcycles setReloadHCcycle={setReloadHCcycle}/>
+          <MergetoHCcycles setReloadScanApi={setReloadScanApi}  setReloadHCcycle={setReloadHCcycle}/>
           </Grid>
         </Grid>
 
