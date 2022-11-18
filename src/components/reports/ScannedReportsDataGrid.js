@@ -4,6 +4,7 @@ import {
   DataGrid,
   GridToolbarContainer,
   GridToolbarDensitySelector,
+  GridToolbarExport
 } from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
@@ -298,6 +299,7 @@ React.useEffect(() => {
     return (
       <GridToolbarContainer>
         <GridToolbarDensitySelector />
+        <GridToolbarExport />
         <MergetoHCcycles setReloadHCcycle={setReloadHCcycle} />
         &nbsp;&nbsp;
         
@@ -340,8 +342,7 @@ React.useEffect(() => {
 
         filterModel={{
           items: [
-            { columnField: urlFilterProps, operatorValue: 'isNotEmpty', value: 'isNotEmpty' },
-            { columnField: 'severity', operatorValue: 'equals', value: 'Critical' }],
+            { columnField: urlFilterProps, operatorValue: 'isNotEmpty', value: 'isNotEmpty' }],
         }}
 
       // editMode="row"
