@@ -14,7 +14,8 @@ import Typography from '@mui/material/Typography';
 import ExpandListItem from './ExpandListItem';
 import UserService from '../service/UserService';
 import Notify from '../utils/Notify';
-
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -55,7 +56,7 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs({setReloadHCcycle}) {
+export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState('');
@@ -75,84 +76,77 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
         setDueDate('')
         setAssignee('')
 
-        UserService.getScannedDates().then((results) => {
-            if (results.status === 200) {
-               console.log("results", results.data);
-              setScans(results.data);
-            }
-          }).catch((error) => {
-            console.log("error", error)
-            Notify.showError("Error" + error); 
+        // let defaultChecked = []; 
+        // currentRow?.scans?.forEach(element => {
+        //     defaultChecked.push(element.id); 
+        // });  
+        // setCheckedScans(defaultChecked); 
 
-      
-          });
+        // UserService.getScannedDates().then((results) => {
+        //     if (results.status === 200) {
+        //        console.log("results", results.data);
+        //       setScans(results.data);
+        //     }
+        //   }).catch((error) => {
+        //     console.log("error", error)
+        //     Notify.showError("Error" + error); 
+        //   });
     };
     const handleClose = () => {
         setOpen(false);
     };
     const handleSubmit = () => {
-
-        if(!name){
-            alert("Name can't be empty!"); 
-            return; 
-        }
-        if(checkedScans?.length === 0){
-            alert("Select the scans!"); 
-            return; 
-        }
-        if(!dueDate){
-            alert("Select Due Date!"); 
-            return; 
-        }
-        if(!assignee){
-            alert("Type Assigee name!"); 
-            return; 
-        }
-
-        let param = {
-            "name": name,
-            "description": desc,
-            "scans": checkedScans, 
-            "dueDate": dueDate,
-            "assignee":assignee
-        }
-        
-        UserService.createHCCycle(param).then((results) => {
-            setReloadHCcycle(true);
+        UserService.deleteScanfromHCCycle(currentRow?.id, checkedScans).then((results) => {
             let data = results.data; 
             if (data.ok) {
-                setReloadHCcycle(true);
                 alert(data.message);
+                setReloadHCcycle(true);
               // console.log("results", results.data);
-              Notify.showSuccess("HC Cycle successfully created"); 
+              Notify.showSuccess("Selected scans deleted successfully from the HC cycles"); 
              
               setOpen(false);
             }
           }).catch((error) => {
             console.log("error", error)
+            alert(error);
+
             Notify.showError("Error" + error); 
           });
 
         
     };
     const handleCheckbox = (event) => {
-        console.log(event.target)
+
         if(event.target.checked){
-            if(!checkedScans.filter(item => item == event.target.value).length){
+            console.log(checkedScans.includes(event.target.value))
+            if(!checkedScans.includes(event.target.value)){
                 checkedScans.push(event.target.value)
             }
         }else {
             var index = checkedScans.findIndex(data => data === event.target.value)
             checkedScans.splice(index, 1);
         }
+        console.log(event.target.checked, event.target.value , checkedScans)
+        console.log('checkedScans', checkedScans)
 
         setCheckedScans(checkedScans); 
       };
 
+
+    // React.useEffect(() => {
+    //     let defaultChecked = []; 
+    //     currentRow?.scans?.forEach(element => {
+    //         defaultChecked.push(element.id); 
+    //     });  
+    //     setCheckedScans(defaultChecked); 
+    // }, [])
+
+    console.log('checkedScans', checkedScans)
+
     return (
         <div>
             <Button size='size' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
-               Create new HC cycle
+                <EditIcon fontSize="small"  />
             </Button>
             <BootstrapDialog
                 onClose={handleClose}
@@ -163,66 +157,26 @@ export default function CustomizedDialogs({setReloadHCcycle}) {
                 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                 Create new HC cycle
+                 Edit: {currentRow.name}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
+                  <b>Cycle Name:</b>  {currentRow.name} <br />
+                  <b>Policies:</b> {currentRow.policies} <br />
+                  <b>Scan Range:</b>  {currentRow.scanRange} <br />
+                  <b>Status:</b> {currentRow.status} <br />
 
-                    <TextField
-                    variant='standard'
-                    id="outlined-name"
-                    label="Name"
-                    value={name}
-                    required
-                    fullWidth
-                    onChange={(e) => setName(e.target.value)}
-                    />
-                    <br />
-                    <TextField
-                    fullWidth
-                     variant='standard'
-                    id="outlined-uncontrolled"
-                    label="Description"
-                    value={desc}
-                    onChange={(e) => setDesc(e.target.value)}
-                    multiline
-                    rows={2}
-                    />
-                    <br />
-                    Scan Dates * 
-                    {scans?.map((scan) => {
+                  <br />
+                  Selected scans will be deleted from the <b>{currentRow.name} </b>HC Cycle
+                 
+                    {currentRow?.scans?.map((scan) => {
                         return (
                             <div>
-                                
                              <FormGroup>
                                 <FormControlLabel control={<Checkbox value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (Job #${scan.jobId})`  }  />
                             </FormGroup>
                             </div>
                         );
                     })}
-
-                
-                <TextField  
-                type="date"
-                variant='standard'
-                InputLabelProps={{
-                    shrink: true,
-                  }}
-                required 
-                label="Select Due Date:"
-                value={dueDate}              
-                onChange={(e) => setDueDate(e.target.value)}
-                />
-                
-              
-                <TextField
-                    variant='standard'
-                    id="outlined-name"
-                    label="Type Assignee Name"
-                    value={assignee}
-                    required
-                    fullWidth
-                    onChange={(e) => setAssignee(e.target.value)}
-                    />
 
                 </DialogContent>
                 <DialogActions> 

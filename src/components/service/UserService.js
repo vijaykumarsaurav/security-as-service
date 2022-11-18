@@ -38,6 +38,15 @@ class UserService {
         return axios.get(apiConstant.GET_SCANNED_DATES, '');
     }
 
+    async addToHCCycle(selectHealthCheck, selectionModel) {
+        return axios.post(apiConstant.GET_CYCLE_HOSTNAMES + selectHealthCheck + '/add', selectionModel);
+    }
+
+    async deleteScanfromHCCycle(selectedHCNo, scanIds) {
+
+        return axios.delete(apiConstant.GET_CYCLE_HOSTNAMES + selectedHCNo + '/delete', { data: scanIds } );
+    }
+
     async createHCCycle(param) {
         return axios.post(apiConstant.CREATE_HC_CYCLE, param);
     }

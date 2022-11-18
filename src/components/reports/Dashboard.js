@@ -18,10 +18,12 @@ import ScanDateSelect from './ScanDateSelect';
 import PolicySelect from './PolicySelect';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import ScansAssignToHCCycle from './ScansAssignToHCCycle';
 import MergetoHCcycles from './MergetoHCcycles';
+import EditHCcycles from './EditHCcycles';
+
 import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
-
 const headCells = [
   {
     field: 'id',
@@ -157,10 +159,21 @@ const headCells = [
   },
   {
     field: 'assignee',
-    width: 150,
+    width: 100,
     sortable: true,
     editable: true,
     headerName: 'Assignee',
+  },
+  {
+    field: 'Edit',
+    width: 100,
+    sortable: true,
+    editable: true,
+    headerName: 'Edit',
+    renderCell: (param) => {
+      const currentRow = param.row;
+       return <EditHCcycles currentRow={currentRow} />
+    }
   },
 
 ];
@@ -176,15 +189,15 @@ const headCellsUnassignedScan = [
     headerName: 'JobId',
   },
   {
-    field: 'Ansible_Job',
+    field: 'name',
     numeric: true,
-    width: 150,
+    width: 280,
     sortable: true,
     editable: true,
     headerName: 'Ansible Job',
   },
   {
-    field: 'name',
+    field: 'policies',
     numeric: true,
     width: 150,
     sortable: true,
@@ -195,12 +208,12 @@ const headCellsUnassignedScan = [
   {
     field: 'date',
     numeric: true,
-    width: 100,
+    width: 180,
     sortable: true,
     editable: true,
     headerName: 'Scan Date',
     valueGetter: (params) =>
-      `${moment(params.row.scan_date).format('DD-MM-YYYY') || ''}`,
+      `${moment(params.row.scan_date).format('DD-MM-YYYY hh:mm A') || ''}`,
     
    
   },
@@ -325,7 +338,20 @@ const duplicateDeviationsData = (devData, setRows, setLoader) => {
 };
 
 
-
+const getPolicies = (scan) => {
+  let allPolicies = [];
+  scan?.policies.forEach(element => {
+    let found = allPolicies.filter(name => name == element.name); 
+    console.log("found", found)
+    if(!found.length){
+      let policyName = element.name.split('-'); 
+      allPolicies.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
+    }
+    
+  });
+  return allPolicies; 
+}
+ 
 export default function ScannedReportsDataGrid() {
   const [rows, setRows] = React.useState([{
     id: "2",
@@ -391,10 +417,17 @@ export default function ScannedReportsDataGrid() {
   const [scansRows, setScansRows] = React.useState([]);
   const [scanDate, setScanDate] = React.useState('');
   const [loader, setLoader] = React.useState(false);
-  const [reloadHCcycle, setReloadHCcycle] = React.useState(false);
+  const [loaderScan, setLoaderScan] = React.useState(false);
 
+  const [reloadHCcycle, setReloadHCcycle] = React.useState(false);
+  const [reloadScanApi, setReloadScanApi] = React.useState(false);
+
+  const [selectionModel, setSelectionModel] = React.useState([]);
+   
   React.useEffect(() => {
     setLoader(true); 
+    console.log('reloadHCcycle hc', reloadHCcycle)
+
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
         let policiesList = results.data; 
@@ -402,19 +435,8 @@ export default function ScannedReportsDataGrid() {
         policiesList.forEach(policy => {
           let scanDates = []; 
           policy?.scans.forEach(scan => {
-            let allPolicies = [];
             scanDates.push(moment(scan.date)); 
-            scan?.policies.forEach(element => {
-              let found = allPolicies.filter(name => name == element.name); 
-              console.log("found", found)
-              if(!found.length){
-                let policyName = element.name.split('-'); 
-                allPolicies.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
-              }
-              
-            });
-            policy.policies = allPolicies; 
-
+            policy.policies = getPolicies(scan); 
           })
           scanDates.sort((a, b)=> moment(a) - moment(b)); 
           policy.scanRange = scanDates[0].format('DD-MMM-YYYY') + " " + scanDates[scanDates.length-1].format('DD-MMM-YYYY');  
@@ -427,12 +449,18 @@ export default function ScannedReportsDataGrid() {
       console.log("error", error)
       alert("Fail to connect get HC API " + error);
     });
-  }, [reloadHCcycle]);
+  }, [reloadScanApi, reloadHCcycle]);
 
   React.useEffect(() => {
+    setLoaderScan(true)
+    console.log('reloadHCcycle scans', reloadHCcycle)
     UserService.getScannedDates().then((results) => {
       if (results.status === 200) {
+        results.data.forEach(scan => {
+          scan.policies = getPolicies(scan); 
+        });
         setScansRows(results.data);
+        setLoaderScan(false)
       }
     }).catch((error) => {
       console.log("error", error)
@@ -441,7 +469,7 @@ export default function ScannedReportsDataGrid() {
 
     });
 
-  }, [reloadHCcycle]);
+  }, [reloadScanApi, reloadHCcycle]);
 
   React.useEffect(() => {
     console.log("hccycleName", hccycleName);
@@ -466,7 +494,6 @@ export default function ScannedReportsDataGrid() {
   }, [hccycleName]);
 
   React.useEffect(() => {
-    console.log("scanDate", scanDate);
     if (scanDate) {
       let allPolicies = [];
       let scansRow = scansRows.filter((item) => item.jobId === scanDate);
@@ -503,6 +530,13 @@ export default function ScannedReportsDataGrid() {
   //     });
   //   }
   // }, [hccycleName, scanDate, policyName]);
+
+  headCells[headCells.length-1].renderCell = (param) => {
+    const currentRow = param.row;
+     return <EditHCcycles setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />
+  }
+
+  console.log("scanDate", headCells[headCells.length-1]);
 
 
   return (
@@ -546,14 +580,22 @@ export default function ScannedReportsDataGrid() {
           <Grid item>
             <Typography style={{padding: "5px"}} color="primary">Unassigned Scans</Typography>
           </Grid>
+          <Grid xs display="flex" justifyContent="right" alignItems="right">
+          
+          <ScansAssignToHCCycle setReloadScanApi={setReloadScanApi} scansRows={scansRows} selectionModel={selectionModel} hcrows={hcrows}/>
+          </Grid>
         </Grid>
 
         <DataGrid
           rows={scansRows}
           columns={headCellsUnassignedScan}
           autoPageSize
-          loading={loader}
+          loading={loaderScan}
           disableSelectionOnClick
+          checkboxSelection
+          onSelectionModelChange={(newSelectionModel) => {
+            setSelectionModel(newSelectionModel);
+          }}
           experimentalFeatures={{ newEditingApi: true }}
           density="compact"
         />
