@@ -69,7 +69,7 @@ const headCells = [
   {
     field: 'scanRange',
     numeric: true,
-    width: 175,
+    width: 185,
     sortable: true,
     editable: true,
     headerName: 'Scan Range',
@@ -457,7 +457,7 @@ export default function ScannedReportsDataGrid() {
    
   React.useEffect(() => {
     setLoader(true); 
-    console.log('reloadHCcycle hc', reloadHCcycle)
+    console.log('reloadHCcycle', reloadScanApi, reloadHCcycle)
 
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
@@ -466,15 +466,17 @@ export default function ScannedReportsDataGrid() {
         policiesList.forEach(policy => {
           let scanDates = []; 
           policy?.scans.forEach(scan => {
-            scanDates.push(moment(scan.date)); 
+            scanDates.push(moment(scan.date).format('DD-MMM-YYYY hh:mm:ss')); 
             policy.policies = getPolicies(scan); 
           })
           scanDates.sort((a, b)=> moment(a) - moment(b)); 
-          policy.scanRange = scanDates[0].format('DD-MMM-YYYY') + " " + scanDates[scanDates.length-1].format('DD-MMM-YYYY');  
+          policy.scanRange = scanDates[0] + " " + scanDates[scanDates.length-1];  
         })
 
         setHcrows(policiesList);
         setLoader(false)
+        setReloadScanApi(false)
+        setReloadHCcycle(false)
       }
     }).catch((error) => {
       console.log("error", error)
@@ -484,7 +486,8 @@ export default function ScannedReportsDataGrid() {
 
   React.useEffect(() => {
     setLoaderScan(true)
-    console.log('reloadHCcycle scans', reloadHCcycle)
+
+
     UserService.getScannedDates().then((results) => {
       if (results.status === 200) {
         results.data.forEach(scan => {
@@ -492,6 +495,8 @@ export default function ScannedReportsDataGrid() {
         });
         setScansRows(results.data);
         setLoaderScan(false)
+        setReloadScanApi(false)
+        setReloadHCcycle(false)
       }
     }).catch((error) => {
       console.log("error", error)
@@ -564,7 +569,7 @@ export default function ScannedReportsDataGrid() {
 
   headCells[headCells.length-2].renderCell = (param) => {
     const currentRow = param.row;
-     return <div>  <UpdateHCcycles setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />  
+     return <div>  <UpdateHCcycles setReloadScanApi={setReloadScanApi} setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />  
        </div>; 
   }
 

@@ -19,6 +19,7 @@ import HCcyclesSelect from './HCcyclesSelect';
 import ScanDateSelect from './ScanDateSelect';
 import PolicySelect from './PolicySelect';
 import moment from 'moment';
+import Tooltip from '@mui/material/Tooltip';
 
 
 const headCells = [
@@ -45,6 +46,12 @@ const headCells = [
     sortable: true,
     editable: true,
     headerName: 'Check Description',
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <Tooltip title={currentRow?.check_description}>
+      <span> {currentRow?.check_description}</span>
+    </Tooltip>
+    }
   },
   {
     field: 'hostname',
@@ -73,12 +80,12 @@ const headCells = [
   },
   {
     field: 'scan_date',
-    width: 150,
+    width: 160,
     sortable: true,
     editable: true,
     headerName: 'Scan Date',
      valueGetter: (params) =>
-      `${moment(params.row.scan_date).format('DD-MM-YYYY') || ""}`,
+      `${moment(params.row.scan_date).format('DD-MM-YYYY hh:mm:ss') || ""}`,
   },
 
   // {

@@ -20,6 +20,7 @@ import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import moment from 'moment';
+
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -57,7 +58,7 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
+export default function CustomizedDialogs({currentRow, setReloadHCcycle, setReloadScanApi}) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState(currentRow.name);
@@ -67,20 +68,29 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
     const [scans, setScans] = React.useState([]);
     const [dueDate, setDueDate] = React.useState( moment(currentRow.dueDate).format('YYYY-MM-DD')   );
     const [assignee, setAssignee] = React.useState(currentRow.assignee);
-    const [status, setStatus] = React.useState(currentRow.status);
 
+    const getPolicies = (policies) => {
+        let allPolicies = [];
+        policies?.forEach(element => {
+          let found = allPolicies.filter(name => name == element.name); 
+          console.log("found", found)
+          if(!found.length){
+            let policyName = element.name.split('-'); 
+            allPolicies.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
+          }
+        });
+        return allPolicies; 
+    }
+       
 
     const handleClickOpen = () => {
         setOpen(true);
-        //setName(''); 
-        //setDesc('')
-        //setCheckedScans([]); 
-        //setDueDate('')
-        //setAssignee('')
 
         let scansList = []; 
         currentRow?.scans?.forEach(element => {
             element.defaultChecked = true; 
+            if(element?.policies)
+            element.policies = getPolicies(element.policies).join();
             scansList.push(element); 
         });  
         console.log("scansList",scansList )
@@ -90,6 +100,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
                console.log("results", results.data);
                for (let index = 0; index < results.data.length; index++) {
                 const element = results.data[index];
+                element.policies = getPolicies(element.policies).join();
                 scansList.push(element); 
                }
                setScans(scansList); 
@@ -99,26 +110,36 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
             Notify.showError("Error" + error); 
           });
     };
+    // React.useEffect(()=> {
+        
+
+    // },[ open ])
     const handleClose = () => {
         setOpen(false);
+        setName(''); 
+        setDesc('')
+        setCheckedScans([]); 
+        setDueDate('')
+        setAssignee('')
     };
     const handleSubmit = () => {
         let data = {
             "name": name,
             "description": desc,
             "scans": checkedScans,
-            "status": "",
             "dueDate": dueDate,
             "assignee": assignee
           }
         UserService.updateHCCycle(currentRow?.id, data).then((results) => {
             let data = results.data; 
             if (data.ok) {
-                alert(data.message);
                 setReloadHCcycle(true);
+                setReloadScanApi(true)
+                alert(data.message);
+                
+
               // console.log("results", results.data);
-              Notify.showSuccess("Selected scans deleted successfully from the HC cycles"); 
-             
+              //window.location.reload(true)
               setOpen(false);
             }
           }).catch((error) => {
@@ -157,7 +178,8 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
     }, [currentRow])
 
     console.log('defaultChecked', scans )
-
+  
+    
     return (
         <div>
             <Button size='size' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
@@ -176,7 +198,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                  
-                 
+            
                 <TextField
                     variant='standard'
                     id="outlined-name"
@@ -204,7 +226,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
                             <div>
                                 
                              <FormGroup>
-                                <FormControlLabel  control={<Checkbox defaultChecked={scan.defaultChecked} value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (Job #${scan.jobId})`  }  />
+                                <FormControlLabel  control={<Checkbox defaultChecked={scan.defaultChecked} value={scan.id} onChange={handleCheckbox} />} label= {`${new Date(scan.date).toLocaleString()} (Job #${scan.jobId}) ${scan.policies}`  }  />
                             </FormGroup>
                             </div>
                         );
@@ -235,7 +257,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
                     />
 
 
-                <TextField
+                {/* <TextField
                     variant='standard'
                     id="outlined-name"
                     label="Status"
@@ -243,7 +265,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle}) {
                     required
                     fullWidth
                     onChange={(e) => setStatus(e.target.value)}
-                    />
+                    /> */}
                 </DialogContent>
                 <DialogActions> 
                 {/* contained */}
