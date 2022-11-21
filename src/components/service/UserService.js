@@ -47,6 +47,16 @@ class UserService {
         return axios.delete(apiConstant.GET_CYCLE_HOSTNAMES + selectedHCNo + '/delete', { data: scanIds } );
     }
 
+    async deleteHCCycle(selectedHCNo) {
+
+        return axios.delete(apiConstant.GET_CYCLE_HOSTNAMES + selectedHCNo , { data: '' } );
+    }
+
+    async updateHCCycle(selectedHCNo, data) {
+
+        return axios.patch(apiConstant.GET_CYCLE_HOSTNAMES + selectedHCNo , data );
+    }
+
     async createHCCycle(param) {
         return axios.post(apiConstant.CREATE_HC_CYCLE, param);
     }

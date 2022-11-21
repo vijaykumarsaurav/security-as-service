@@ -21,6 +21,8 @@ import Stack from '@mui/material/Stack';
 import ScansAssignToHCCycle from './ScansAssignToHCCycle';
 import MergetoHCcycles from './MergetoHCcycles';
 import EditHCcycles from './EditHCcycles';
+import UpdateHCcycles from './UpdateHCcycles';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
@@ -166,20 +168,48 @@ const headCells = [
     headerName: 'Assignee',
   },
   {
-    field: 'Action',
+    field: 'Edit',
     width: 100,
     sortable: true,
     editable: true,
     headerName: 'Edit',
     renderCell: (param) => {
       const currentRow = param.row;
-       return <EditHCcycles currentRow={currentRow} />
+       return  <div>  <UpdateHCcycles currentRow={currentRow} />  
+      
+       </div> //<EditHCcycles currentRow={currentRow} />
     }
   },
-
+  {
+    field: 'Delete',
+    width: 100,
+    sortable: true,
+    editable: true,
+    headerName: 'Delete',
+    renderCell: (param) => {
+      const currentRow = param.row;
+       return  <div> 
+       <Button size='small' variant="outlined"  onClick={() => handleDelete(currentRow.id)} > <DeleteIcon /></Button>
+       </div> //<EditHCcycles currentRow={currentRow} />
+    }
+  },
 ];
 
+const handleDelete = (id) => {
+  
+  if(window.confirm("Are you sure to delete HC cycle?"))
+  UserService.deleteHCCycle(id).then((results) => {
+      let data = results.data; 
+      if (data.ok) {
+          alert(data.message);
+      }
+    }).catch((error) => {
+      console.log("error", error)
+      alert(error);
+    });
 
+  
+};
 const headCellsUnassignedScan = [
   {
     field: 'jobId',
@@ -532,9 +562,10 @@ export default function ScannedReportsDataGrid() {
   //   }
   // }, [hccycleName, scanDate, policyName]);
 
-  headCells[headCells.length-1].renderCell = (param) => {
+  headCells[headCells.length-2].renderCell = (param) => {
     const currentRow = param.row;
-     return <EditHCcycles setReloadHCcycle={setReloadHCcycle}  currentRow={currentRow} />
+     return <div>  <UpdateHCcycles setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />  
+       </div>; 
   }
 
   console.log("scanDate", headCells[headCells.length-1]);
