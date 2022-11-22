@@ -202,6 +202,7 @@ const handleDelete = (id) => {
       let data = results.data; 
       if (data.ok) {
           alert(data.message);
+           window.location.reload(true)
       }
     }).catch((error) => {
       console.log("error", error)
@@ -610,7 +611,7 @@ export default function ScannedReportsDataGrid() {
       </Paper>
 
       <br />
-      <Paper style={{ paddingLeft: "10px", height:"200px", paddingBottom: "25px", width: '99%' }}>
+      <Paper style={{ paddingLeft: "10px", height:"250px", paddingBottom: "25px", width: '99%' }}>
 
         <Grid justify="space-between" container>
 

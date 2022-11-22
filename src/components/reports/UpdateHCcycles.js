@@ -139,7 +139,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle, setRelo
                 
 
               // console.log("results", results.data);
-              //window.location.reload(true)
+              window.location.reload(true)
               setOpen(false);
             }
           }).catch((error) => {
