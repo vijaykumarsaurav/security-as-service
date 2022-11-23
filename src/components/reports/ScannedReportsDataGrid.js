@@ -337,7 +337,7 @@ React.useEffect(() => {
         columns={headCells}
         //pageSize={20}
         // rowsPerPageOptions={[5, 10, 20, 50]}
-        checkboxSelection
+        //checkboxSelection
         autoPageSize
         loading={loader}
         disableSelectionOnClick

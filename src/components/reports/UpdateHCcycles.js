@@ -70,16 +70,20 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle, setRelo
     const [assignee, setAssignee] = React.useState(currentRow.assignee);
 
     const getPolicies = (policies) => {
-        let allPolicies = [];
-        policies?.forEach(element => {
-          let found = allPolicies.filter(name => name == element.name); 
-          console.log("found", found)
-          if(!found.length){
-            let policyName = element.name.split('-'); 
-            allPolicies.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
-          }
-        });
-        return allPolicies; 
+        if(policies.length){ 
+            let allPolicies = [];
+            console.log("policies table", policies)
+            policies?.forEach(element => {
+              let found = allPolicies.filter(name => name == element.name); 
+              console.log("found", found)
+              if(!found.length){
+                let policyName = element.name.split('-'); 
+                allPolicies.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
+              }
+            });
+            return allPolicies; 
+        }
+       
     }
        
 

@@ -218,7 +218,7 @@ const headCellsUnassignedScan = [
     width: 80,
     sortable: true,
     editable: true,
-    headerName: 'JobId',
+    headerName: 'Job Id',
   },
   {
     field: 'name',
