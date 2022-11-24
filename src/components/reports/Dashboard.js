@@ -618,10 +618,10 @@ export default function ScannedReportsDataGrid() {
           <Grid item>
             <Typography style={{padding: "5px"}} color="primary">Unassigned Scans</Typography>
           </Grid>
-          <Grid xs display="flex" justifyContent="right" alignItems="right">
+          {/* <Grid xs display="flex" justifyContent="right" alignItems="right">
           
           <ScansAssignToHCCycle setReloadScanApi={setReloadScanApi} scansRows={scansRows} selectionModel={selectionModel} hcrows={hcrows}/>
-          </Grid>
+          </Grid> */}
         </Grid>
 
         <DataGrid
@@ -630,7 +630,7 @@ export default function ScannedReportsDataGrid() {
           autoPageSize
           loading={loaderScan}
           disableSelectionOnClick
-          checkboxSelection
+         // checkboxSelection
           onSelectionModelChange={(newSelectionModel) => {
             setSelectionModel(newSelectionModel);
           }}
