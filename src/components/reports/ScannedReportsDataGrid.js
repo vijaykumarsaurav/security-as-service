@@ -6,6 +6,13 @@ import {
   GridToolbarDensitySelector,
   GridToolbarExport
 } from '@mui/x-data-grid';
+// import {
+//   DataGridPremium,
+//   GridToolbarContainer,
+//   GridToolbarExport,
+//    GridToolbarDensitySelector,
+// } from '@mui/x-data-grid-premium';
+
 import HeaderNavbar from '../HeaderNavbar'
 import UserService from '../service/UserService';
 import ItemsDialog from './ItemsDialog';
@@ -20,7 +27,6 @@ import ScanDateSelect from './ScanDateSelect';
 import PolicySelect from './PolicySelect';
 import moment from 'moment';
 import Tooltip from '@mui/material/Tooltip';
-
 
 const headCells = [
   {
@@ -186,7 +192,6 @@ const duplicateDeviationsData = (devData, setRows,  setLoader) => {
 };
 
 
-
 export default function ScannedReportsDataGrid() {
   const [rows, setRows] = React.useState([]);
   const [hccycleName, setHccycleName] = React.useState('');
@@ -324,14 +329,23 @@ React.useEffect(() => {
       </GridToolbarContainer>
     );
   }
+  function CustomToolbarExport() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarExport />
+      </GridToolbarContainer>
+    );
+  }
 
   console.log("urlFilterProps", urlFilterProps)
+
+
   return (
 
     <Box sx={{ height: 500, width: '100%' }}>
       <HeaderNavbar />
 
-      <DataGrid
+      <DataGrid //DataGridPremium
        
         rows={rows}
         columns={headCells}
@@ -343,8 +357,11 @@ React.useEffect(() => {
         disableSelectionOnClick
         experimentalFeatures={{ newEditingApi: true }}
         density="compact"
+        // components={{
+        //   Toolbar: urlHCcycle == 'undefined' ? CustomToolbar : "",
+        // }}
         components={{
-          Toolbar: urlHCcycle == 'undefined' ? CustomToolbar : "",
+          Toolbar:  CustomToolbarExport 
         }}
         initialState={{
           sorting: {

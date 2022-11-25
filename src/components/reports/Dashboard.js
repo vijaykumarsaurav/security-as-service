@@ -385,63 +385,8 @@ const getPolicies = (scan) => {
 }
  
 export default function ScannedReportsDataGrid() {
-  const [rows, setRows] = React.useState([{
-    id: "2",
-    cycle_name: "Financially significant systems",
-    policies: ["Windows 2019", "Windows 2022"],
-    scanRange: "28/Oct/2022 3/Nov/2022",
-    status: "Draft",
-    hostname: "62",
-    ADPS: "123",
-    checks: "22",
-    hostname: "62",
-    violations: "33",
-    hcCycleDueDate: "28/Oct/2022",
-    assignee: "Vijay"
-  }, {
-    id: "3",
-    cycle_name: "Prod systems",
-    policies: ["Windows2022_3"],
-    scanRange: "28/Oct/2022 3/Nov/2022",
-    status: "Assigning Violations",
-    hostname: "21",
-    ADPS: "22",
-    checks: "22",
-    hostname: "33",
-    violations: "11",
-    hcCycleDueDate: "29/Oct/2022",
-    assignee: "Pavel"
-  },
-  {
-    id: "4",
-    cycle_name: "Red Hat, Suse",
-    policies: ["Windows2022_4"],
-    scanRange: "28/Oct/2022 3/Nov/2022",
-    status: "Client Review",
-    hostname: "21",
-    ADPS: "22",
-    checks: "22",
-    hostname: "33",
-    violations: "11",
-    hcCycleDueDate: "29/Dec/2022",
-    assignee: "Blade"
-  }]);
-
-  const [rowsUnassignedScan, setRowsUnassignedScan] = React.useState([{
-    id: "13493",
-    Ansible_Job: "zz1_jobtemplate_healthscan_scan_windows_os_kemistry",
-    Scan_Date: "28/Oct/2022",
-    hostname: "2",
-    checks: "7",
-    violations: "5",
-  }, {
-    id: "2",
-    Ansible_Job: "Windows",
-    Scan_Date: "28/Oct/2022",
-    hostname: "2",
-    checks: "62",
-    violations: "359",
-  }]);
+  const [rows, setRows] = React.useState([]);
+  const [rowsUnassignedScan, setRowsUnassignedScan] = React.useState([]);
   const [hccycleName, setHccycleName] = React.useState('');
   const [policies, setPolicies] = React.useState([]);
   const [policyName, setPolicyName] = React.useState('');
@@ -458,7 +403,6 @@ export default function ScannedReportsDataGrid() {
    
   React.useEffect(() => {
     setLoader(true); 
-    console.log('reloadHCcycle', reloadScanApi, reloadHCcycle)
 
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
@@ -476,8 +420,6 @@ export default function ScannedReportsDataGrid() {
 
         setHcrows(policiesList);
         setLoader(false)
-        setReloadScanApi(false)
-        setReloadHCcycle(false)
       }
     }).catch((error) => {
       console.log("error", error)
@@ -496,8 +438,6 @@ export default function ScannedReportsDataGrid() {
         });
         setScansRows(results.data);
         setLoaderScan(false)
-        setReloadScanApi(false)
-        setReloadHCcycle(false)
       }
     }).catch((error) => {
       console.log("error", error)
