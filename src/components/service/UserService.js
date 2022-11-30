@@ -20,6 +20,10 @@ class UserService {
     async getHCCycles() {
         return axios.get(apiConstant.GET_HC_CYCLES, '');
     }
+
+    async getChangeTickets() {
+        return axios.get(apiConstant.GET_CHANGE_REQUEST, '');
+    }
     
     async getCycleDetails(id) {
         return axios.get(apiConstant.GET_CYCLE_DETAILS + id, '');

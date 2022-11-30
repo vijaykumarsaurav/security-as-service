@@ -116,6 +116,7 @@ export default function PrimarySearchAppBar(props) {
     >
       <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
       <MenuItem onClick={() => window.location.replace('#/dashboard')}>Dashboard</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/change-request')}>Change Request</MenuItem>
 
       <MenuItem onClick={() => window.location.replace('#/scanned-reports-datagrid')}>Deviations Reports (Finalized)</MenuItem>
 
@@ -191,10 +192,10 @@ export default function PrimarySearchAppBar(props) {
               size="large"
               aria-label="Added product"
               color="inherit"
-              title="Scanned Reports"
+              title="Dashboard"
              >
 
-            <Badge onClick={() => window.location.replace('#/scanned-reports-datagrid')} badgeContent={props.totalItem || cartList.length} color="error">
+            <Badge onClick={() => window.location.replace('#/dashboard')} badgeContent={props.totalItem || cartList.length} color="error">
               <AssignmentIcon/>
             </Badge>
           

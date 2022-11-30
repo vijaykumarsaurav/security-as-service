@@ -4,6 +4,7 @@ import ScannedReports from './reports/ScannedReports';
 import ScannedReportsDuplicates from './reports/ScannedReportsDuplicates';
 import ScannedReportsDataGrid from './reports/ScannedReportsDataGrid';
 import Dashboard from './reports/Dashboard';
+import ChangeRequestDataGrid from './reports/ChangeRequestDataGrid';
 
 
 const AppRouter = () => {
@@ -17,6 +18,7 @@ const AppRouter = () => {
                     <Route path="/scanned-reports-duplicate" component={ScannedReportsDuplicates}/>
                     <Route path="/scanned-reports-datagrid" component={ScannedReportsDataGrid}/>
                     <Route path="/dashboard" component={Dashboard}/>
+                    <Route path="/change-request" component={ChangeRequestDataGrid}/>
 
                     <Route path="*" component={ScannedReportsDataGrid} />
                      
