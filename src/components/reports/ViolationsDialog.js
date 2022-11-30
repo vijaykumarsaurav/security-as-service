@@ -74,13 +74,14 @@ export default function CustomizedDialogs({ items, title }) {
                 open={open}
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                    {title === "Values" ? "Measure Values" : "Policy Parameters"}
+                    {title}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                     <Paper style={{padding:'10px'}}> 
                     {items?.map((item, i) => {
                         return (
-                            <span><span>{i+1}. {item}</span><br /></span> 
+                            <span><span>{i+1}. {item.message
+                            }</span><br /></span> 
                         );
                     })}
                     </Paper>

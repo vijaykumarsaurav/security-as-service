@@ -184,7 +184,7 @@ export default function CustomizedDialogs({id, cycle_name,  count, title, dashbo
                 </DialogContent>
                 <DialogActions> 
                     <Button variant="outlined"  autoFocus onClick={handleClose}>
-                        Okey
+                        Okay
                     </Button>
                 </DialogActions>
             </BootstrapDialog>

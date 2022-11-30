@@ -97,7 +97,7 @@ export default function CustomizedDialogs(props) {
                 </DialogContent>
                 <DialogActions>
                     <Button autoFocus onClick={handleClose}>
-                        Okey
+                        OK
                     </Button>
                 </DialogActions>
             </BootstrapDialog>
