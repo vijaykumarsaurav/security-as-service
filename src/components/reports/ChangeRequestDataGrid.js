@@ -84,17 +84,17 @@ const headCells = [
     editable: true,
     headerName: 'Correlation Display',
   },
-  {
-    field: 'patterns',
-    width: 150,
-    sortable: true,
-    editable: true,
-    headerName: 'Patterns',
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return <Button onClick={() => alert(JSON.stringify(currentRow?.patterns))}> {currentRow?.patterns?.length} Patterns</Button>
-    }
-  },
+  // {
+  //   field: 'patterns',
+  //   width: 150,
+  //   sortable: true,
+  //   editable: true,
+  //   headerName: 'Patterns',
+  //   renderCell: (param) => {
+  //     const currentRow = param.row;
+  //     return <Button onClick={() => alert(JSON.stringify(currentRow?.patterns))}> {currentRow?.patterns?.length} Patterns</Button>
+  //   }
+  // },
   {
     field: 'violations',
     width: 150,
