@@ -59,8 +59,8 @@ const headCells = [
     headerName: 'Policies',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Tooltip title={currentRow?.policies.join()}>
-      <span> {currentRow?.policies.join()}</span>
+      return <Tooltip title={currentRow?.policies}>
+      <span> {currentRow?.policies}</span>
     </Tooltip>//<bigTextDisplay policies={currentRow?.policies} />
     }
     // valueGetter: (params) =>
@@ -129,7 +129,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?hc="+currentRow?.name+"&sort=check_status"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
+      return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?hc="+currentRow?.id+"&f=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -146,7 +146,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-       return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?hc="+currentRow?.name+"&sort=violation_name" } >{currentRow?.statistic?.violations}</Button>
+       return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?hc="+currentRow?.id+"&f=violations" } >{currentRow?.statistic?.violations}</Button>
       //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
   },
@@ -277,7 +277,7 @@ const headCellsUnassignedScan = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?jobid="+currentRow?.jobId+"&sort=check_status"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
+      return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?jobid="+currentRow?.id+"&sort=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -294,7 +294,7 @@ const headCellsUnassignedScan = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-       return <Button size='small' variant="outlined" target={'_blank'} href={"#/scanned-reports-datagrid?hc="+currentRow?.jobId+"&sort=violation_name" } >{currentRow?.statistic?.violations}</Button>
+       return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?hc="+currentRow?.id+"&sort=violations" } >{currentRow?.statistic?.violations}</Button>
       //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
   },
@@ -369,19 +369,12 @@ const duplicateDeviationsData = (devData, setRows, setLoader) => {
   setLoader(false);
 };
 
-
-const getPolicies = (scan) => {
-  let allPolicies = [];
+const getPolicies = (scan, policiesList) => {
   scan?.policies.forEach(element => {
-    let found = allPolicies.filter(name => name == element.name); 
-    console.log("found", found)
-    if(!found.length){
-      let policyName = element.name.split('-'); 
-      allPolicies.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
-    }
-    
+    let policyName = element.name.split('-'); 
+    policiesList.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
   });
-  return allPolicies; 
+  return policiesList; 
 }
  
 export default function ScannedReportsDataGrid() {
@@ -406,19 +399,19 @@ export default function ScannedReportsDataGrid() {
 
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
-        let policiesList = results.data; 
-        
-        policiesList.forEach(policy => {
+        let hcList = results.data; 
+        let policiesList = []; 
+        hcList.forEach(hcCycle => {
           let scanDates = []; 
-          policy?.scans.forEach(scan => {
+          hcCycle?.scans.forEach(scan => {
             scanDates.push(moment(scan.date).format('DD-MMM-YYYY hh:mm:ss')); 
-            policy.policies = getPolicies(scan); 
+            hcCycle.policies =  [...new Set(getPolicies(scan, policiesList))];;
           })
           scanDates.sort((a, b)=> moment(a) - moment(b)); 
-          policy.scanRange = scanDates[0] + " " + scanDates[scanDates.length-1];  
+          hcCycle.scanRange = scanDates[0] + " " + scanDates[scanDates.length-1];  
         })
 
-        setHcrows(policiesList);
+        setHcrows(hcList);
         setLoader(false)
       }
     }).catch((error) => {
@@ -430,11 +423,12 @@ export default function ScannedReportsDataGrid() {
   React.useEffect(() => {
     setLoaderScan(true)
 
+    let policiesList = []; 
 
     UserService.getScannedDates().then((results) => {
       if (results.status === 200) {
         results.data.forEach(scan => {
-          scan.policies = getPolicies(scan); 
+          scan.policies =  [...new Set(getPolicies(scan, policiesList))];;
         });
         setScansRows(results.data);
         setLoaderScan(false)
@@ -443,7 +437,6 @@ export default function ScannedReportsDataGrid() {
       console.log("error", error)
       alert("Error" + error);
       alert("Fail to connect get Scan Dates API " + error);
-
     });
 
   }, [reloadScanApi, reloadHCcycle]);

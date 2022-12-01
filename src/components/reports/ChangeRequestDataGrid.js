@@ -21,6 +21,7 @@ import ScanDateSelect from './ScanDateSelect';
 import PolicySelect from './PolicySelect';
 import moment from 'moment';
 import Tooltip from '@mui/material/Tooltip';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const headCells = [
   {
@@ -109,8 +110,51 @@ const headCells = [
       const currentRow = param.row;
       return <ViolationsDialog items={currentRow?.violations} title="Violations" />
     }
-  }
+  },
+  {
+    field: 'Edit',
+    width: 100,
+    sortable: true,
+    editable: true,
+    headerName: 'Edit',
+    renderCell: (param) => {
+      const currentRow = param.row;
+       return  <div>  <CreateChangeRequest currentRow={currentRow} />  
+      
+       </div> //<EditHCcycles currentRow={currentRow} />
+    }
+  },
+  {
+    field: 'Delete',
+    width: 100,
+    sortable: true,
+    editable: true,
+    headerName: 'Delete',
+    renderCell: (param) => {
+      const currentRow = param.row;
+       return  <div> 
+       <Button size='small' variant="outlined"  onClick={() => handleDelete(currentRow.id)} > <DeleteIcon /></Button>
+       </div> //<EditHCcycles currentRow={currentRow} />
+    }
+  },
 ];
+
+const handleDelete = (id) => {
+  
+  if(window.confirm("Are you sure to delete HC cycle?"))
+  UserService.deleteHCCycle(id).then((results) => {
+      let data = results.data; 
+      if (data.ok) {
+          alert(data.message);
+           window.location.reload(true)
+      }
+    }).catch((error) => {
+      console.log("error", error)
+      alert(error);
+    });
+
+  
+};
 
 export default function ScannedReportsDataGrid() {
   const [rows, setRows] = React.useState([]);
