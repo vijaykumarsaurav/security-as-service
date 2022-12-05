@@ -52,12 +52,14 @@ class UserService {
     }
 
     async deleteHCCycle(selectedHCNo) {
-
         return axios.delete(apiConstant.GET_CYCLE_HOSTNAMES + selectedHCNo , { data: '' } );
     }
 
-    async updateHCCycle(selectedHCNo, data) {
+    async deleteChangeRequest(selectedHCNo) {
+        return axios.delete(apiConstant.CHANGE_REQUEST + selectedHCNo , { data: '' } );
+    }
 
+    async updateHCCycle(selectedHCNo, data) {
         return axios.patch(apiConstant.GET_CYCLE_HOSTNAMES + selectedHCNo , data );
     }
 
@@ -67,6 +69,10 @@ class UserService {
 
     async createChangeTicket(param) {
         return axios.post(apiConstant.CHANGE_REQUEST, param);
+    }
+
+    async updateChangeTicket(Id, data) {
+        return axios.patch(apiConstant.CHANGE_REQUEST + Id , data );
     }
 
     

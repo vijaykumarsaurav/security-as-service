@@ -15,6 +15,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import { Select, Button, Typography, Paper, Grid } from '@mui/material';
 import CreateChangeRequest from './CreateChangeRequest';
+import CreateChangeEdit from './CreateChangeEdit';
+
 import Notify from '../utils/Notify';
 import HCcyclesSelect from './HCcyclesSelect';
 import ScanDateSelect from './ScanDateSelect';
@@ -119,7 +121,7 @@ const headCells = [
     headerName: 'Edit',
     renderCell: (param) => {
       const currentRow = param.row;
-       return  <div>  <CreateChangeRequest currentRow={currentRow} />  
+       return  <div>  <CreateChangeEdit currentRow={currentRow} />  
       
        </div> //<EditHCcycles currentRow={currentRow} />
     }
@@ -141,8 +143,8 @@ const headCells = [
 
 const handleDelete = (id) => {
   
-  if(window.confirm("Are you sure to delete HC cycle?"))
-  UserService.deleteHCCycle(id).then((results) => {
+  if(window.confirm("Are you sure to delete the change request  ?"))
+  UserService.deleteChangeRequest(id).then((results) => {
       let data = results.data; 
       if (data.ok) {
           alert(data.message);
@@ -170,10 +172,11 @@ export default function ScannedReportsDataGrid() {
   const [urlFilterProps, setUrlFilterProps] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[1]?.split('=')[1]));
 
   React.useEffect(() => {
+    setLoader(true)
     UserService.getChangeTickets().then((results) => {
       if (results.status === 200) {
+        setLoader(false)
         setRows(results.data);
-      
       }
     }).catch((error) => {
       console.log("error", error)
