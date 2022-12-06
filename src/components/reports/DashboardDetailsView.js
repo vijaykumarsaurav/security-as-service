@@ -36,6 +36,12 @@ const headCells = [
     sortable: true,
     editable: true,
     headerName: 'Check Section',
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <Tooltip title={currentRow?.check_section}>
+      <span> {currentRow?.check_section}</span>
+    </Tooltip>
+    }
   },
   {
     field: 'policy',
@@ -138,7 +144,7 @@ const headCells = [
     headerName: 'Policy Parameters',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <ItemsDialog items={currentRow?.policy_parameters} title="Values" />
+      return <ItemsDialog items={currentRow?.policy_parameters} title="Parameters" />
     }
     //   renderCell: (params) => {
     //     const onClick = (e) => {
