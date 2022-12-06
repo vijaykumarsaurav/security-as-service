@@ -90,7 +90,7 @@ export default function CustomizedDialogs({ items, title }) {
                 </DialogContent>
                 <DialogActions>
                     <Button autoFocus onClick={handleClose}>
-                        Okay
+                        OK
                     </Button>
                 </DialogActions>
             </BootstrapDialog>

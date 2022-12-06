@@ -122,7 +122,7 @@ const headCells = [
     width: 75,
     sortable: true,
     editable: true,
-    headerName: 'Checks',
+    headerName: 'Results',
     // renderCell: (param) => {
     //   const currentRow = param.row;
     //   return <a href="#/dashboard" >{currentRow?.statistic?.checks}</a>
@@ -155,7 +155,7 @@ const headCells = [
     width: 150,
     sortable: true,
     editable: true,
-    headerName: 'HC Cycle Due Date',
+    headerName: 'Due Date',
     valueGetter: (params) =>
     `${moment(params.row.dueDate).format('DD-MM-YYYY') || ''}`,
 
@@ -235,6 +235,12 @@ const headCellsUnassignedScan = [
     sortable: true,
     editable: true,
     headerName: 'Policies',
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <Tooltip title={currentRow?.policies}>
+      <span> {currentRow?.policies}</span>
+    </Tooltip>
+    }
   },
   
   {
@@ -270,7 +276,7 @@ const headCellsUnassignedScan = [
     width: 75,
     sortable: true,
     editable: true,
-    headerName: 'Checks',
+    headerName: 'Results',
     // renderCell: (param) => {
     //   const currentRow = param.row;
     //   return <a href="#/dashboard" >{currentRow?.statistic?.checks}</a>
@@ -521,7 +527,7 @@ export default function ScannedReportsDataGrid() {
 
         <Grid container >
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-          <Typography color="primary" style={{padding: "5px"}}>  Active Health Check cycles</Typography>
+          <Typography color="primary" style={{padding: "5px"}}>  Health Check Cycles</Typography>
           </Grid>
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">

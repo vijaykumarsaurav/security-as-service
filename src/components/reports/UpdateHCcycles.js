@@ -127,6 +127,11 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle, setRelo
         setAssignee('')
     };
     const handleSubmit = () => {
+
+        if(checkedScans.length === 0){
+            alert("No scan selected!")
+            return;
+        }
         let data = {
             "name": name,
             "description": desc,
@@ -198,7 +203,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle, setRelo
                 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                 Update:  {currentRow.name}
+                 {currentRow.name}
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
                  
