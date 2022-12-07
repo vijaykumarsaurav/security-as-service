@@ -406,12 +406,12 @@ export default function ScannedReportsDataGrid() {
     UserService.getHCCycles().then((results) => {
       if (results.status === 200) {
         let hcList = results.data; 
-        let policiesList = []; 
         hcList.forEach(hcCycle => {
           let scanDates = []; 
+          let policiesList = []; 
           hcCycle?.scans.forEach(scan => {
             scanDates.push(moment(scan.date).format('DD-MMM-YYYY hh:mm:ss')); 
-            hcCycle.policies =  [...new Set(getPolicies(scan, policiesList))];;
+            hcCycle.policies =  [...new Set(getPolicies(scan, policiesList))];
           })
           scanDates.sort((a, b)=> moment(a) - moment(b)); 
           hcCycle.scanRange = scanDates[0] + " " + scanDates[scanDates.length-1];  

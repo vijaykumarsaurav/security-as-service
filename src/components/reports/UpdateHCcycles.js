@@ -94,7 +94,9 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle, setRelo
         currentRow?.scans?.forEach(element => {
             element.defaultChecked = true; 
             if(element?.policies)
-            element.policies = getPolicies(element.policies).join();
+            if(element.policies){
+                element.policies = getPolicies(element.policies).join();
+            }
             scansList.push(element); 
         });  
         console.log("scansList",scansList )
@@ -104,7 +106,9 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle, setRelo
                console.log("results", results.data);
                for (let index = 0; index < results.data.length; index++) {
                 const element = results.data[index];
-                element.policies = getPolicies(element.policies).join();
+                if(element.policies){
+                    element.policies = getPolicies(element.policies).join();
+                }
                 scansList.push(element); 
                }
                setScans(scansList); 

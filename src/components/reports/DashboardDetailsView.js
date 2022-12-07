@@ -44,12 +44,18 @@ const headCells = [
     }
   },
   {
-    field: 'policy',
+    field: 'displayPolicyName',
     numeric: false,
     width: 150,
     sortable: true,
     editable: true,
     headerName: 'Policy',
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <Tooltip title={currentRow?.displayPolicyName}>
+      <span> {currentRow?.displayPolicyName}</span>
+    </Tooltip>
+    }
   },
   {
     field: 'severity',
@@ -180,24 +186,25 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
         policy_parameters: host.policy_parameters,
         id: id,
         violation_name : "",
-        policy : policy
+        displayPolicyName : ''
       }
 
 
       if (host.check_status === 'OK' && urlFilterProps === 'checks') {
-        rowsData.push(hostData);
+        tempDevData.push(hostData);
         id++;
       } else if(urlFilterProps === 'violations' || urlFilterProps === 'checks'){
         if (host.check_status === 'KO') {
           host.violations.forEach(violation => {
-            let seperateHostdata = { ...hostData };
+            let seperateHostdata = hostData;  //{ ...hostData };
             seperateHostdata.id = id;
             seperateHostdata.violation_name = violation.message;
-            seperateHostdata.policy = policy;
+            seperateHostdata.displayPolicyName =  policy
 
-            if(violation.message){
-              rowsData.push(seperateHostdata);
-            }
+            tempDevData.push(seperateHostdata);
+            // if(violation.message){
+            //   tempDevData.push(seperateHostdata);
+            // }
             id++;
           })
         }
@@ -211,6 +218,57 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
   //rowsData.concat(tempDevData);
  //setRows(rows.concat(tempDevData));
  // setLoader(false);
+ return tempDevData;
+};
+
+const getResults = (checks, urlFilterProps, policy='', rowsData) => {
+  let tempDevData = [];
+  let id = 0;
+
+
+  for (let index = 0; index < checks.length; index++) {
+    const element = checks[index];
+    let hostData = {
+      check_section: element.check_section,
+      check_description: element.check_description,
+      severity: element.severity,
+      displayPolicyName : policy,
+
+      hostname: '',
+      ip: '',
+      scan_date:'',
+      measure_values: '',
+      policy_parameters: '',
+      id: id,
+      violation_name : "",
+    }
+    tempDevData.push(hostData);
+    let hostnames =[];
+    // element?.hosts.forEach(host => {
+      
+    //   hostnames.push(host.hostname); 
+    //   hostData.check_status = host.check_status; 
+    //   if (host.check_status === 'KO') {
+    //     let violations = []
+    //     host.violations.forEach(violation => {
+    //       violations.push(violation.message);
+    //     })
+    //     hostData.violation_name = violations.join(',');
+    //   }
+    //   tempDevData.push(hostData);
+
+      
+    // });
+    // hostData.hostname = hostnames.join(',');
+
+
+  }
+
+  //let rowsData =  [...rows]; 
+  //rowsData.concat(tempDevData);
+ //setRows(rows.concat(tempDevData));
+ // setLoader(false);
+ return tempDevData;
 };
 
 
@@ -228,12 +286,32 @@ export default function ScannedReportsDataGrid() {
       if (results.status === 200) {
        // setRows(results.data);
        let rowsData = []; 
+
         for (let index = 0; index < results.data.length; index++) {
           const checks = results.data[index]?.checks;
           const policy = results.data[index]?.policy;
-          duplicateDeviationsData(checks, urlFilterProps, policy, rowsData);
+
+           if(urlFilterProps === 'violations'){
+              let tempDevData = duplicateDeviationsData(checks, urlFilterProps, policy, rowsData);
+              console.log("tempDevData", tempDevData, policy)
+              tempDevData.forEach(element => {
+              console.log("element.policyName", element.policyName)
+              rowsData.push(element);
+              });
+           }else if(urlFilterProps === 'checks'){
+              let tempDevData = getResults(checks, urlFilterProps, policy, rowsData);
+              console.log("tempDevData", tempDevData, policy)
+              tempDevData.forEach(element => {
+              console.log("element.policyName", element.policyName)
+              rowsData.push(element);
+              });
+           }
+         
+          //rowsData.concat(tempDevData);
         }
-        setRows(rowsData);
+        setRows(rowsData)
+       // console.log("rowsData", rowsData)
+        //
         setLoader(false)
       }
     }).catch((error) => {
