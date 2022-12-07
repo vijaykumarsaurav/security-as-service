@@ -180,38 +180,28 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
   for (let index = 0; index < checks.length; index++) {
     const element = checks[index];
     element?.hosts.forEach(host => {
-      let hostData = {
-        check_section: element.check_section,
-        check_description: element.check_description,
-        severity: element.severity,
-        hostname: host.hostname,
-        check_status: host.check_status,
-        ip: host.ip,
-        scan_date: host.scan_date,
-        measure_values: host.measure_values,
-        policy_parameters: host.policy_parameters,
-        id: id,
-        violation_name : "",
-        displayPolicyName : ''
-      }
-
-
-      if (host.check_status === 'OK' && urlFilterProps === 'checks') {
-        tempDevData.push(hostData);
-        id++;
-      } else if(urlFilterProps === 'violations' || urlFilterProps === 'checks'){
+     
+       if(urlFilterProps === 'violations'){
         if (host.check_status === 'KO') {
+         
           host.violations.forEach(violation => {
-            let seperateHostdata = { ...hostData }; //hostData;  //
-            seperateHostdata.id = violation.id;
-            seperateHostdata.violation_name = violation.message;
-            seperateHostdata.displayPolicyName =  policy
 
-            tempDevData.push(seperateHostdata);
-            // if(violation.message){
-            //   tempDevData.push(seperateHostdata);
-            // }
-            id++;
+            let hostData = {
+              check_section: element.check_section,
+              check_description: element.check_description,
+              severity: element.severity,
+              hostname: host.hostname,
+              check_status: host.check_status,
+              ip: host.ip,
+              scan_date: host.scan_date,
+              measure_values: host.measure_values,
+              policy_parameters: host.policy_parameters,
+              violation_name : violation.message,
+              displayPolicyName : policy,
+              id: violation.id
+            }
+
+            tempDevData.push(hostData);
           })
         }
       }

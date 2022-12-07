@@ -518,11 +518,11 @@ export default function ScannedReportsDataGrid() {
   //   }
   // }, [hccycleName, scanDate, policyName]);
 
-  headCells[headCells.length-2].renderCell = (param) => {
-    const currentRow = param.row;
-     return <div>  <UpdateHCcycles setReloadScanApi={setReloadScanApi} setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />  
-       </div>; 
-  }
+  // headCells[headCells.length-3].renderCell = (param) => {
+  //   const currentRow = param.row;
+  //    return <div>  <UpdateHCcycles setReloadScanApi={setReloadScanApi} setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />  
+  //      </div>; 
+  // }
 
   console.log("scanDate", headCells[headCells.length-1]);
 

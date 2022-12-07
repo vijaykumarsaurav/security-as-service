@@ -58,7 +58,7 @@ BootstrapDialogTitle.propTypes = {
     onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs({currentRow, setReloadHCcycle, setReloadScanApi}) {
+export default function CustomizedDialogs({currentRow}) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState(currentRow.name);
@@ -146,11 +146,7 @@ export default function CustomizedDialogs({currentRow, setReloadHCcycle, setRelo
         UserService.updateHCCycle(currentRow?.id, data).then((results) => {
             let data = results.data; 
             if (data.ok) {
-                setReloadHCcycle(true);
-                setReloadScanApi(true)
                 alert(data.message);
-                
-
               // console.log("results", results.data);
               window.location.reload(true)
               setOpen(false);
