@@ -111,7 +111,7 @@ const headCells = [
     editable: true,
     headerName: 'Scan Date',
      valueGetter: (params) =>
-      `${moment(params.row.scan_date).format('DD-MM-YYYY hh:mm:ss') || ""}`,
+     params.row.scan_date ? `${moment(params.row.scan_date).format('DD-MM-YYYY hh:mm:ss') || ""}` : "",
   },
 
   // {
@@ -130,6 +130,12 @@ const headCells = [
     sortable: true,
     editable: true,
     headerName: 'Violation',
+    renderCell: (param) => {
+      const currentRow = param.row;
+      return <Tooltip title={currentRow?.violation_name}>
+      <span> {currentRow?.violation_name}</span>
+    </Tooltip>
+    }
   },
   {
     field: 'measure_values',
@@ -139,7 +145,7 @@ const headCells = [
     headerName: 'Measure Values',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <ItemsDialog items={currentRow?.measure_values} title="Values" />
+      return currentRow?.measure_values?.length > 0 ? <ItemsDialog items={currentRow?.measure_values} title="Values" /> : ""
     }
   },
   {
@@ -150,7 +156,7 @@ const headCells = [
     headerName: 'Policy Parameters',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <ItemsDialog items={currentRow?.policy_parameters} title="Parameters" />
+      return currentRow?.policy_parameters?.length > 0 ? <ItemsDialog items={currentRow?.policy_parameters} title="Parameters" /> : ""
     }
     //   renderCell: (params) => {
     //     const onClick = (e) => {
@@ -196,8 +202,8 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
       } else if(urlFilterProps === 'violations' || urlFilterProps === 'checks'){
         if (host.check_status === 'KO') {
           host.violations.forEach(violation => {
-            let seperateHostdata = hostData;  //{ ...hostData };
-            seperateHostdata.id = id;
+            let seperateHostdata = { ...hostData }; //hostData;  //
+            seperateHostdata.id = violation.id;
             seperateHostdata.violation_name = violation.message;
             seperateHostdata.displayPolicyName =  policy
 
@@ -278,6 +284,10 @@ export default function ScannedReportsDataGrid() {
 
   const [urlHCcycle, setUrlHCcycle] = React.useState(decodeURIComponent(window.location.href.split('?')[1]?.split('=')[1])?.split("&")[0]);
   const [urlFilterProps, setUrlFilterProps] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[1]?.split('=')[1]));
+  const [urlVoilations, setUrlVoilations] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[2]?.split('=')[1]));
+  const [changeId, setChangeId] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[3]?.split('=')[1]));
+
+  const [selectionModel, setSelectionModel] = React.useState( [] );
 
   React.useEffect(() => {
     setLoader(true)
@@ -300,7 +310,7 @@ export default function ScannedReportsDataGrid() {
               });
            }else if(urlFilterProps === 'checks'){
               let tempDevData = getResults(checks, urlFilterProps, policy, rowsData);
-              console.log("tempDevData", tempDevData, policy)
+              console.log("tempDevData checks", tempDevData, policy)
               tempDevData.forEach(element => {
               console.log("element.policyName", element.policyName)
               rowsData.push(element);
@@ -318,18 +328,44 @@ export default function ScannedReportsDataGrid() {
       console.log("error", error)
       alert("Fail to connect get HC API " + error);
     });
+
+    if(urlVoilations != 'undefined' ){
+      setSelectionModel(JSON.parse(urlVoilations)); 
+    }
+
   }, []);
+
+  const handleAssignment = () => {
+  
+    let param = {
+      "violations": selectionModel,
+    }
+  
+  UserService.updateChangeTicket(changeId, param).then((results) => {
+      let data = results.data; 
+      if (data.ok) {
+          alert(data.message);
+          window.opener.location.reload();
+          window.close()
+      }
+    }).catch((error) => {
+      console.log("error", error)
+      Notify.showError("Error" + error); 
+    });
+  }
 
   function CustomToolbarExport() {
     return (
       <GridToolbarContainer>
         <GridToolbarExport />
+        &nbsp;&nbsp;
+        {selectionModel.length > 0  ? <Button onClick={handleAssignment} size="small" variant='outlined'> Assign to change Ticket </Button> :"" }
+        
       </GridToolbarContainer>
     );
   }
 
-
-
+  console.log("changeId", changeId)
   return (
 
     <Box sx={{ height: 500, width: '100%' }}>
@@ -339,33 +375,20 @@ export default function ScannedReportsDataGrid() {
        
         rows={rows}
         columns={headCells}
-        //pageSize={20}
-        // rowsPerPageOptions={[5, 10, 20, 50]}
-        //checkboxSelection
+        checkboxSelection={changeId != 'undefined' ? true :  false} 
+        onSelectionModelChange={(newSelectionModel) => {
+          setSelectionModel(newSelectionModel);
+        }}
+        selectionModel={selectionModel}
+      
         autoPageSize
         loading={loader}
         disableSelectionOnClick
         experimentalFeatures={{ newEditingApi: true }}
         density="compact"
-        // components={{
-        //   Toolbar: urlHCcycle == 'undefined' ? CustomToolbar : "",
-        // }}
         components={{
           Toolbar:  CustomToolbarExport 
         }}
-        
-        // initialState={{
-        //   sorting: {
-        //     sortModel: [{ field: 'check_status', sort: 'desc' }],
-        //   },
-        // }}
-
-        // filterModel={{
-        //   items: [
-        //     { columnField: urlFilterProps, operatorValue: 'isNotEmpty', value: 'isNotEmpty' }],
-        // }}
-
-      // editMode="row"
       />
     </Box>
   );

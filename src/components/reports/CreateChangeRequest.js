@@ -308,7 +308,7 @@ export default function CustomizedDialogs({setReloadCTcycle}) {
                     onChange={(e) => setAssignmentGroup(e.target.value)}
                     />
                     <br />  <br />
-                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                {/* <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Select Health Check Cycle</InputLabel>
                     <Select
                     labelId="demo-select-small"
@@ -331,7 +331,7 @@ export default function CustomizedDialogs({setReloadCTcycle}) {
               
 
                 <VoilationTable rows={violationList} loader={loader} setSelectionModel={setSelectionModel} />
-
+ */}
 
                 </DialogContent>
 

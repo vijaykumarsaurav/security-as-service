@@ -63,6 +63,8 @@ export default function CustomizedDialogs({ items, title }) {
         setOpen(false);
     };
 
+    
+
     return (
         <div>
             <Button size='small' title="Click to view the all"  variant="outlined" onClick={handleClickOpen}>

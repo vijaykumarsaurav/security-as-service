@@ -23,7 +23,7 @@ import MergetoHCcycles from './MergetoHCcycles';
 import EditHCcycles from './EditHCcycles';
 import UpdateHCcycles from './UpdateHCcycles';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
 import Tooltip from '@mui/material/Tooltip';
 import moment from 'moment';
 const headCells = [
@@ -191,6 +191,17 @@ const headCells = [
        return  <div> 
        <Button size='small' variant="outlined"  onClick={() => handleDelete(currentRow.id)} > <DeleteIcon /></Button>
        </div> //<EditHCcycles currentRow={currentRow} />
+    }
+  },
+  {
+    field: 'ManageCT',
+    width: 100,
+    sortable: true,
+    editable: true,
+    headerName: 'Manage Change Ticket',
+    renderCell: (param) => {
+      const currentRow = param.row;
+       return <Button size='small' title="Manage Change Ticket" variant="outlined" target={'_blank'} href={"#/change-request?hc="+currentRow?.id+"&v="+ currentRow?.statistic?.violations + "&hcName=" + currentRow?.name } ><ManageHistoryIcon /></Button>
     }
   },
 ];

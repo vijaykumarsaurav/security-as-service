@@ -24,12 +24,12 @@ import PolicySelect from './PolicySelect';
 import moment from 'moment';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import FilterIcon from '@mui/icons-material/Filter';
 const headCells = [
   {
     field: 'type',
     numeric: false,
-    width: 150,
+    width: 120,
     sortable: true,
     editable: true,
     headerName: 'Type',
@@ -37,7 +37,7 @@ const headCells = [
   {
     field: 'risk',
     numeric: true,
-    width: 150,
+    width: 60,
     sortable: true,
     editable: true,
     headerName: 'Risk',
@@ -99,18 +99,30 @@ const headCells = [
   //   }
   // },
   {
+    field: 'unassigned_violations',
+    width: 160,
+    sortable: true,
+    editable: true,
+    headerName: 'Unassigned Violations',
+      renderCell: (param) => {
+      const currentRow = param.row;
+      return currentRow?.unassigned_violations > 0 ? <span> {currentRow?.unassigned_violations} Violations</span> : '' 
+    }
+  },
+  {
     field: 'violations',
     width: 150,
     sortable: true,
     editable: true,
-    headerName: 'Violations',
+    headerName: 'Assigned Violations',
     // renderCell: (param) => {
     //   const currentRow = param.row;
     //   return <Button onClick={() => alert(JSON.stringify(currentRow?.violations))}> {currentRow?.violations?.length} Violations</Button>
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <ViolationsDialog items={currentRow?.violations} title="Violations" />
+    
+      return currentRow?.unassigned_violations > 0 ? '' : <ViolationsDialog items={currentRow?.violations} title="Violations" />
     }
   },
   {
@@ -121,10 +133,16 @@ const headCells = [
     headerName: 'Edit',
     renderCell: (param) => {
       const currentRow = param.row;
-       return  <div>  <CreateChangeEdit currentRow={currentRow} />  
-      
-       </div> //<EditHCcycles currentRow={currentRow} />
+       return   currentRow?.unassigned_violations > 0 ? '' : <div>  <CreateChangeEdit currentRow={currentRow} />  </div> 
     }
+  },
+ 
+  {
+    field: 'manage_voilations',
+    width: 100,
+    sortable: true,
+    editable: true,
+    headerName: 'Manage Voilations',
   },
   {
     field: 'Delete',
@@ -134,7 +152,7 @@ const headCells = [
     headerName: 'Delete',
     renderCell: (param) => {
       const currentRow = param.row;
-       return  <div> 
+       return currentRow?.unassigned_violations > 0 ? '' : <div> 
        <Button size='small' variant="outlined"  onClick={() => handleDelete(currentRow.id)} > <DeleteIcon /></Button>
        </div> //<EditHCcycles currentRow={currentRow} />
     }
@@ -170,13 +188,26 @@ export default function ScannedReportsDataGrid() {
   const [reloadCTcycle, setReloadCTcycle] = React.useState(false);
   const [urlHCcycle, setUrlHCcycle] = React.useState(decodeURIComponent(window.location.href.split('?')[1]?.split('=')[1])?.split("&")[0]);
   const [urlFilterProps, setUrlFilterProps] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[1]?.split('=')[1]));
+  const [hcName, setHcName] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[2]?.split('=')[1]));
 
   React.useEffect(() => {
     setLoader(true)
     UserService.getChangeTickets().then((results) => {
+      let defaultRow = [{id: 0, type:'', risk: '', short_description: '', reason_for_change: '',assignment_group: '', unassigned_violations: urlFilterProps, violations: []}]
       if (results.status === 200) {
         setLoader(false)
-        setRows(results.data);
+        let changeTickts = results.data; 
+
+        let totalAssignedVoilations = 0; 
+        changeTickts.forEach(element => {
+          totalAssignedVoilations += element.violations?.length; 
+        });
+        defaultRow[0].unassigned_violations =  parseInt(urlFilterProps) - totalAssignedVoilations;
+
+      //  defaultRow.concat(changeTickts);
+        const mergedRows = [...defaultRow, ...changeTickts];
+
+        setRows(mergedRows);
       }
     }).catch((error) => {
       console.log("error", error)
@@ -184,6 +215,16 @@ export default function ScannedReportsDataGrid() {
     });
   }, [reloadCTcycle]);
 
+  headCells[headCells.length-2].renderCell = (param) => {
+    const currentRow = param.row;
+    let vid = []; 
+    currentRow.violations.forEach(element => {
+      vid.push(element.id); 
+    });
+     return currentRow?.unassigned_violations > 0 ? '' : <div> 
+       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/dashboard-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id )}  ><FilterIcon /></Button>
+     </div>
+  }
 
   function CustomToolbarExport() {
     return (
@@ -200,7 +241,7 @@ export default function ScannedReportsDataGrid() {
 
         <Grid container >
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-          <Typography color="primary" style={{padding: "5px"}}>  Change Request</Typography>
+          <Typography color="primary" style={{padding: "5px"}}>  Change Request for {hcName}</Typography>
           </Grid>
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">
