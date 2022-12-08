@@ -246,7 +246,7 @@ export default function ScannedReportsDataGrid() {
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">
           
-          <CreateChangeRequest setReloadCTcycle={setReloadCTcycle} />
+          <CreateChangeRequest urlHCcycle={urlHCcycle} setReloadCTcycle={setReloadCTcycle} />
           </Grid>
         </Grid>
 

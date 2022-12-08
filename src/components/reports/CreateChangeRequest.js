@@ -84,7 +84,7 @@ const headCells = [
     
   ];
 
-export default function CustomizedDialogs({setReloadCTcycle}) {
+export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
     const [open, setOpen] = React.useState(false);
     const [name, setName] = React.useState('');
@@ -105,7 +105,6 @@ export default function CustomizedDialogs({setReloadCTcycle}) {
     const [violationList, setViolationList] = React.useState([]);
     const [loader, setLoader] = React.useState(false);
     const [selectionModel, setSelectionModel] = React.useState([]);
-
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -159,6 +158,8 @@ export default function CustomizedDialogs({setReloadCTcycle}) {
             "reason_for_change": reasonForChange,
             "assignment_group": assignmentGroup,
             "violations": selectionModel,
+            "health_check_cycle_id": urlHCcycle,
+
           }
         
         UserService.createChangeTicket(param).then((results) => {
