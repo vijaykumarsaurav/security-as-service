@@ -6,7 +6,7 @@ COPY . .
 # RUN npm test - if you want to test before to build
 RUN npm run build
 
-FROM nginx:alpine
+FROM nginxinc/nginx-unprivileged:alpine
 WORKDIR /usr/share/nginx/html
 COPY --from=prod /app/build .
 #COPY ./env.sh .
