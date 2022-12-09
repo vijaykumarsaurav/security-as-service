@@ -1,0 +1,44 @@
+name: Create Docker Image
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version - e.g. v0.1.1'
+        default: '0.1.1'
+        required: true
+      stage:
+        description: 'Stage - dev or prod'
+        default: 'dev'
+        required: true
+
+jobs:
+  build:
+    runs-on: [ ubuntu-latest ]
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
+      - name: Docker build kemistry-ui ${{ github.event.inputs.version }} to ${{ github.event.inputs.stages }}
+        run: |
+          module='kemistry-ui'
+          version='${{ github.event.inputs.version }}'
+          stage='${{ github.event.inputs.stage }}'
+          repo="na.artifactory.taas.kyndryl.net/gts-cacf-global-team-${stage}-docker-local"
+          # Login
+          docker login ${repo} --username ${{ secrets.docker_username }} --password ${{ secrets.docker_password }}
+          # Build image
+          image="kemistry/${module}:${version}"
+          latestImage="kemistry/${module}:latest"
+          docker rmi ${image} --force
+          docker build -f ./Dockerfile --build-arg "module=${module}" --build-arg "build_id=${version}-$(date +%Y%m%d%H%m%S)" --tag "${image}" --no-cache .
+          # Push image
+          docker rmi ${repo}/${image} --force
+          docker tag ${image} ${repo}/${image}
+          docker push ${repo}/${image}
+          # Push image (latest)
+          docker rmi ${repo}/${latestImage} --force
+          docker tag ${image} ${repo}/${latestImage}
+          docker push ${repo}/${latestImage}
