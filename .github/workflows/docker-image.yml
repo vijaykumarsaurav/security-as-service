@@ -33,7 +33,7 @@ jobs:
           image="kemistry/${module}:${version}"
           latestImage="kemistry/${module}:latest"
           docker rmi ${image} --force
-          docker build -f ./Dockerfile --build-arg "module=${module}" --build-arg "build_id=${version}-$(date +%Y%m%d%H%m%S)" --build-arg "GIT_TOKEN=${{ secrets.CI_USER_TOKEN }}" --tag "${image}" --no-cache .
+          docker build -f ./Dockerfile --build-arg "module=${module}" --build-arg "build_id=${version}-$(date +%Y%m%d%H%m%S)" --tag "${image}" --no-cache .
           # Push image
           docker rmi ${repo}/${image} --force
           docker tag ${image} ${repo}/${image}
