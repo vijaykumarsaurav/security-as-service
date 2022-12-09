@@ -222,7 +222,7 @@ export default function ScannedReportsDataGrid() {
       vid.push(element.id); 
     });
      return currentRow?.unassigned_violations > 0 ? '' : <div> 
-       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/dashboard-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id )}  ><FilterIcon /></Button>
+       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id )}  ><FilterIcon /></Button>
      </div>
   }
 
