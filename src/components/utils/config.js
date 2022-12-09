@@ -1,4 +1,4 @@
-export const BASE_URL =  window._env_.BACKEND_SERVER; 
+export const BASE_URL =  'https://kemistry-api.apps.ocp7.sr1.ag1.sp.ibm.local'; 
 export const GET_DEVIATIONS = BASE_URL + '/api/deviations/zz1/policy/';
 
 export const GET_HC_CYCLES = BASE_URL + '/api/zz1/health-check-cycles';
