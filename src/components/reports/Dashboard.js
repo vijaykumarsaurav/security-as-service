@@ -129,7 +129,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?hc="+currentRow?.id+"&f=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
+      return <Button size='small' variant="outlined" target={'_blank'} href={"#/hc-details-view?hc="+currentRow?.id+"&f=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -146,7 +146,7 @@ const headCells = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-       return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?hc="+currentRow?.id+"&f=violations" } >{currentRow?.statistic?.violations}</Button>
+       return <Button size='small' variant="outlined" target={'_blank'} href={"#/hc-details-view?hc="+currentRow?.id+"&f=violations" } >{currentRow?.statistic?.violations}</Button>
       //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
   },
@@ -294,7 +294,7 @@ const headCellsUnassignedScan = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?jobid="+currentRow?.id+"&sort=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
+      return <Button size='small' variant="outlined" target={'_blank'} href={"#/unscanned-details-view?sid="+currentRow?.id+"&sort=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
     }
   },
   {
@@ -311,7 +311,7 @@ const headCellsUnassignedScan = [
     // }
     renderCell: (param) => {
       const currentRow = param.row;
-       return <Button size='small' variant="outlined" target={'_blank'} href={"#/dashboard-details-view?hc="+currentRow?.id+"&sort=violations" } >{currentRow?.statistic?.violations}</Button>
+       return <Button size='small' variant="outlined" target={'_blank'} href={"#/unscanned-details-view?sid="+currentRow?.id+"&sort=violations" } >{currentRow?.statistic?.violations}</Button>
       //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
     }
   },

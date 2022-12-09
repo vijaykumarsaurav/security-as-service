@@ -185,6 +185,7 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
         if (host.check_status === 'KO') {
          
           host.violations.forEach(violation => {
+            let policyName = policy.split('-'); 
 
             let hostData = {
               check_section: element.check_section,
@@ -197,7 +198,7 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
               measure_values: host.measure_values,
               policy_parameters: host.policy_parameters,
               violation_name : violation.message,
-              displayPolicyName : policy,
+              displayPolicyName : `${policyName[0]} ${policyName[1]} v${policyName[3]}`,
               id: violation.id
             }
 
@@ -220,46 +221,49 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
 const getResults = (checks, urlFilterProps, policy='', rowsData) => {
   let tempDevData = [];
   let id = 0;
-
-
   for (let index = 0; index < checks.length; index++) {
     const element = checks[index];
-    let hostData = {
-      check_section: element.check_section,
-      check_description: element.check_description,
-      severity: element.severity,
-      displayPolicyName : policy,
+    element?.hosts.forEach(host => {
+      let policyName = policy.split('-'); 
+      let hostData = {
+        check_section: element.check_section,
+        check_description: element.check_description,
+        severity: element.severity,
+        hostname: host.hostname,
+        check_status: host.check_status,
+        ip: host.ip,
+        scan_date: host.scan_date,
+        measure_values: host.measure_values,
+        policy_parameters: host.policy_parameters,
+        id: id,
+        violation_name : "",
+        displayPolicyName : `${policyName[0]} ${policyName[1]} v${policyName[3]}`
+      }
 
-      hostname: '',
-      ip: '',
-      scan_date:'',
-      measure_values: '',
-      policy_parameters: '',
-      id: id,
-      violation_name : "",
-    }
-    tempDevData.push(hostData);
-    let hostnames =[];
-    // element?.hosts.forEach(host => {
+
+      if (host.check_status === 'OK' && urlFilterProps === 'checks') {
+        tempDevData.push(hostData);
+        id++;
+      } else if( urlFilterProps === 'checks'){
+
+        if (host.check_status === 'KO') {
+
+          host.violations.forEach(violation => {
+            let seperateHostdata = { ...hostData }; //hostData;  //
+            seperateHostdata.id = violation.id;
+            seperateHostdata.violation_name = violation.message;
+
+            tempDevData.push(seperateHostdata);
+            // if(violation.message){
+            //   tempDevData.push(seperateHostdata);
+            // }
+            id++;
+          })
+        }
+      }
       
-    //   hostnames.push(host.hostname); 
-    //   hostData.check_status = host.check_status; 
-    //   if (host.check_status === 'KO') {
-    //     let violations = []
-    //     host.violations.forEach(violation => {
-    //       violations.push(violation.message);
-    //     })
-    //     hostData.violation_name = violations.join(',');
-    //   }
-    //   tempDevData.push(hostData);
-
-      
-    // });
-    // hostData.hostname = hostnames.join(',');
-
-
+    });
   }
-
   //let rowsData =  [...rows]; 
   //rowsData.concat(tempDevData);
  //setRows(rows.concat(tempDevData));

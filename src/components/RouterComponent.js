@@ -3,7 +3,8 @@ import React from "react";
 import ScannedReports from './reports/ScannedReports';
 import ScannedReportsDuplicates from './reports/ScannedReportsDuplicates';
 import ScannedReportsDataGrid from './reports/ScannedReportsDataGrid';
-import DashboardDetailsView from './reports/DashboardDetailsView';
+import DashboardHcDetailsView from './reports/DashboardHcDetailsView';
+import DashboardUnscannedDetailsView from './reports/DashboardUnscannedDetailsView';
 
 import Dashboard from './reports/Dashboard';
 import ChangeRequestDataGrid from './reports/ChangeRequestDataGrid';
@@ -19,8 +20,10 @@ const AppRouter = () => {
                     <Route path="/scanned-reports" component={ScannedReports}/>
                     <Route path="/scanned-reports-duplicate" component={ScannedReportsDuplicates}/>
                     <Route path="/scanned-reports-datagrid" component={ScannedReportsDataGrid}/>
-                    <Route path="/dashboard-details-view" component={DashboardDetailsView}/>
+                    <Route path="/hc-details-view" component={DashboardHcDetailsView}/>
+                    <Route path="/unscanned-details-view" component={DashboardUnscannedDetailsView}/>
 
+                    
                     <Route path="/dashboard" component={Dashboard}/>
                     <Route path="/change-request" component={ChangeRequestDataGrid}/>
 
