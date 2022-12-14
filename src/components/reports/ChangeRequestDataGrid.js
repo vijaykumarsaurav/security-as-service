@@ -37,7 +37,7 @@ const headCells = [
   {
     field: 'risk',
     numeric: true,
-    width: 60,
+    width: 100,
     sortable: true,
     editable: true,
     headerName: 'Risk',
@@ -98,32 +98,39 @@ const headCells = [
   //     return <Button onClick={() => alert(JSON.stringify(currentRow?.patterns))}> {currentRow?.patterns?.length} Patterns</Button>
   //   }
   // },
-  {
-    field: 'unassigned_violations',
-    width: 160,
-    sortable: true,
-    editable: true,
-    headerName: 'Unassigned Violations',
-      renderCell: (param) => {
-      const currentRow = param.row;
-      return currentRow?.unassigned_violations > 0 ? <span> {currentRow?.unassigned_violations} Violations</span> : '' 
-    }
-  },
-  {
-    field: 'violations',
-    width: 150,
-    sortable: true,
-    editable: true,
-    headerName: 'Assigned Violations',
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return <Button onClick={() => alert(JSON.stringify(currentRow?.violations))}> {currentRow?.violations?.length} Violations</Button>
-    // }
-    renderCell: (param) => {
-      const currentRow = param.row;
+  // {
+  //   field: 'unassigned_violations',
+  //   width: 160,
+  //   sortable: true,
+  //   editable: true,
+  //   headerName: 'Unassigned Violations',
+  //     renderCell: (param) => {
+  //     const currentRow = param.row;
+  //     return currentRow?.unassigned_violations > 0 ? <span> {currentRow?.unassigned_violations} Violations</span> : '' 
+  //   }
+  // },
+  // {
+  //   field: 'violations',
+  //   width: 150,
+  //   sortable: true,
+  //   editable: true,
+  //   headerName: 'Violations',
+  //   // renderCell: (param) => {
+  //   //   const currentRow = param.row;
+  //   //   return <Button onClick={() => alert(JSON.stringify(currentRow?.violations))}> {currentRow?.violations?.length} Violations</Button>
+  //   // }
+  //   renderCell: (param) => {
+  //     const currentRow = param.row;
     
-      return currentRow?.unassigned_violations > 0 ? '' : <ViolationsDialog items={currentRow?.violations} title="Violations" />
-    }
+  //     return currentRow?.unassigned_violations > 0 ? '' : <ViolationsDialog items={currentRow?.violations} title="Violations" />
+  //   }
+  // },
+  {
+    field: 'manage_voilations',
+    width: 140,
+    sortable: true,
+    editable: true,
+    headerName: 'Voilations',
   },
   {
     field: 'Edit',
@@ -137,13 +144,6 @@ const headCells = [
     }
   },
  
-  {
-    field: 'manage_voilations',
-    width: 100,
-    sortable: true,
-    editable: true,
-    headerName: 'Manage Voilations',
-  },
   {
     field: 'Delete',
     width: 100,
@@ -189,19 +189,31 @@ export default function ScannedReportsDataGrid() {
   const [urlHCcycle, setUrlHCcycle] = React.useState(decodeURIComponent(window.location.href.split('?')[1]?.split('=')[1])?.split("&")[0]);
   const [urlFilterProps, setUrlFilterProps] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[1]?.split('=')[1]));
   const [hcName, setHcName] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[2]?.split('=')[1]));
+  const [asignedVoilations, setAsignedVoilations] = React.useState([]);
+  let usedVoilation = []; 
 
   React.useEffect(() => {
     setLoader(true)
-    UserService.getChangeTickets().then((results) => {
+    UserService.getChangeTickets(urlHCcycle).then((results) => {
       let defaultRow = [{id: 0, type:'', risk: '', short_description: '', reason_for_change: '',assignment_group: '', unassigned_violations: urlFilterProps, violations: []}]
       if (results.status === 200) {
         setLoader(false)
         let changeTickts = results.data; 
 
         let totalAssignedVoilations = 0; 
+        
         changeTickts.forEach(element => {
           totalAssignedVoilations += element.violations?.length; 
+          element?.violations?.forEach(vioId => {
+            usedVoilation.push(vioId.id); 
+          });
+        //  const allAssingedVoilations = [...asignedVoilations, ...element.violations];
+          
         });
+        console.log("usedVoilation", usedVoilation)
+
+      //  setAsignedVoilations(usedVoilation);
+
         defaultRow[0].unassigned_violations =  parseInt(urlFilterProps) - totalAssignedVoilations;
 
       //  defaultRow.concat(changeTickts);
@@ -215,14 +227,14 @@ export default function ScannedReportsDataGrid() {
     });
   }, [reloadCTcycle]);
 
-  headCells[headCells.length-2].renderCell = (param) => {
+  headCells[headCells.length-3].renderCell = (param) => {
     const currentRow = param.row;
     let vid = []; 
     currentRow.violations.forEach(element => {
       vid.push(element.id); 
     });
-     return currentRow?.unassigned_violations > 0 ? '' : <div> 
-       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id )}  ><FilterIcon /></Button>
+     return currentRow?.unassigned_violations > 0 ?   <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(usedVoilation) )} >  {currentRow?.unassigned_violations} Violations </Button>: <div> 
+       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id )} >{currentRow?.violations?.length} Voilations </Button>
      </div>
   }
 

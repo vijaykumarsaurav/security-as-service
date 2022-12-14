@@ -172,10 +172,11 @@ const headCells = [
 ];
 
 
-const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) => {
+const duplicateDeviationsData = (checks, urlFilterProps, policy='', urlVoilations, changeId) => {
   let tempDevData = [];
   let id = 0;
 
+  console.log("changeId", changeId)
 
   for (let index = 0; index < checks.length; index++) {
     const element = checks[index];
@@ -201,8 +202,15 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', rowsData) =>
               displayPolicyName : `${policyName[0]} ${policyName[1]} v${policyName[3]}`,
               id: violation.id
             }
-
-            tempDevData.push(hostData);
+            const found = urlVoilations.find(element => element === violation.id);
+            
+            if(found !== violation.id && changeId == 'undefined'){
+              tempDevData.push(hostData);
+            } 
+            else if(changeId != 'undefined'){ 
+              tempDevData.push(hostData);
+            } 
+            
           })
         }
       }
@@ -225,7 +233,7 @@ const getResults = (checks, urlFilterProps, policy='', rowsData) => {
     const element = checks[index];
     element?.hosts.forEach(host => {
       let policyName = policy.split('-'); 
-      let hostData = {
+      let hostData = { 
         check_section: element.check_section,
         check_description: element.check_description,
         severity: element.severity,
@@ -296,12 +304,36 @@ export default function ScannedReportsDataGrid() {
           const policy = results.data[index]?.policy;
 
            if(urlFilterProps === 'violations'){
-              let tempDevData = duplicateDeviationsData(checks, urlFilterProps, policy, rowsData);
+              let usedVoilation = JSON.parse(urlVoilations); 
+              let tempDevData = duplicateDeviationsData(checks, urlFilterProps, policy, usedVoilation, changeId);
               console.log("tempDevData", tempDevData, policy)
               tempDevData.forEach(element => {
               console.log("element.policyName", element.policyName)
               rowsData.push(element);
               });
+
+
+             if(changeId != 'undefined'){ 
+              let finalData = []; 
+
+                usedVoilation.forEach(voiId => {
+                  const found = rowsData.find(data => data.id === voiId);
+                  finalData.push(found);
+                  });
+
+                  
+                  rowsData.forEach(row => {
+                    const found = finalData.find(data => data?.id === row?.id);
+                    if( found == undefined)
+                    finalData.push(row);
+                    });
+    
+                console.log("finalData", finalData)
+              rowsData = finalData;
+              } 
+             
+                
+
            }else if(urlFilterProps === 'checks'){
               let tempDevData = getResults(checks, urlFilterProps, policy, rowsData);
               console.log("tempDevData checks", tempDevData, policy)
