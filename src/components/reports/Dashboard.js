@@ -60,7 +60,7 @@ const headCells = [
     renderCell: (param) => {
       const currentRow = param.row;
       return <Tooltip title={currentRow?.policies}>
-      <span> {currentRow?.policies}</span>
+      <span> {currentRow?.policies?.join()}</span>
     </Tooltip>//<bigTextDisplay policies={currentRow?.policies} />
     }
     // valueGetter: (params) =>
