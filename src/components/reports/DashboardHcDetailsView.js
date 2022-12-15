@@ -172,11 +172,11 @@ const headCells = [
 ];
 
 
-const duplicateDeviationsData = (checks, urlFilterProps, policy='', urlVoilations, changeId) => {
+const duplicateDeviationsData = (checks, urlFilterProps, policy='', urlVoilations, changeId, usedVid) => {
   let tempDevData = [];
   let id = 0;
 
-  console.log("changeId", changeId)
+  console.log("changeId", changeId, "usedVid", usedVid)
 
   for (let index = 0; index < checks.length; index++) {
     const element = checks[index];
@@ -208,9 +208,11 @@ const duplicateDeviationsData = (checks, urlFilterProps, policy='', urlVoilation
               tempDevData.push(hostData);
             } 
             else if(changeId != 'undefined'){ 
-              tempDevData.push(hostData);
+              const found = usedVid?.find(element => element === violation.id);
+              if(found !== violation.id){
+                tempDevData.push(hostData);
+              }
             } 
-            
           })
         }
       }
@@ -288,6 +290,7 @@ export default function ScannedReportsDataGrid() {
   const [urlFilterProps, setUrlFilterProps] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[1]?.split('=')[1]));
   const [urlVoilations, setUrlVoilations] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[2]?.split('=')[1]));
   const [changeId, setChangeId] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[3]?.split('=')[1]));
+  const [usedVid, setUsedVid] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[4]?.split('=')[1]));
 
   const [selectionModel, setSelectionModel] = React.useState( [] );
 
@@ -305,7 +308,13 @@ export default function ScannedReportsDataGrid() {
 
            if(urlFilterProps === 'violations'){
               let usedVoilation = JSON.parse(urlVoilations); 
-              let tempDevData = duplicateDeviationsData(checks, urlFilterProps, policy, usedVoilation, changeId);
+
+              let usedids = []; 
+              if(usedVid != 'undefined'){
+                usedids = JSON.parse(usedVid); 
+              }
+
+              let tempDevData = duplicateDeviationsData(checks, urlFilterProps, policy, usedVoilation, changeId, usedids);
               console.log("tempDevData", tempDevData, policy)
               tempDevData.forEach(element => {
               console.log("element.policyName", element.policyName)

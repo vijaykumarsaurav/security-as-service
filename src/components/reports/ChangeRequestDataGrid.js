@@ -233,8 +233,19 @@ export default function ScannedReportsDataGrid() {
     currentRow.violations.forEach(element => {
       vid.push(element.id); 
     });
+     
+  
+    let otherUsedVid = []; 
+    usedVoilation.forEach(uid => {
+      const found = vid.find(id => id === uid);
+            
+      if(found !== uid){
+        otherUsedVid.push(uid);
+      } 
+    });
+     
      return currentRow?.unassigned_violations > 0 ?   <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(usedVoilation) )} >  {currentRow?.unassigned_violations} Violations </Button>: <div> 
-       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id )} >{currentRow?.violations?.length} Voilations </Button>
+       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id + "&uid="+ JSON.stringify(otherUsedVid) )} >{currentRow?.violations?.length} Voilations </Button>
      </div>
   }
 
