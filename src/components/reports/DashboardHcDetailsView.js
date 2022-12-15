@@ -326,7 +326,7 @@ export default function ScannedReportsDataGrid() {
               let finalData = []; 
 
                 usedVoilation.forEach(voiId => {
-                  const found = rowsData.find(data => data.id === voiId);
+                  const found = rowsData.find(data => data?.id === voiId);
                   finalData.push(found);
                   });
 

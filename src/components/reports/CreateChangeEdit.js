@@ -109,6 +109,7 @@ export default function CustomizedDialogs({ currentRow }) {
     const [selectionModel, setSelectionModel] = React.useState(currentRow.violations);
     console.log("currentRowcurrentRow", currentRow, description);
 
+    const [urlHCcycle, setUrlHCcycle] = React.useState(decodeURIComponent(window.location.href.split('?')[1]?.split('=')[1])?.split("&")[0]);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -160,7 +161,8 @@ export default function CustomizedDialogs({ currentRow }) {
             "short_description": shortDescription,
             "reason_for_change": reasonForChange,
             "assignment_group": assignmentGroup,
-            "violations": selectionModel,
+//            "violations": selectionModel,
+            "health_check_cycle_id": urlHCcycle,
           }
         
         UserService.updateChangeTicket(changeId, param).then((results) => {
