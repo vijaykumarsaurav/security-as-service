@@ -247,6 +247,8 @@ export default function CustomizedDialogs({ currentRow }) {
                      <MenuItem value={'remediation'}>Remediation</MenuItem>
                      <MenuItem value={'suppression'}>Suppression</MenuItem>
                      <MenuItem value={'calibration'}>Calibration</MenuItem>
+                     <MenuItem value={'false_positive'}>False Positive</MenuItem>
+
                     </Select>
                 </FormControl>
 

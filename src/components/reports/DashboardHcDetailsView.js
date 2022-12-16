@@ -307,7 +307,8 @@ export default function ScannedReportsDataGrid() {
           const policy = results.data[index]?.policy;
 
            if(urlFilterProps === 'violations'){
-              let usedVoilation = JSON.parse(urlVoilations); 
+
+              let usedVoilation = urlVoilations != 'undefined' ? JSON.parse(urlVoilations) : []; 
 
               let usedids = []; 
               if(usedVid != 'undefined'){
