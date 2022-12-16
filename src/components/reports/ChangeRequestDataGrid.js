@@ -195,7 +195,7 @@ export default function ScannedReportsDataGrid() {
   React.useEffect(() => {
     setLoader(true)
     UserService.getChangeTickets(urlHCcycle).then((results) => {
-      let defaultRow = [{id: 0, type:'', risk: '', short_description: '', reason_for_change: '',assignment_group: '', unassigned_violations: urlFilterProps, violations: []}]
+      let defaultRow = [{id: 0, type:'unassigned', risk: '', short_description: '', reason_for_change: '',assignment_group: '', unassigned_violations: urlFilterProps, violations: []}]
       if (results.status === 200) {
         setLoader(false)
         let changeTickts = results.data; 
