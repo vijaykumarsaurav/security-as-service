@@ -246,7 +246,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                      <MenuItem value={'remediation'}>Remediation</MenuItem>
                      <MenuItem value={'suppression'}>Suppression</MenuItem>
                      <MenuItem value={'calibration'}>Calibration</MenuItem>
-                     <MenuItem value={'false_positive'}>False Positive</MenuItem>
+                     <MenuItem value={'false positive'}>False Positive</MenuItem>
 
                     </Select>
                 </FormControl>
