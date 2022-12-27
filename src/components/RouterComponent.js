@@ -5,6 +5,7 @@ import ScannedReportsDuplicates from './reports/ScannedReportsDuplicates';
 import ScannedReportsDataGrid from './reports/ScannedReportsDataGrid';
 import DashboardHcDetailsView from './reports/DashboardHcDetailsView';
 import DashboardUnscannedDetailsView from './reports/DashboardUnscannedDetailsView';
+import LoginComponent from './login/LoginComponent';
 
 import Dashboard from './reports/Dashboard';
 import ChangeRequestDataGrid from './reports/ChangeRequestDataGrid';
@@ -17,6 +18,7 @@ const AppRouter = () => {
             <Router>
                 <Switch>
                     <Route path="/" exact component={ScannedReportsDataGrid}/>
+                    <Route path="/login" exact component={LoginComponent}/>
                     <Route path="/scanned-reports" component={ScannedReports}/>
                     <Route path="/scanned-reports-duplicate" component={ScannedReportsDuplicates}/>
                     <Route path="/scanned-reports-datagrid" component={ScannedReportsDataGrid}/>

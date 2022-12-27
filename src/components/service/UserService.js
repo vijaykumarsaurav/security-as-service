@@ -71,6 +71,10 @@ class UserService {
         return axios.post(apiConstant.CREATE_HC_CYCLE, param);
     }
 
+    async login(param) {
+        return axios.post(apiConstant.CREATE_HC_CYCLE, param);
+    }
+
     async createChangeTicket(param) {
         return axios.post(apiConstant.CHANGE_REQUEST, param);
     }

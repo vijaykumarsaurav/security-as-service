@@ -122,6 +122,7 @@ export default function PrimarySearchAppBar(props) {
 
       <MenuItem onClick={() => window.location.replace('#/scanned-reports-duplicate')}>Reports - Will Delete</MenuItem>
       <MenuItem onClick={() => window.location.replace('#/scanned-reports')}>Unique Report - Will Delete</MenuItem>
+      <MenuItem onClick={() => window.location.replace('#/login')}>Logout</MenuItem>
 
       
     </Menu>

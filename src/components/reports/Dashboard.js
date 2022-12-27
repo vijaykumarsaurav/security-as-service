@@ -532,7 +532,6 @@ export default function ScannedReportsDataGrid() {
     <Box sx={{ height: 500, width: '100%',   }}>
       <HeaderNavbar />
       <br />
-
       
       <Paper  style={{  height: '50%', width: '99%', paddingBottom: "25px" }}>
 
