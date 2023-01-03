@@ -130,7 +130,7 @@ const headCells = [
     width: 140,
     sortable: true,
     editable: true,
-    headerName: 'Voilations',
+    headerName: 'Violations',
   },
   {
     field: 'Edit',
@@ -140,7 +140,8 @@ const headCells = [
     headerName: 'Edit',
     renderCell: (param) => {
       const currentRow = param.row;
-       return   currentRow?.unassigned_violations > 0 ? '' : <div>  <CreateChangeEdit currentRow={currentRow} />  </div> 
+
+       return   currentRow?.unassigned_violations >= 0 ? '' : <div>  <CreateChangeEdit currentRow={currentRow} />  </div> 
     }
   },
  
@@ -152,7 +153,7 @@ const headCells = [
     headerName: 'Delete',
     renderCell: (param) => {
       const currentRow = param.row;
-       return currentRow?.unassigned_violations > 0 ? '' : <div> 
+       return currentRow?.unassigned_violations >= 0 ? '' : <div> 
        <Button size='small' variant="outlined"  onClick={() => handleDelete(currentRow.id)} > <DeleteIcon /></Button>
        </div> //<EditHCcycles currentRow={currentRow} />
     }
