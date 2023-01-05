@@ -87,41 +87,47 @@ const headCells = [
 export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
     const [open, setOpen] = React.useState(false);
-    const [name, setName] = React.useState('');
     const [desc, setDesc] = React.useState('');
     const [checkedScans, setCheckedScans] = React.useState([]);
-
-    const [scans, setScans] = React.useState([]);
-    const [dueDate, setDueDate] = React.useState(new Date());
-    const [assignee, setAssignee] = React.useState('');
 
     const [type, setType] = React.useState('');
     const [risk, setRisk] = React.useState('');
     const [shortDescription, setShortDescription] = React.useState('');
     const [reasonForChange, setReasonForChange] = React.useState('');
     const [assignmentGroup, setAssignmentGroup] = React.useState('');
-    const [hcrows, setHcrows] = React.useState([]);
-    const [selectedHC, setSelectedHC] = React.useState('');
-    const [violationList, setViolationList] = React.useState([]);
-    const [loader, setLoader] = React.useState(false);
+ 
+
     const [selectionModel, setSelectionModel] = React.useState([]);
+    const [showCheckSection, setShowCheckSection] = React.useState(false);
+    const [checkSections, setCheckSections] = React.useState([]);
+    const [checkSectionSelected, setCheckSectionSelected] = React.useState('');
+    const [checkResults, setCheckResults] = React.useState([]);
+    const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState([]);
+
+    const [regularExp, setRegularExp] = React.useState('');
 
     const handleClickOpen = () => {
         setOpen(true);
-        setName(''); 
         setDesc('')
         setCheckedScans([]); 
-        setDueDate('')
-        setAssignee('')
-
-        UserService.getHCCycles().then((results) => {
+   
+        UserService.getCycleDetails(urlHCcycle).then((results) => {
             if (results.status === 200) {
                console.log("results", results.data);
-               setHcrows(results.data);
 
-               if(results.data?.length == 1){
-                setSelectedHC(results.data[0].id);
-               }
+               let checks = results.data; 
+               let checkRows = []; 
+
+               checks.forEach(element => {
+                    element?.checks?.forEach(check=> {
+                        if(check?.check_section !== 'N/A' && !checkedScans.includes(check?.check_section)){
+                            checkRows.push(check?.check_section)
+                        }
+                    });
+               });
+
+               setCheckSections(checkRows);
+               setCheckResults(checks);
             }
           }).catch((error) => {
             console.log("error", error)
@@ -130,6 +136,11 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
     };
     const handleClose = () => {
         setOpen(false);
+        setShowCheckSection(false);
+        setPolicyParamsKeyValue([])
+        setRegularExp('')
+        setCheckSectionSelected('')
+        setType('')
     };
     const handleSubmit = () => {
 
@@ -179,39 +190,58 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
         
     };
+    const handlePolicyParams = (e) => {
+        
+        let policyKeys = [...policyParamsKeyValue]; 
+        
+        policyKeys.forEach(element => {
+            if(element.key === e.target.name) {
+                element.value = e.target.value;
+                return; 
+            }
+        });
+        
+        setPolicyParamsKeyValue(policyKeys);
+        console.log(e.target.name, e.target.value,policyParamsKeyValue)
+    };
 
-      React.useEffect(() => {
-        if(selectedHC){
-            setLoader(true)
-            UserService.getCycleDetails(selectedHC).then((results) => {
-                if(results.status === 200){ 
-                let checks =  results?.data[0]?.checks;
-                let tempDevData = [];
-                for (let index = 0; index < checks.length; index++) {
-                    const element = checks[index];
-                    element?.hosts.forEach(host => {
-                    if (host.check_status === 'KO') {
-                        host?.violations.forEach(violation => {
-                        tempDevData.push(violation);
-                        })
-                    }
+
+    
+
+    React.useEffect(() => {
+
+        let policyParams = []; 
+        checkResults?.forEach(element => {
+            element?.checks?.forEach(check=> {
+                if(check?.check_section === checkSectionSelected){
+                    check.hosts?.forEach(host => {
+                        host?.policy_parameters?.forEach(policyParameter => {
+                            
+                            let policyData = policyParameter?.split('='); 
+                            if(policyData[1]){
+                                let found = policyParams.filter(item => item.key == policyData[0]);
+                                if(found.length == 0){
+                                    policyParams.push({key : policyData[0], value : policyData[1]});
+                                }
+
+                            }
+                        });
                     });
                 }
-                  setViolationList(tempDevData); 
-                  setLoader(false)
-                }
-              }).catch((error)=> {
-                console.log("error", error)
-               // setRowsWait(false);
-                alert("Error" + error);
-          
-              });
-        }
-       
+            });
+       });
+       setPolicyParamsKeyValue(policyParams)
 
-      }, [selectedHC])
+    }, [checkSectionSelected])
 
-      console.log("setSelectionModel", selectionModel);
+
+    // React.useEffect(()=> {
+
+    //     setPolicyParamsKeyValue(policyParamsKeyValue);
+
+    // }, [policyParamsKeyValue])
+
+      console.log("policyParamsKeyValue", policyParamsKeyValue);
 
     return (
         <div>
@@ -241,7 +271,19 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                     title="Type"
                     variant='standard'
                     label="Type"
-                    onChange={(e) => setType(e.target.value)}
+                    onChange={(e) => {
+                        setType(e.target.value);
+
+                        if(e.target.value  === 'calibration'){
+                            setShowCheckSection(true);
+                        }else{
+                            setShowCheckSection(false);
+                            setPolicyParamsKeyValue([])
+                            setRegularExp('')
+                            setCheckSectionSelected('')
+                        }
+                       
+                    } }
                     > 
                      <MenuItem value={'remediation'}>Remediation</MenuItem>
                      <MenuItem value={'suppression'}>Suppression</MenuItem>
@@ -251,6 +293,44 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                     </Select>
                 </FormControl>
 
+               {showCheckSection?  <React.Fragment> <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                    <InputLabel id="demo-select-small">Check Section</InputLabel>
+                    <Select
+                    labelId="demo-select-small"
+                    id="demo-select-small"
+                    required
+                    value={checkSectionSelected}
+                    title="Check Section"
+                    variant='standard'
+                    label="Check Section"
+                    onChange={(e) => setCheckSectionSelected(e.target.value)}
+                    >
+                    {checkSections?.map((item, i) => {
+                        return (
+                            <MenuItem value={item}>{item}</MenuItem>
+                        );
+                    })}
+                    
+                     </Select>
+
+                </FormControl> 
+                
+                <FormControl sx={{ m: 1 }}  size="mediam">
+                <TextField
+                variant='standard'
+                id="outlined-name"
+                title='Hostname Regular Expression'
+                label="Hostname Regular Expr."
+                value={regularExp}
+                required
+                onChange={(e) => setRegularExp(e.target.value)}
+                />
+                </FormControl></React.Fragment> 
+
+                : "" }
+
+              
+               
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Risk *</InputLabel>
                     <Select
@@ -311,6 +391,31 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                     onChange={(e) => setAssignmentGroup(e.target.value)}
                     />
                     <br />  <br />
+
+
+                    {type === "calibration" ? "Policy Parameters:" : ""}   <br />
+                   
+                    {policyParamsKeyValue?.map((element) => {
+                        return (
+                         <span  style={{marginBottom: '-5px'}} >  
+                            <InputLabel>{element?.key}: 
+                            &nbsp;
+
+                            <TextField
+                            variant='standard'
+                            id="outlined-name"
+                           // label="Value"
+                            style={{marginTop: '-5px'}}
+                            name={element?.key}
+                            value={element?.value}
+                            onChange={handlePolicyParams}
+                            />
+                            </InputLabel>
+                          </span>  
+                        );
+                    })}
+
+
                 {/* <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Select Health Check Cycle</InputLabel>
                     <Select
