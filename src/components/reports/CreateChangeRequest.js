@@ -104,6 +104,8 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
     const [checkResults, setCheckResults] = React.useState([]);
     const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState([]);
 
+    const [selectedVoilation, setSelectedVoilation] = React.useState([]);
+
     const [regularExp, setRegularExp] = React.useState('');
 
     const handleClickOpen = () => {
@@ -210,29 +212,42 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
     React.useEffect(() => {
 
-        let policyParams = []; 
+        let policyParams = [], selectedVoilations = []; 
         checkResults?.forEach(element => {
             element?.checks?.forEach(check=> {
                 if(check?.check_section === checkSectionSelected){
                     check.hosts?.forEach(host => {
                         host?.policy_parameters?.forEach(policyParameter => {
-                            
                             let policyData = policyParameter?.split('='); 
                             if(policyData[1]){
                                 let found = policyParams.filter(item => item.key == policyData[0]);
                                 if(found.length == 0){
                                     policyParams.push({key : policyData[0], value : policyData[1]});
                                 }
-
                             }
                         });
+
+                        const reg = new RegExp(regularExp, "g");
+                        if(host?.hostname?.match( reg )){
+                            host?.violations?.forEach(violation => {                            
+                                let found = selectedVoilations.filter(item => item.id == violation.id);
+                                       if(found.length == 0){
+                                           selectedVoilations.push(violation);
+                                       }
+                               });
+                        }
+                      
                     });
+
+                    
                 }
             });
        });
        setPolicyParamsKeyValue(policyParams)
+       console.log('selectedVoilations', selectedVoilations)
+       setSelectedVoilation(selectedVoilations)
 
-    }, [checkSectionSelected])
+    }, [checkSectionSelected,  regularExp])
 
 
     // React.useEffect(()=> {
@@ -329,6 +344,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
                 : "" }
 
+
               
                
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
@@ -348,6 +364,9 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                      <MenuItem value={'high'}>High</MenuItem>
                     </Select>
                 </FormControl>
+
+                 {selectedVoilation.length ? <span title={JSON.stringify(selectedVoilation, null, 2)}> {selectedVoilation.length + ' Voilations found'} </span>  : ""} 
+
 
                     <TextField
                     variant='standard'
