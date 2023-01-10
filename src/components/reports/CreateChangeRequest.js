@@ -123,7 +123,19 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                checks.forEach(element => {
                     element?.checks?.forEach(check=> {
                         if(check?.check_section !== 'N/A' && !checkedScans.includes(check?.check_section)){
-                            checkRows.push(check?.check_section)
+
+                            let addFlag = false; 
+                            check?.hosts?.forEach(host => {
+                                host?.policy_parameters?.forEach(policyParameter => {
+                                    if(policyParameter.split("=")[1]){
+                                        addFlag = true;
+                                        return; 
+                                    }
+                                }); 
+                            });
+                            if (addFlag){
+                                checkRows.push(check?.check_section)
+                            }
                         }
                     });
                });
@@ -365,9 +377,6 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                     </Select>
                 </FormControl>
 
-                 {selectedVoilation.length ? <span title={JSON.stringify(selectedVoilation, null, 2)}> {selectedVoilation.length + ' Voilations found'} </span>  : ""} 
-
-
                     <TextField
                     variant='standard'
                     id="outlined-name"
@@ -462,7 +471,10 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
                 </DialogContent>
 
+                {selectedVoilation.length ? <span title={JSON.stringify(selectedVoilation, null, 2)}> {selectedVoilation.length + ' voilations passing on submit action'} </span>  : ""} 
+
                 <DialogActions> 
+
                 {/* contained */}
                     <Button variant="outlined" color="secondary"   onClick={handleClose}>
                         Cancel
