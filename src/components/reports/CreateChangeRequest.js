@@ -103,8 +103,11 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
     const [checkSectionSelected, setCheckSectionSelected] = React.useState('');
     const [checkResults, setCheckResults] = React.useState([]);
     const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState([]);
+    const [policyParamsForSubmit, setPolicyParamsForSubmit] = React.useState([]);
 
     const [selectedVoilation, setSelectedVoilation] = React.useState([]);
+    const [priority, setPriority] = React.useState('');
+    const [policy, setPolicy] = React.useState('');
 
     const [regularExp, setRegularExp] = React.useState('');
 
@@ -184,7 +187,14 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
             "assignment_group": assignmentGroup,
             "violations": selectionModel,
             "health_check_cycle_id": urlHCcycle,
-
+            "violations": selectedVoilation, 
+            "calibration": {
+            "pattern": regularExp,    
+            "priority": priority,
+            "section": checkSectionSelected, 
+            "policy": policy,
+            "policyParameters": policyParamsForSubmit
+            }
           }
         
         UserService.createChangeTicket(param).then((results) => {
@@ -228,6 +238,8 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
         checkResults?.forEach(element => {
             element?.checks?.forEach(check=> {
                 if(check?.check_section === checkSectionSelected){
+                    console.log("setPolicy", element.policy)
+                    setPolicy(element.policy); 
                     check.hosts?.forEach(host => {
                         host?.policy_parameters?.forEach(policyParameter => {
                             let policyData = policyParameter?.split('='); 
@@ -244,7 +256,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                             host?.violations?.forEach(violation => {                            
                                 let found = selectedVoilations.filter(item => item.id == violation.id);
                                        if(found.length == 0){
-                                           selectedVoilations.push(violation);
+                                           selectedVoilations.push(violation.id);
                                        }
                                });
                         }
@@ -262,13 +274,18 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
     }, [checkSectionSelected,  regularExp])
 
 
-    // React.useEffect(()=> {
+    React.useEffect(()=> {
 
-    //     setPolicyParamsKeyValue(policyParamsKeyValue);
+        let tPcopy = [];  
+        policyParamsKeyValue.forEach(element => {
+            tPcopy.push({ name: element.key, value: element.value, type: typeof element.value})
+        });
 
-    // }, [policyParamsKeyValue])
+        setPolicyParamsForSubmit(tPcopy);
 
-      console.log("policyParamsKeyValue", policyParamsKeyValue);
+    }, [policyParamsKeyValue])
+
+      console.log("policyParamsKeyValue", policyParamsKeyValue, policyParamsForSubmit);
 
     return (
         <div>
@@ -352,13 +369,31 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                 required
                 onChange={(e) => setRegularExp(e.target.value)}
                 />
-                </FormControl></React.Fragment> 
+                </FormControl>
+                
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                    <InputLabel id="demo-select-small">Priority *</InputLabel>
+                    <Select
+                    labelId="demo-select-small"
+                    id="demo-select-small"
+                    value={priority}
+                    required
+                    title="Priority"
+                    variant='standard'
+                    label="Priority"
+                    onChange={(e) => setPriority(e.target.value)}
+                    > 
+                     <MenuItem value={1}>1</MenuItem>
+                     <MenuItem value={2}>2</MenuItem>
+                     <MenuItem value={3}>3</MenuItem>
+                     <MenuItem value={4}>4</MenuItem>
+                     <MenuItem value={5}>5</MenuItem>
+                    </Select>
+                </FormControl>
+                </React.Fragment> 
 
                 : "" }
 
-
-              
-               
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Risk *</InputLabel>
                     <Select
@@ -376,6 +411,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                      <MenuItem value={'high'}>High</MenuItem>
                     </Select>
                 </FormControl>
+
 
                     <TextField
                     variant='standard'
