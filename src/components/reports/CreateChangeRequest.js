@@ -13,12 +13,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import ExpandListItem from './ExpandListItem';
 import VoilationTable from './VoilationTable';
+import EditIcon from '@mui/icons-material/Edit';
 
 import UserService from '../service/UserService';
 import Notify from '../utils/Notify';
 import { Select,FormControl, InputLabel, MenuItem } from '@mui/material';
 import {
-    DataGrid,
+    DataGrid, 
     GridToolbarContainer,
     GridToolbarDensitySelector,
     GridToolbarExport
@@ -84,80 +85,95 @@ const headCells = [
     
   ];
 
-export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
+export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionType, currentRow}) {
 
     const [open, setOpen] = React.useState(false);
-    const [desc, setDesc] = React.useState('');
+    const [desc, setDesc] = React.useState(currentRow?.description);
     const [checkedScans, setCheckedScans] = React.useState([]);
 
-    const [type, setType] = React.useState('');
-    const [risk, setRisk] = React.useState('');
-    const [shortDescription, setShortDescription] = React.useState('');
-    const [reasonForChange, setReasonForChange] = React.useState('');
-    const [assignmentGroup, setAssignmentGroup] = React.useState('');
+    const [type, setType] = React.useState(currentRow?.type);
+    const [risk, setRisk] = React.useState(currentRow?.risk);
+    const [shortDescription, setShortDescription] = React.useState(currentRow?.short_description);
+    const [reasonForChange, setReasonForChange] = React.useState(currentRow?.reason_for_change);
+    const [assignmentGroup, setAssignmentGroup] = React.useState(currentRow?.assignment_group);
  
 
     const [selectionModel, setSelectionModel] = React.useState([]);
-    const [showCheckSection, setShowCheckSection] = React.useState(false);
+    const [showCheckSection, setShowCheckSection] = React.useState(currentRow?.type === "calibration" ? true : false);
     const [checkSections, setCheckSections] = React.useState([]);
-    const [checkSectionSelected, setCheckSectionSelected] = React.useState('');
+    const [checkSectionSelected, setCheckSectionSelected] = React.useState(currentRow?.calibration?.section);
     const [checkResults, setCheckResults] = React.useState([]);
-    const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState([]);
+    const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState(currentRow?.calibration?.policyParameters); 
     const [policyParamsForSubmit, setPolicyParamsForSubmit] = React.useState([]);
 
     const [selectedVoilation, setSelectedVoilation] = React.useState([]);
-    const [priority, setPriority] = React.useState('');
-    const [policy, setPolicy] = React.useState('');
+    const [selectedVoilationOld, setSelectedVoilationOld] = React.useState(currentRow?.violations);
 
-    const [regularExp, setRegularExp] = React.useState('');
+    const [priority, setPriority] = React.useState(currentRow?.calibration?.priority);
+    const [policy, setPolicy] = React.useState(currentRow?.calibration?.policy);
 
+    const [regularExp, setRegularExp] = React.useState(currentRow?.calibration?.pattern);
+
+    console.log("currentRow", currentRow)
     const handleClickOpen = () => {
-        setOpen(true);
-        setDesc('')
+       
         setCheckedScans([]); 
+
+        if (actionType === "Create"){
+            setReasonForChange('');
+            setShortDescription('')
+            setAssignmentGroup('')
+            setRisk('')
+            setType('')
+            setDesc('')
+        }
    
-        UserService.getCycleDetails(urlHCcycle).then((results) => {
-            if (results.status === 200) {
-               console.log("results", results.data);
-
-               let checks = results.data; 
-               let checkRows = []; 
-
-               checks.forEach(element => {
-                    element?.checks?.forEach(check=> {
-                        if(check?.check_section !== 'N/A' && !checkedScans.includes(check?.check_section)){
-
-                            let addFlag = false; 
-                            check?.hosts?.forEach(host => {
-                                host?.policy_parameters?.forEach(policyParameter => {
-                                    if(policyParameter.split("=")[1]){
-                                        addFlag = true;
-                                        return; 
-                                    }
-                                }); 
-                            });
-                            if (addFlag){
-                                checkRows.push(check?.check_section)
+         setOpen(true);
+            UserService.getCycleDetails(urlHCcycle).then((results) => {
+                if (results.status === 200) {
+                   console.log("results", results.data);
+    
+                   let checks = results.data; 
+                   let checkRows = []; 
+    
+                   checks.forEach(element => {
+                        element?.checks?.forEach(check=> {
+                            if(check?.check_section !== 'N/A' && !checkedScans.includes(check?.check_section)){
+    
+                                let addFlag = false; 
+                                check?.hosts?.forEach(host => {
+                                    host?.policy_parameters?.forEach(policyParameter => {
+                                        if(policyParameter.split("=")[1]){
+                                            addFlag = true;
+                                            return; 
+                                        }
+                                    }); 
+                                });
+                                if (addFlag){
+                                    checkRows.push(check?.check_section)
+                                }
                             }
-                        }
-                    });
-               });
+                        });
+                   });
+    
+                   setCheckSections(checkRows);
+                   setCheckResults(checks);
+                   
+                }
+              }).catch((error) => {
+                console.log("error", error)
+                Notify.showError("Error" + error); 
+              });
 
-               setCheckSections(checkRows);
-               setCheckResults(checks);
-            }
-          }).catch((error) => {
-            console.log("error", error)
-            Notify.showError("Error" + error); 
-          });
+       
     };
     const handleClose = () => {
         setOpen(false);
-        setShowCheckSection(false);
-        setPolicyParamsKeyValue([])
-        setRegularExp('')
-        setCheckSectionSelected('')
-        setType('')
+        // setShowCheckSection(false);
+        // setPolicyParamsKeyValue([])
+        // setRegularExp('')
+        // setCheckSectionSelected('')
+        // setType('')
     };
     const handleSubmit = () => {
 
@@ -185,52 +201,73 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
             "short_description": shortDescription,
             "reason_for_change": reasonForChange,
             "assignment_group": assignmentGroup,
-            "violations": selectionModel,
             "health_check_cycle_id": urlHCcycle,
-            "violations": selectedVoilation, 
-            "calibration": {
-            "pattern": regularExp,    
-            "priority": priority,
-            "section": checkSectionSelected, 
-            "policy": policy,
-            "policyParameters": policyParamsForSubmit
+            "violations": selectedVoilation?.map( object => object.id) 
+            , 
+            // "calibration": {
+            // "pattern": regularExp,    
+            // "priority": priority,
+            // "section": checkSectionSelected, 
+            // "policy": policy,
+            // "policyParameters": policyParamsForSubmit
+            // }
+          }
+
+          if(type  === 'calibration'){
+            param.calibration = {
+                "pattern": regularExp,    
+                "priority": priority,
+                "section": checkSectionSelected, 
+                "policy": policy,
+                "policyParameters": policyParamsForSubmit
             }
           }
-        
-        UserService.createChangeTicket(param).then((results) => {
-            let data = results.data; 
-            if (data.ok) {
-                setReloadCTcycle(true)
-                alert(data.message);
-              // console.log("results", results.data);
-              Notify.showSuccess("HC Cycle successfully created"); 
-             
-              setOpen(false);
-            }
-          }).catch((error) => {
-            console.log("error", error)
-            Notify.showError("Error" + error); 
-          });
+        if(actionType === 'Create'){
+            UserService.createChangeTicket(param).then((results) => {
+                let data = results.data; 
+                if (data.ok) {
+                    setReloadCTcycle(true)
+                    alert(data.message);
+                  // console.log("results", results.data);
+                  Notify.showSuccess("HC Cycle successfully created"); 
+                 
+                  setOpen(false);
+                }
+              }).catch((error) => {
+                console.log("error", error)
+                Notify.showError("Error" + error); 
+              });
+        }else{
 
+            UserService.updateChangeTicket(currentRow?.id, param).then((results) => {
+                let data = results.data; 
+                if (data.ok) {
+                    alert(data.message);
+                  setOpen(false);
+                  window.location.reload(true)
+                }
+              }).catch((error) => {
+                console.log("error", error)
+                Notify.showError("Error" + error); 
+              });
+        }
         
     };
     const handlePolicyParams = (e) => {
         
         let policyKeys = [...policyParamsKeyValue]; 
-        
+        console.log(e.target.name, e.target.value)
+
         policyKeys.forEach(element => {
             if(element.key === e.target.name) {
                 element.value = e.target.value;
                 return; 
             }
         });
-        
+
         setPolicyParamsKeyValue(policyKeys);
-        console.log(e.target.name, e.target.value,policyParamsKeyValue)
+       // setPolicyParamsForSubmit(policyKeys)
     };
-
-
-    
 
     React.useEffect(() => {
 
@@ -238,7 +275,6 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
         checkResults?.forEach(element => {
             element?.checks?.forEach(check=> {
                 if(check?.check_section === checkSectionSelected){
-                    console.log("setPolicy", element.policy)
                     setPolicy(element.policy); 
                     check.hosts?.forEach(host => {
                         host?.policy_parameters?.forEach(policyParameter => {
@@ -256,41 +292,42 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                             host?.violations?.forEach(violation => {                            
                                 let found = selectedVoilations.filter(item => item.id == violation.id);
                                        if(found.length == 0){
-                                           selectedVoilations.push(violation.id);
+                                           selectedVoilations.push(violation);
                                        }
                                });
                         }
                       
                     });
 
-                    
                 }
             });
        });
-       setPolicyParamsKeyValue(policyParams)
-       console.log('selectedVoilations', selectedVoilations)
+       console.log("policyParams useeffect checkSectionSelected", policyParams)
+
+       if(actionType === "Create"){
+        setPolicyParamsKeyValue(policyParams)
+       }
+
        setSelectedVoilation(selectedVoilations)
 
     }, [checkSectionSelected,  regularExp])
 
 
     React.useEffect(()=> {
-
         let tPcopy = [];  
-        policyParamsKeyValue.forEach(element => {
+        policyParamsKeyValue?.forEach(element => {
             tPcopy.push({ name: element.key, value: element.value, type: typeof element.value})
         });
-
         setPolicyParamsForSubmit(tPcopy);
-
     }, [policyParamsKeyValue])
 
-      console.log("policyParamsKeyValue", policyParamsKeyValue, policyParamsForSubmit);
+      console.log("policyParamsForSubmit", policyParamsForSubmit);
 
     return (
         <div>
             <Button size='size' title="Click to view the all hosts"  variant="outlined" onClick={handleClickOpen}>
-               Create Change Ticket
+              
+               {actionType === 'Edit' ?  <EditIcon fontSize="small"  /> : "Create Change Ticket"} 
             </Button>
             <BootstrapDialog
                 onClose={handleClose}
@@ -301,7 +338,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                 
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
-                Create Change Ticket
+                {actionType} Change Ticket
                 </BootstrapDialogTitle>
                 <DialogContent dividers>
         
@@ -347,7 +384,10 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                     title="Check Section"
                     variant='standard'
                     label="Check Section"
-                    onChange={(e) => setCheckSectionSelected(e.target.value)}
+                    onChange={(e) => {
+                        setCheckSectionSelected(e.target.value)
+                        setSelectedVoilationOld([])
+                    }}
                     >
                     {checkSections?.map((item, i) => {
                         return (
@@ -459,10 +499,10 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
                     {type === "calibration" ? "Policy Parameters:" : ""}   <br />
                    
-                    {policyParamsKeyValue?.map((element) => {
+                    {policyParamsKeyValue?.map((element, j) => {
                         return (
                          <span  style={{marginBottom: '-5px'}} >  
-                            <InputLabel>{element?.key}: 
+                            <InputLabel>{j+1}. {element?.key || element?.name}: 
                             &nbsp;
 
                             <TextField
@@ -478,8 +518,24 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
                           </span>  
                         );
                     })}
+                <br />
+                {type === "calibration" ? "Violations:" : ""}   <br />
+                   
+                   {selectedVoilationOld?.map((element, i) => {
+                       return (
 
+                           <InputLabel>{i+1}. {element?.message} </InputLabel>
+                  
+                       );
+                   })}
 
+                    {selectedVoilation?.map((element, i) => {
+                       return (
+
+                           <InputLabel>{i+1}. {element?.message} </InputLabel>
+                  
+                       );
+                   })}
                 {/* <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Select Health Check Cycle</InputLabel>
                     <Select
@@ -507,7 +563,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle}) {
 
                 </DialogContent>
 
-                {selectedVoilation.length ? <span title={JSON.stringify(selectedVoilation, null, 2)}> {selectedVoilation.length + ' voilations passing on submit action'} </span>  : ""} 
+                {/* {selectedVoilation.length ? <span title={JSON.stringify(selectedVoilation, null, 2)}> {selectedVoilation.length + ' voilations passing on submit action'} </span>  : ""}  */}
 
                 <DialogActions> 
 

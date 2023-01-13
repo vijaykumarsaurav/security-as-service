@@ -107,9 +107,22 @@ export default function CustomizedDialogs({ currentRow }) {
     const [violationList, setViolationList] = React.useState([]);
     const [loader, setLoader] = React.useState(false);
     const [selectionModel, setSelectionModel] = React.useState(currentRow.violations);
-    console.log("currentRowcurrentRow", currentRow, description);
-
     const [urlHCcycle, setUrlHCcycle] = React.useState(decodeURIComponent(window.location.href.split('?')[1]?.split('=')[1])?.split("&")[0]);
+
+    const [showCheckSection, setShowCheckSection] = React.useState(currentRow.type === "calibration" ? true : false);
+    const [checkSections, setCheckSections] = React.useState([]);
+    const [checkSectionSelected, setCheckSectionSelected] = React.useState(currentRow?.calibration?.section);
+    const [checkResults, setCheckResults] = React.useState([]);
+    const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState([]);
+    const [policyParamsForSubmit, setPolicyParamsForSubmit] = React.useState([]);
+
+    const [selectedVoilation, setSelectedVoilation] = React.useState([]);
+    const [priority, setPriority] = React.useState(currentRow?.calibration?.priority);
+    const [policy, setPolicy] = React.useState(currentRow?.calibration?.policy);
+
+    const [regularExp, setRegularExp] = React.useState(currentRow?.calibration?.pattern);
+
+
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -118,14 +131,38 @@ export default function CustomizedDialogs({ currentRow }) {
         // setDueDate('')
         // setAssignee('')
 
-        UserService.getHCCycles().then((results) => {
+        //setDesc('')
+        setCheckedScans([]); 
+   
+        UserService.getCycleDetails(urlHCcycle).then((results) => {
             if (results.status === 200) {
                console.log("results", results.data);
-               setHcrows(results.data);
 
-               if(results.data?.length == 1){
-                setSelectedHC(results.data[0].id);
-               }
+               let checks = results.data; 
+               let checkRows = []; 
+
+               checks.forEach(element => {
+                    element?.checks?.forEach(check=> {
+                        if(check?.check_section !== 'N/A' && !checkedScans.includes(check?.check_section)){
+
+                            let addFlag = false; 
+                            check?.hosts?.forEach(host => {
+                                host?.policy_parameters?.forEach(policyParameter => {
+                                    if(policyParameter.split("=")[1]){
+                                        addFlag = true;
+                                        return; 
+                                    }
+                                }); 
+                            });
+                            if (addFlag){
+                                checkRows.push(check?.check_section)
+                            }
+                        }
+                    });
+               });
+
+               setCheckSections(checkRows);
+               setCheckResults(checks);
             }
           }).catch((error) => {
             console.log("error", error)
@@ -134,6 +171,11 @@ export default function CustomizedDialogs({ currentRow }) {
     };
     const handleClose = () => {
         setOpen(false);
+        // setShowCheckSection(false);
+        // setPolicyParamsKeyValue([])
+        // setRegularExp('')
+        // setCheckSectionSelected('')
+        // setType('')
     };
     const handleSubmit = () => {
 
@@ -212,6 +254,76 @@ export default function CustomizedDialogs({ currentRow }) {
 
       }, [selectedHC])
 
+      const handlePolicyParams = (e) => {
+        
+        let policyKeys = [...policyParamsKeyValue]; 
+        
+        policyKeys.forEach(element => {
+            if(element.key === e.target.name) {
+                element.value = e.target.value;
+                return; 
+            }
+        });
+        
+        setPolicyParamsKeyValue(policyKeys);
+        console.log(e.target.name, e.target.value,policyParamsKeyValue)
+    };
+
+
+    
+
+    React.useEffect(() => {
+
+        let policyParams = [], selectedVoilations = []; 
+        checkResults?.forEach(element => {
+            element?.checks?.forEach(check=> {
+                if(check?.check_section === checkSectionSelected){
+                    console.log("setPolicy", element.policy)
+                    setPolicy(element.policy); 
+                    check.hosts?.forEach(host => {
+                        host?.policy_parameters?.forEach(policyParameter => {
+                            let policyData = policyParameter?.split('='); 
+                            if(policyData[1]){
+                                let found = policyParams.filter(item => item.key == policyData[0]);
+                                if(found.length == 0){
+                                    policyParams.push({key : policyData[0], value : policyData[1]});
+                                }
+                            }
+                        });
+
+                        const reg = new RegExp(regularExp, "g");
+                        if(host?.hostname?.match( reg )){
+                            host?.violations?.forEach(violation => {                            
+                                let found = selectedVoilations.filter(item => item.id == violation.id);
+                                       if(found.length == 0){
+                                           selectedVoilations.push(violation.id);
+                                       }
+                               });
+                        }
+                      
+                    });
+
+                    
+                }
+            });
+       });
+       setPolicyParamsKeyValue(policyParams)
+       console.log('selectedVoilations', selectedVoilations)
+       setSelectedVoilation(selectedVoilations)
+
+    }, [checkSectionSelected,  regularExp])
+
+
+    React.useEffect(()=> {
+
+        let tPcopy = [];  
+        policyParamsKeyValue.forEach(element => {
+            tPcopy.push({ name: element.key, value: element.value, type: typeof element.value})
+        });
+
+        setPolicyParamsForSubmit(tPcopy);
+
+    }, [policyParamsKeyValue])
       console.log("setSelectionModel", selectionModel);
 
     return (
@@ -251,6 +363,63 @@ export default function CustomizedDialogs({ currentRow }) {
 
                     </Select>
                 </FormControl>
+
+                {showCheckSection?  <React.Fragment> <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                    <InputLabel id="demo-select-small">Check Section</InputLabel>
+                    <Select
+                    labelId="demo-select-small"
+                    id="demo-select-small"
+                    required
+                    value={checkSectionSelected}
+                    title="Check Section"
+                    variant='standard'
+                    label="Check Section"
+                    onChange={(e) => setCheckSectionSelected(e.target.value)}
+                    >
+                    {checkSections?.map((item, i) => {
+                        return (
+                            <MenuItem value={item}>{item}</MenuItem>
+                        );
+                    })}
+                    
+                     </Select>
+
+                </FormControl> 
+                
+                <FormControl sx={{ m: 1 }}  size="mediam">
+                <TextField
+                variant='standard'
+                id="outlined-name"
+                title='Hostname Regular Expression'
+                label="Hostname Regular Expr."
+                value={regularExp}
+                required
+                onChange={(e) => setRegularExp(e.target.value)}
+                />
+                </FormControl>
+                
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                    <InputLabel id="demo-select-small">Priority *</InputLabel>
+                    <Select
+                    labelId="demo-select-small"
+                    id="demo-select-small"
+                    value={priority}
+                    required
+                    title="Priority"
+                    variant='standard'
+                    label="Priority"
+                    onChange={(e) => setPriority(e.target.value)}
+                    > 
+                     <MenuItem value={1}>1</MenuItem>
+                     <MenuItem value={2}>2</MenuItem>
+                     <MenuItem value={3}>3</MenuItem>
+                     <MenuItem value={4}>4</MenuItem>
+                     <MenuItem value={5}>5</MenuItem>
+                    </Select>
+                </FormControl>
+                </React.Fragment> 
+
+                : "" }
 
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Risk *</InputLabel>

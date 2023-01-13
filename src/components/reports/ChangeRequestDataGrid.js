@@ -141,7 +141,7 @@ const headCells = [
     renderCell: (param) => {
       const currentRow = param.row;
 
-       return   currentRow?.unassigned_violations >= 0 ? '' : <div>  <CreateChangeEdit currentRow={currentRow} />  </div> 
+       return   currentRow?.unassigned_violations >= 0 ? '' : <div>  <CreateChangeRequest actionType={"Edit"}  currentRow={currentRow} urlHCcycle={currentRow?.id}/>  </div> 
     }
   },
  
@@ -244,10 +244,17 @@ export default function ScannedReportsDataGrid() {
         otherUsedVid.push(uid);
       } 
     });
-     
+
+    let viewOnly = currentRow.type === "calibration"? 'ok' : "";
+
      return currentRow?.unassigned_violations > 0 ?   <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(usedVoilation) )} >  {currentRow?.unassigned_violations} Violations </Button>: <div> 
-       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id + "&uid="+ JSON.stringify(otherUsedVid) )} >{currentRow?.violations?.length} Voilations </Button>
+       <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id + "&uid="+ JSON.stringify(otherUsedVid) + "&vO=" + viewOnly )} >{currentRow?.violations?.length} Voilations </Button>
      </div>
+  }
+
+  headCells[headCells.length-2].renderCell = (param) => {
+    const currentRow = param.row;
+    return   currentRow?.unassigned_violations >= 0 ? '' : <div>  <CreateChangeRequest actionType={"Edit"}  currentRow={currentRow} urlHCcycle={urlHCcycle}/>  </div> 
   }
 
   function CustomToolbarExport() {
@@ -270,7 +277,7 @@ export default function ScannedReportsDataGrid() {
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">
           
-          <CreateChangeRequest urlHCcycle={urlHCcycle} setReloadCTcycle={setReloadCTcycle} />
+          <CreateChangeRequest actionType={"Create"} urlHCcycle={urlHCcycle} setReloadCTcycle={setReloadCTcycle} />
           </Grid>
         </Grid>
 

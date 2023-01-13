@@ -291,7 +291,9 @@ export default function ScannedReportsDataGrid() {
   const [urlVoilations, setUrlVoilations] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[2]?.split('=')[1]));
   const [changeId, setChangeId] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[3]?.split('=')[1]));
   const [usedVid, setUsedVid] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[4]?.split('=')[1]));
+  const [viewOnly, setViewOnly] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[5]?.split('=')[1]));
 
+  
   const [selectionModel, setSelectionModel] = React.useState( [] );
 
   React.useEffect(() => {
@@ -395,7 +397,7 @@ export default function ScannedReportsDataGrid() {
       <GridToolbarContainer>
         <GridToolbarExport />
         &nbsp;&nbsp;
-        {selectionModel.length > 0  ? <Button onClick={handleAssignment} size="small" variant='outlined'> Assign to change Ticket </Button> :"" }
+        {selectionModel.length > 0 && viewOnly != "ok" ? <Button onClick={handleAssignment} size="small" variant='outlined'> Assign to change Ticket </Button> :"" }
         
       </GridToolbarContainer>
     );
@@ -425,6 +427,7 @@ export default function ScannedReportsDataGrid() {
         components={{
           Toolbar:  CustomToolbarExport 
         }}
+
       />
     </Box>
   );
