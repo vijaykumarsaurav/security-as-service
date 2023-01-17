@@ -127,6 +127,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             setRisk('')
             setType('')
             setDesc('')
+            setShowCheckSection(false)
         }
    
          setOpen(true);
