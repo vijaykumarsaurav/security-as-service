@@ -3,29 +3,27 @@ import { DataGrid } from '@mui/x-data-grid';
 import Tooltip from '@mui/material/Tooltip';
 
 const columnsList = [
-  // {
-  //   field: 'id',
-  //   numeric: false,
-  //   width: 80,
-  //   sortable: true,
-  //   editable: true,
-  //   headerName: 'Sr.',
-  // },
   {
-    field: 'message',
+    field: 'hostname',
     numeric: true,
-    minWidth: 400,
-    maxWidth: 500,
+    minWidth: 100,
+    maxWidth: 200,
 
     sortable: true,
     editable: true,
-    headerName: 'Name',
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return <Tooltip placement="bottom" title={currentRow?.message}>
-      <span> {currentRow?.message}</span>
-    </Tooltip>
-    }
+    headerName: 'Hostname',
+ 
+  },
+  {
+    field: 'violation',
+    numeric: true,
+    width: 180,
+    sortable: true,
+    editable: true,
+    headerName: 'violation',
+    valueGetter: (params) =>
+      `${params.violation.message || ''}`,
+  
   },
 ];
 

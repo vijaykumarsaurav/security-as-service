@@ -18,7 +18,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 import UserService from '../service/UserService';
 import Notify from '../utils/Notify';
-import { Select,FormControl, InputLabel, MenuItem } from '@mui/material';
+import { Select,FormControl, InputLabel, MenuItem, Table, TableHead, TableBody,TableRow, TableCell } from '@mui/material';
 import {
     DataGrid, 
     GridToolbarContainer,
@@ -200,6 +200,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             return; 
         }
       
+        console.log('selectedVoilation', selectedVoilation)
 
         let param = {
             "type": type,
@@ -209,7 +210,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             "reason_for_change": reasonForChange,
             "assignment_group": assignmentGroup,
             "health_check_cycle_id": urlHCcycle,
-            "violations": selectedVoilation?.map( object => object.id) 
+            "violations": selectedVoilation?.map( object => object.violation?.id) 
             , 
             // "calibration": {
             // "pattern": regularExp,    
@@ -301,7 +302,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                                 host?.violations?.forEach(violation => {                            
                                     let found = selectedVoilations.filter(item => item.id == violation.id);
                                            if(found.length == 0){
-                                               selectedVoilations.push(violation);
+                                               selectedVoilations.push({ hostname : host?.hostname, violation: violation} );
                                            }
                                    });
                             }
@@ -313,7 +314,6 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 }
             });
        });
-       console.log("policyParams useeffect checkSectionSelected", policyParams)
 
        if(actionType === "Create"){
         setPolicyParamsKeyValue(policyParams)
@@ -322,6 +322,30 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
        setSelectedVoilation(selectedVoilations)
 
     }, [checkSectionSelected,  regularExp])
+
+
+    React.useEffect(()=> {
+        console.log("currentRow?.violations", currentRow?.violations)
+        let policyParams = [], existingVoilations = []; 
+        checkResults?.forEach(element => {
+            element?.checks?.forEach(check=> {
+                check.hosts?.forEach(host => {
+                        
+                    host?.violations?.forEach(violation => {                            
+                        let found = currentRow?.violations.filter(item => item.id == violation.id);
+                               if(found?.length > 0){
+                                existingVoilations.push({ hostname : host?.hostname, violation: violation} );
+                               }
+                       });
+                    
+                  
+                });
+            });
+       });
+
+       setSelectedVoilation(existingVoilations)
+
+    }, [checkResults, currentRow?.violations])
 
 
     React.useEffect(()=> {
@@ -359,7 +383,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     labelId="demo-select-small"
                     id="demo-select-small"
                     required
-                    disabled={type === 'calibration' ? true : false}
+                    disabled={actionType === 'Edit' && type === 'calibration' ? true : false}
                     value={type}
                     title="Type"
                     variant='standard'
@@ -548,47 +572,40 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                         );
                     })}
                 <br />
-                {type === "calibration" ? "Violations:" : ""}   <br />
-                   
-                   {selectedVoilationOld?.map((element, i) => {
-                       return (
+                {type === "calibration" ? <span>  Violations: 
+                    <Table> <TableHead> 
+                        <TableRow> 
+                            <TableCell> 
+                                Hostname
+                            </TableCell>
+                            <TableCell> 
+                                Violation
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>  
 
-                           <InputLabel>{i+1}. {element?.message} </InputLabel>
-                  
-                       );
-                   })}
-
+                    <TableBody> 
+                      
                     {selectedVoilation?.map((element, i) => {
                        return (
 
-                           <InputLabel>{i+1}. {element?.message} </InputLabel>
-                  
+                        <TableRow> 
+                            <TableCell>
+                                <InputLabel>{i+1}. {element?.hostname}   </InputLabel>
+                            </TableCell>
+                        <TableCell> 
+                            {element?.violation?.message}
+                        </TableCell>
+                    </TableRow>
+               
                        );
                    })}
-                {/* <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    <InputLabel id="demo-select-small">Select Health Check Cycle</InputLabel>
-                    <Select
-                    labelId="demo-select-small"
-                    id="demo-select-small"
-                    value={selectedHC}
-                    title="Risk"
-                    variant='standard'
-                    label="Risk"
-                    onChange={(e) => setSelectedHC(e.target.value)}
-                    > 
-                    
-                     {hcrows?.map((cycle) => {
-                        return (
-                            <MenuItem value={cycle?.id}>{cycle?.name}</MenuItem>
-                        );
-                    })}
-                    </Select>
-                </FormControl>
-                <br /> 
+                    </TableBody>
+                    </Table> </span> : ""} 
+                
               
+                {/* <VoilationTable rows={selectedVoilation}/> */}
 
-                <VoilationTable rows={violationList} loader={loader} setSelectionModel={setSelectionModel} />
- */}
 
                 </DialogContent>
 
@@ -601,7 +618,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                         Cancel
                     </Button>
                     <Button 
-                     disabled={actionType === 'Edit' ? true : false}
+                     disabled={actionType === 'Edit' && type === 'calibration' ? true : false}
                     variant="outlined"  color="primary"   onClick={handleSubmit}>
                         Submit
                     </Button>
