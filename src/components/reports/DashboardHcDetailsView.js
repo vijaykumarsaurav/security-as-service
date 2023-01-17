@@ -282,6 +282,58 @@ const getResults = (checks, urlFilterProps, policy='', rowsData) => {
 };
 
 
+
+const getCalibrationVoilations = (checks, urlFilterProps, policy='',  usedVoilation, rowsData) => {
+  let tempDevData = [];
+  let id = 0;
+  console.log("usedVoilation usedVoilation" , usedVoilation)
+  for (let index = 0; index < checks.length; index++) {
+    const element = checks[index];
+    element?.hosts.forEach(host => {
+      let policyName = policy.split('-'); 
+      let hostData = { 
+        check_section: element.check_section,
+        check_description: element.check_description,
+        severity: element.severity,
+        hostname: host.hostname,
+        check_status: host.check_status,
+        ip: host.ip,
+        scan_date: host.scan_date,
+        measure_values: host.measure_values,
+        policy_parameters: host.policy_parameters,
+        id: id,
+        violation_name : "",
+        displayPolicyName : `${policyName[0]} ${policyName[1]} v${policyName[3]}`
+      }
+      if (host.check_status === 'KO') {
+
+        host.violations.forEach(violation => {
+          let seperateHostdata = { ...hostData }; //hostData;  //
+          seperateHostdata.id = violation.id;
+
+          seperateHostdata.violation_name = violation.message;
+          console.log("usedVoilation usedVoilation" , usedVoilation)
+
+          if(usedVoilation?.includes(violation.id) ){
+            tempDevData.push(seperateHostdata);
+
+          }
+
+          id++;
+        })
+      }
+      
+    });
+  }
+  //let rowsData =  [...rows]; 
+  //rowsData.concat(tempDevData);
+ //setRows(rows.concat(tempDevData));
+ // setLoader(false);
+ return tempDevData;
+};
+
+
+
 export default function ScannedReportsDataGrid() {
   const [rows, setRows] = React.useState([]);
   const [loader, setLoader] = React.useState(false);
@@ -308,7 +360,15 @@ export default function ScannedReportsDataGrid() {
           const checks = results.data[index]?.checks;
           const policy = results.data[index]?.policy;
 
-           if(urlFilterProps === 'violations'){
+            if(urlFilterProps === 'violations' && viewOnly === 'ok'){
+                let usedVoilation = urlVoilations != 'undefined' ? JSON.parse(urlVoilations) : []; 
+                let tempDevData = getCalibrationVoilations(checks, urlFilterProps, policy,usedVoilation, rowsData);
+                console.log("tempDevData checks", tempDevData, policy)
+                tempDevData.forEach(element => {
+                console.log("element.policyName", element.policyName)
+                rowsData.push(element);
+                });
+            } else if(urlFilterProps === 'violations'){
 
               let usedVoilation = urlVoilations != 'undefined' ? JSON.parse(urlVoilations) : []; 
 
@@ -342,10 +402,7 @@ export default function ScannedReportsDataGrid() {
     
                 console.log("finalData", finalData)
               rowsData = finalData;
-              } 
-             
-                
-
+              }
            }else if(urlFilterProps === 'checks'){
               let tempDevData = getResults(checks, urlFilterProps, policy, rowsData);
               console.log("tempDevData checks", tempDevData, policy)
@@ -354,9 +411,9 @@ export default function ScannedReportsDataGrid() {
               rowsData.push(element);
               });
            }
+          }
          
           //rowsData.concat(tempDevData);
-        }
         setRows(rowsData)
        // console.log("rowsData", rowsData)
         //
@@ -413,7 +470,7 @@ export default function ScannedReportsDataGrid() {
        
         rows={rows}
         columns={headCells}
-        checkboxSelection={changeId != 'undefined' ? true :  false} 
+        checkboxSelection={changeId != 'undefined' && viewOnly != "ok"  ? true :  false} 
         onSelectionModelChange={(newSelectionModel) => {
           setSelectionModel(newSelectionModel);
         }}

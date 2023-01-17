@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import ExpandListItem from './ExpandListItem';
 import VoilationTable from './VoilationTable';
 import EditIcon from '@mui/icons-material/Edit';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import UserService from '../service/UserService';
 import Notify from '../utils/Notify';
@@ -155,7 +156,8 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                             }
                         });
                    });
-    
+                   checkRows?.sort();
+
                    setCheckSections(checkRows);
                    setCheckResults(checks);
                    
@@ -181,6 +183,10 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             alert("Select Type!"); 
             return; 
         }
+        if(type  === 'calibration' && !regularExp){
+            alert("Type regular expression for hostname!"); 
+            return; 
+        }
         if(!risk){
             alert("Select Risk!"); 
             return; 
@@ -193,6 +199,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             alert("Type Reason For Change!"); 
             return; 
         }
+      
 
         let param = {
             "type": type,
@@ -286,16 +293,20 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                                 }
                             }
                         });
-
-                        const reg = new RegExp(regularExp, "g");
-                        if(host?.hostname?.match( reg )){
-                            host?.violations?.forEach(violation => {                            
-                                let found = selectedVoilations.filter(item => item.id == violation.id);
-                                       if(found.length == 0){
-                                           selectedVoilations.push(violation);
-                                       }
-                               });
+                        
+                        console.log('regularExp?', regularExp)
+                        if(regularExp?.charAt(0) == '.'){ 
+                            const reg = new RegExp(regularExp, "g");
+                            if(host?.hostname?.match( reg )){
+                                host?.violations?.forEach(violation => {                            
+                                    let found = selectedVoilations.filter(item => item.id == violation.id);
+                                           if(found.length == 0){
+                                               selectedVoilations.push(violation);
+                                           }
+                                   });
+                            }
                         }
+                        
                       
                     });
 
@@ -348,6 +359,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     labelId="demo-select-small"
                     id="demo-select-small"
                     required
+                    disabled={type === 'calibration' ? true : false}
                     value={type}
                     title="Type"
                     variant='standard'
@@ -374,8 +386,10 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     </Select>
                 </FormControl>
 
-               {showCheckSection?  <React.Fragment> <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    <InputLabel id="demo-select-small">Check Section</InputLabel>
+               {showCheckSection?  <React.Fragment> 
+                
+                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+                    {/* <InputLabel id="demo-select-small">Check Section</InputLabel>
                     <Select
                     labelId="demo-select-small"
                     id="demo-select-small"
@@ -395,8 +409,23 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                         );
                     })}
                     
-                     </Select>
+                     </Select> */}
 
+                <Autocomplete
+                    disablePortal
+                    id="combo-box-demo"
+                    options={checkSections}
+                    sx={{ width: 150 }}
+                    value={checkSectionSelected}
+
+                    onChange={(event, newValue) => {
+                        console.log('newvalue', newValue)
+                        setCheckSectionSelected(newValue)
+                        setSelectedVoilationOld([])
+                      }}
+
+                    renderInput={(params) => <TextField  variant="standard"  {...params} label="Check Section" />}
+                    />
                 </FormControl> 
                 
                 <FormControl sx={{ m: 1 }}  size="mediam">
@@ -571,7 +600,9 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     <Button variant="outlined" color="secondary"   onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button variant="outlined"  color="primary"   onClick={handleSubmit}>
+                    <Button 
+                     disabled={actionType === 'Edit' ? true : false}
+                    variant="outlined"  color="primary"   onClick={handleSubmit}>
                         Submit
                     </Button>
                 </DialogActions>
