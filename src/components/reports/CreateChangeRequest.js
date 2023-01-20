@@ -619,7 +619,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                         Cancel
                     </Button>
                     <Button 
-                     disabled={actionType === 'Edit' && type === 'calibration' ? true : false}
+                    // disabled={actionType === 'Edit' && type === 'calibration' ? true : false}
                     variant="outlined"  color="primary"   onClick={handleSubmit}>
                         Submit
                     </Button>
