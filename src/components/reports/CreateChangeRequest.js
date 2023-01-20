@@ -107,7 +107,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
     const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState(currentRow?.calibration?.policyParameters); 
     const [policyParamsForSubmit, setPolicyParamsForSubmit] = React.useState([]);
 
-    const [selectedVoilation, setSelectedVoilation] = React.useState([]);
+    const [selectedVoilation, setSelectedVoilation] = React.useState(currentRow?.violations);
     const [selectedVoilationOld, setSelectedVoilationOld] = React.useState(currentRow?.violations);
 
     const [priority, setPriority] = React.useState(currentRow?.calibration?.priority);

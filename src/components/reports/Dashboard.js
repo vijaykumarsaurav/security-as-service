@@ -201,7 +201,7 @@ const headCells = [
     headerName: 'Manage Change Ticket',
     renderCell: (param) => {
       const currentRow = param.row;
-       return <Button size='small' title="Manage Change Ticket" variant="outlined" target={'_blank'} href={"#/change-request?hc="+currentRow?.id+"&v="+ currentRow?.statistic?.violations + "&hcName=" + currentRow?.name } ><ManageHistoryIcon /></Button>
+       return <Button size='small' title="Manage Change Ticket" variant="outlined" target={'_blank'} href={"#/change-request-seperate-table?hc="+currentRow?.id+"&v="+ currentRow?.statistic?.violations + "&hcName=" + currentRow?.name } ><ManageHistoryIcon /></Button>
     }
   },
 ];

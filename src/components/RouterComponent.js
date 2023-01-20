@@ -9,6 +9,7 @@ import LoginComponent from './login/LoginComponent';
 
 import Dashboard from './reports/Dashboard';
 import ChangeRequestDataGrid from './reports/ChangeRequestDataGrid';
+import ChangeRequestDataGridSeperateTable from './reports/ChangeRequestDataGridSeperateTable';
 
 
 const AppRouter = () => {
@@ -26,8 +27,10 @@ const AppRouter = () => {
                     <Route path="/unscanned-details-view" component={DashboardUnscannedDetailsView}/>
 
                     
+                    
                     <Route path="/dashboard" component={Dashboard}/>
                     <Route path="/change-request" component={ChangeRequestDataGrid}/>
+                    <Route path="/change-request-seperate-table" component={ChangeRequestDataGridSeperateTable}/>
 
                     <Route path="*" component={ScannedReportsDataGrid} />
                      
