@@ -104,7 +104,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
     const [checkSections, setCheckSections] = React.useState([]);
     const [checkSectionSelected, setCheckSectionSelected] = React.useState(currentRow?.calibration?.section);
     const [checkResults, setCheckResults] = React.useState([]);
-    const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState(currentRow?.calibration?.policyParameters); 
+    const [policyParamsKeyValue, setPolicyParamsKeyValue] = React.useState([]); 
     const [policyParamsForSubmit, setPolicyParamsForSubmit] = React.useState([]);
 
     const [selectedVoilation, setSelectedVoilation] = React.useState(currentRow?.violations);
@@ -268,7 +268,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
         console.log(e.target.name, e.target.value)
 
         policyKeys.forEach(element => {
-            if(element.key === e.target.name) {
+            if(element.name === e.target.name) {
                 element.value = e.target.value;
                 return; 
             }
@@ -316,16 +316,23 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             });
        });
 
-       if(actionType === "Create"){
-        setPolicyParamsKeyValue(policyParams)
-       }
+    //    if(actionType === "Create"){
+    //    }
+
+       setPolicyParamsKeyValue(policyParams)
+
 
        console.log("after caluclation vol",selectedVoilations )
-
        setSelectedVoilation(selectedVoilations)
 
     }, [checkSectionSelected,  regularExp])
 
+
+    React.useEffect(()=> {
+        console.log("setPolicyParamsKeyValue", currentRow)
+        setPolicyParamsKeyValue(currentRow?.calibration?.policyParameters); 
+
+    }, [currentRow])
 
     React.useEffect(()=> {
         console.log("currentRow?.violations", currentRow?.violations)
@@ -561,7 +568,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     {policyParamsKeyValue?.map((element, j) => {
                         return (
                          <span  style={{marginBottom: '-5px'}} >  
-                            <InputLabel>{j+1}. {element?.key || element?.name}: 
+                            <InputLabel>{j+1}. {element?.name}: 
                             &nbsp;
 
                             <TextField
@@ -569,7 +576,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                             id="outlined-name"
                            // label="Value"
                             style={{marginTop: '-5px'}}
-                            name={element?.key}
+                            name={element?.name}
                             value={element?.value}
                             onChange={handlePolicyParams}
                             />
