@@ -115,7 +115,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
 
     const [regularExp, setRegularExp] = React.useState(currentRow?.calibration?.pattern);
 
-    console.log("currentRow", currentRow)
+    console.log("currentRow", currentRow, "actionType", actionType)
     const handleClickOpen = () => {
        
         setCheckedScans([]); 
@@ -131,7 +131,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
         }
    
          setOpen(true);
-            UserService.getCycleDetails(urlHCcycle).then((results) => {
+            UserService.getCycleDetails(currentRow?.health_check_cycle_id || urlHCcycle).then((results) => {
                 if (results.status === 200) {
                    console.log("results", results.data);
     
@@ -210,7 +210,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             "short_description": shortDescription,
             "reason_for_change": reasonForChange,
             "assignment_group": assignmentGroup,
-            "health_check_cycle_id": urlHCcycle,
+            "health_check_cycle_id": currentRow?.health_check_cycle_id || urlHCcycle,
             "violations": selectedVoilation?.map( object => object.violation?.id) 
             , 
             // "calibration": {
@@ -291,7 +291,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                             if(policyData[1]){
                                 let found = policyParams.filter(item => item.key == policyData[0]);
                                 if(found.length == 0){
-                                    policyParams.push({key : policyData[0], value : policyData[1]});
+                                    policyParams.push({name: policyData[0], value : policyData[1], type: typeof policyData[1]});
                                 }
                             }
                         });
@@ -320,6 +320,8 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
         setPolicyParamsKeyValue(policyParams)
        }
 
+       console.log("after caluclation vol",selectedVoilations )
+
        setSelectedVoilation(selectedVoilations)
 
     }, [checkSectionSelected,  regularExp])
@@ -345,6 +347,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
        });
 
        setSelectedVoilation(existingVoilations)
+       console.log("after caluclation vol existingVoilations",existingVoilations )
 
     }, [checkResults, currentRow?.violations])
 
@@ -352,8 +355,10 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
     React.useEffect(()=> {
         let tPcopy = [];  
         policyParamsKeyValue?.forEach(element => {
-            tPcopy.push({ name: element.key, value: element.value, type: typeof element.value})
+            tPcopy.push({ name: element.name, value: element.value, type: typeof element.value})
         });
+
+        console.log("tPcopy", tPcopy)
         setPolicyParamsForSubmit(tPcopy);
     }, [policyParamsKeyValue])
 

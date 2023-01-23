@@ -345,7 +345,7 @@ export default function ScannedReportsDataGrid() {
         });
         console.log("usedVoilation", usedVoilation)
 
-      //  setAsignedVoilations(usedVoilation);
+        setAsignedVoilations(usedVoilation);
 
         defaultRow[0].unassigned_violations =  parseInt(urlFilterProps) - totalAssignedVoilations;
 
@@ -439,7 +439,8 @@ export default function ScannedReportsDataGrid() {
 
    
           <Grid xs display="flex" justifyContent="right" alignItems="right">
-            <Typography style={{padding: "5px"}}> {unassignedVoilations?.unassigned_violations} Voilations </Typography>
+            <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(asignedVoilations) )} > {unassignedVoilations?.unassigned_violations}  Unassigned Violation </Button>
+             &nbsp;  
             <CreateChangeRequest actionType={"Create"} urlHCcycle={urlHCcycle} setReloadCTcycle={setReloadCTcycle} />
           </Grid>
         </Grid>
