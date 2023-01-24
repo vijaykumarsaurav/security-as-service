@@ -289,9 +289,19 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                         host?.policy_parameters?.forEach(policyParameter => {
                             let policyData = policyParameter?.split('='); 
                             if(policyData[1]){
-                                let found = policyParams.filter(item => item.key == policyData[0]);
+                                let found = policyParams.filter(item => item.name == policyData[0]);
+                                
+                                let value = ''; 
+                                if(found.length > 0){
+                                    if(policyData[0] === found[0].name && policyData[1] === found[0].value) {
+                                        value = policyData[1]; 
+                                    }
+                                }else{
+                                    value = policyData[1];   
+                                }
+
                                 if(found.length == 0){
-                                    policyParams.push({name: policyData[0], value : policyData[1], type: typeof policyData[1]});
+                                    policyParams.push({name: policyData[0], value : value, type: typeof value});
                                 }
                             }
                         });
@@ -316,12 +326,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             });
        });
 
-    //    if(actionType === "Create"){
-    //    }
-
        setPolicyParamsKeyValue(policyParams)
-
-
        console.log("after caluclation vol",selectedVoilations )
        setSelectedVoilation(selectedVoilations)
 

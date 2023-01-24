@@ -228,7 +228,7 @@ const headCellsCalibration = [
   },
   {
     field: 'patterns', 
-    width: 150,
+    width: 100,
     sortable: true,
     editable: true,
     headerName: 'Patterns',
@@ -237,7 +237,7 @@ const headCellsCalibration = [
   },
   {
     field: 'priority', 
-    width: 150,
+    width: 70,
     sortable: true,
     editable: true,
     headerName: 'Priority',
@@ -434,7 +434,7 @@ export default function ScannedReportsDataGrid() {
 
      
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-              <Typography color="primary" style={{padding: "5px"}}> 'Remediation' Change Request for {hcName}</Typography>
+              <Typography color="primary" style={{padding: "5px"}}> Change Request for {hcName}</Typography>
           </Grid>
 
    
@@ -446,7 +446,7 @@ export default function ScannedReportsDataGrid() {
         </Grid>
 
         <DataGrid         
-          rows={ rows?.filter( object => object?.type === "remediation")  }
+          rows={ rows?.filter( object => object?.type !== "calibration")  }
           columns={headCells}
           //checkboxSelection
           autoPageSize
