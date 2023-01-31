@@ -224,16 +224,25 @@ const headCellsCalibration = [
     editable: true,
     headerName: 'Check Section',
     valueGetter: (params) =>
-    `${params.row?.calibration?.section || ''}`,
+    `${params.row?.type === 'calibration' ? params.row?.calibration?.section : params.row?.type === 'suppression' ? params.row?.suppression?.section : ''}`,
   },
   {
     field: 'patterns', 
-    width: 100,
+    width: 120,
     sortable: true,
     editable: true,
-    headerName: 'Patterns',
+    headerName: 'Hostname Pattern',
     valueGetter: (params) =>
-    `${params.row?.calibration?.pattern || ''}`,
+    `${params.row?.type === 'calibration' ? params.row?.calibration?.pattern : params.row?.type === 'suppression' ? params.row?.suppression?.pattern : ''}`,
+  },
+  {
+    field: 'violation_patterns', 
+    width: 110,
+    sortable: true, 
+    editable: true, 
+    headerName: 'Violation Patterns',
+    valueGetter: (params) =>
+    `${params.row?.suppression?.violation || 'N/A'}`,
   },
   {
     field: 'priority', 
@@ -242,7 +251,8 @@ const headCellsCalibration = [
     editable: true,
     headerName: 'Priority',
     valueGetter: (params) =>
-    `${params.row?.calibration?.priority || ''}`,
+    `${params.row?.type === 'calibration' ? params.row?.calibration?.priority : params.row?.type === 'suppression' ? params.row?.suppression?.priority : ''}`,
+
   },
   {
     field: 'policy_parameters',
@@ -322,8 +332,9 @@ export default function ScannedReportsDataGrid() {
   const [hcName, setHcName] = React.useState(decodeURIComponent(window.location.href?.split('?')[1]?.split('&')[2]?.split('=')[1]));
   const [asignedVoilations, setAsignedVoilations] = React.useState([]);
   const [unassignedVoilations, setUnassignedVoilations] = React.useState('');
+  const [priorityHistory, setPriorityHistory] = React.useState([]);
 
-  let usedVoilation = []; 
+  let usedVoilation = [], prioritiesList=''; 
 
   React.useEffect(() => {
     setLoader(true)
@@ -333,7 +344,7 @@ export default function ScannedReportsDataGrid() {
         setLoader(false)
         let changeTickts = results.data; 
 
-        let totalAssignedVoilations = 0; 
+        let totalAssignedVoilations = 0,priorities = []; 
         
         changeTickts.forEach(element => {
           totalAssignedVoilations += element.violations?.length; 
@@ -341,9 +352,13 @@ export default function ScannedReportsDataGrid() {
             usedVoilation.push(vioId.id); 
           });
         //  const allAssingedVoilations = [...asignedVoilations, ...element.violations];
-          
+           if(element.type === 'calibration'){
+            priorities.push({check_section:  element?.calibration?.section, priority:element?.calibration?.priority })
+           }
         });
-        console.log("usedVoilation", usedVoilation)
+        setPriorityHistory(priorities)
+
+        prioritiesList = priorities; 
 
         setAsignedVoilations(usedVoilation);
 
@@ -353,6 +368,7 @@ export default function ScannedReportsDataGrid() {
         const mergedRows = [...changeTickts];
 
         setUnassignedVoilations(defaultRow[0]);
+        console.log("priorityHistorypriorityHistory", priorityHistory)
 
         setRows(mergedRows);
       }
@@ -379,8 +395,7 @@ export default function ScannedReportsDataGrid() {
       } 
     });
 
-    let viewOnly = currentRow.type === "calibration"? 'ok' : "";
-
+    let viewOnly = (currentRow.type === "calibration" || currentRow.type === "suppression")? 'ok' : "";
      return currentRow?.unassigned_violations > 0 ?   <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(usedVoilation) )} >  {currentRow?.unassigned_violations} Violations </Button>: <div> 
        <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id + "&uid="+ JSON.stringify(otherUsedVid) + "&vO=" + viewOnly )} >{currentRow?.violations?.length} Voilations </Button>
      </div>
@@ -403,16 +418,18 @@ export default function ScannedReportsDataGrid() {
       } 
     });
 
-    let viewOnly = currentRow.type === "calibration"? 'ok' : "";
+    let viewOnly = (currentRow.type === "calibration" || currentRow.type === "suppression")? 'ok' : "";
 
      return currentRow?.unassigned_violations > 0 ?   <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(usedVoilation) )} >  {currentRow?.unassigned_violations} Violations </Button>: <div> 
        <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id + "&uid="+ JSON.stringify(otherUsedVid) + "&vO=" + viewOnly )} >{currentRow?.violations?.length} Voilations </Button>
      </div>
   }
 
-  headCells[headCells.length-2].renderCell = (param) => {
+ 
+  console.log('priorityHistoryatend',priorityHistory )
+  headCellsCalibration[headCellsCalibration.length-2].renderCell = (param) => {
     const currentRow = param.row;
-    return   currentRow?.unassigned_violations >= 0 ? '' : <div>  <CreateChangeRequest actionType={"Edit"}  currentRow={currentRow} urlHCcycle={urlHCcycle}/>  </div> 
+    return   currentRow?.unassigned_violations >= 0 ? '' : <div>  <CreateChangeRequest priorityHistory={priorityHistory} actionType={"Edit"}  currentRow={currentRow} urlHCcycle={urlHCcycle}/>  </div> 
   }
 
   function CustomToolbarExport() {
@@ -441,7 +458,7 @@ export default function ScannedReportsDataGrid() {
           <Grid xs display="flex" justifyContent="right" alignItems="right">
             <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(asignedVoilations) )} > {unassignedVoilations?.unassigned_violations}  Unassigned Violation </Button>
              &nbsp;  
-            <CreateChangeRequest actionType={"Create"} urlHCcycle={urlHCcycle} setReloadCTcycle={setReloadCTcycle} />
+            <CreateChangeRequest priorityHistory={priorityHistory}  actionType={"Create"} urlHCcycle={urlHCcycle} setReloadCTcycle={setReloadCTcycle} />
           </Grid>
         </Grid>
 
@@ -474,7 +491,7 @@ export default function ScannedReportsDataGrid() {
 
      
       <Grid xs display="flex" justifyContent="left" alignItems="left">
-            <Typography color="primary" style={{padding: "5px"}}> 'Calibration' Change Request for {hcName}</Typography>
+            <Typography color="primary" style={{padding: "5px"}}> 'Calibration' & 'Suppression' Change Request for {hcName}</Typography>
         </Grid>
 
 
@@ -482,7 +499,7 @@ export default function ScannedReportsDataGrid() {
         </Grid>
 
         <DataGrid         
-        rows={ rows?.filter( object => object?.type === "calibration") }
+        rows={ rows?.filter( object => object?.type === "calibration" || object?.type === "suppression") }
         columns={headCellsCalibration}
         //checkboxSelection
         autoPageSize

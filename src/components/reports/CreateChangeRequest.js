@@ -108,12 +108,13 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
     const [policyParamsForSubmit, setPolicyParamsForSubmit] = React.useState([]);
 
     const [selectedVoilation, setSelectedVoilation] = React.useState(currentRow?.violations);
-    const [selectedVoilationOld, setSelectedVoilationOld] = React.useState(currentRow?.violations);
+    const [selectedVoilationByHostname, setSelectedVoilationByHostname] = React.useState([]);
 
     const [priority, setPriority] = React.useState(currentRow?.calibration?.priority);
     const [policy, setPolicy] = React.useState(currentRow?.calibration?.policy);
 
-    const [regularExp, setRegularExp] = React.useState(currentRow?.calibration?.pattern);
+    const [regularExp, setRegularExp] = React.useState(currentRow?.calibration?.pattern || '.*.');
+    const [suppressionRegularExp, setSuppressionRegularExp] = React.useState('.*.');
 
     console.log("currentRow", currentRow, "actionType", actionType)
     const handleClickOpen = () => {
@@ -231,6 +232,16 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 "policyParameters": policyParamsForSubmit
             }
           }
+          if(type  === 'suppression'){
+            param.suppression = {
+                "pattern": regularExp,    
+                "priority": priority,
+                "section": checkSectionSelected, 
+                "policy": policy,
+                "violation": suppressionRegularExp,
+                "type": "string",
+            }
+          }
         if(actionType === 'Create'){
             UserService.createChangeTicket(param).then((results) => {
                 let data = results.data; 
@@ -327,16 +338,55 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
        });
 
        setPolicyParamsKeyValue(policyParams)
-       console.log("after caluclation vol",selectedVoilations )
-       setSelectedVoilation(selectedVoilations)
+       console.log("after caluclation vol",selectedVoilations)
+
+       if(type === 'calibration'){
+        setSelectedVoilation(selectedVoilations)
+       }
+       setSelectedVoilationByHostname(selectedVoilations)
 
     }, [checkSectionSelected,  regularExp])
+
+    React.useEffect(() => {
+        let selectedVoilations = []; 
+        if(suppressionRegularExp?.charAt(0) == '.'){ 
+            const regv = new RegExp(suppressionRegularExp, "gi");
+          
+            selectedVoilationByHostname?.forEach(violationRow => {   
+
+                    console.log('violationRow?.violation?.message?.match( regv )', violationRow?.violation?.message?.match( regv ))
+                    if(violationRow?.violation?.message?.match( regv )){
+                        selectedVoilations.push(violationRow);
+
+                    }
+                });
+        }
+        setSelectedVoilation(selectedVoilations)
+        console.log('suppressionRegularExp?', suppressionRegularExp, 'selectedVoilations', selectedVoilations, 'selectedVoilationByHostname', selectedVoilationByHostname)
+
+    }, [suppressionRegularExp, selectedVoilationByHostname])
 
 
     React.useEffect(()=> {
         console.log("setPolicyParamsKeyValue", currentRow)
         setPolicyParamsKeyValue(currentRow?.calibration?.policyParameters); 
+        setShowCheckSection(currentRow?.type === "calibration" || currentRow?.type === "suppression" ? true : false)
 
+        if(currentRow?.type === 'calibration'){
+            setCheckSectionSelected(currentRow?.calibration?.section)  
+            setPriority(currentRow?.calibration?.priority)
+            setPolicy(currentRow?.calibration?.policy)
+            setRegularExp(currentRow?.calibration?.pattern)
+
+            console.log('currentRow?.calibration?.policyParameters', currentRow?.calibration?.policyParameters)
+
+        }else if(currentRow?.type === 'suppression'){
+            setCheckSectionSelected(currentRow?.suppression?.section)  
+            setPriority(currentRow?.suppression?.priority)
+            setPolicy(currentRow?.suppression?.policy)
+            setRegularExp(currentRow?.suppression?.pattern)
+            setSuppressionRegularExp(currentRow?.suppression?.violation)
+        }
     }, [currentRow])
 
     React.useEffect(()=> {
@@ -401,7 +451,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     labelId="demo-select-small"
                     id="demo-select-small"
                     required
-                    disabled={actionType === 'Edit' && type === 'calibration' ? true : false}
+                    disabled={actionType === 'Edit' &&  (type === 'calibration' || type === 'suppression') ? true : false}
                     value={type}
                     title="Type"
                     variant='standard'
@@ -409,12 +459,12 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     onChange={(e) => {
                         setType(e.target.value);
 
-                        if(e.target.value  === 'calibration'){
+                        if(e.target.value  === 'calibration' || e.target.value  === 'suppression'){
                             setShowCheckSection(true);
+                            setCheckSectionSelected('')
                         }else{
                             setShowCheckSection(false);
                             setPolicyParamsKeyValue([])
-                            setRegularExp('')
                             setCheckSectionSelected('')
                         }
                        
@@ -431,27 +481,6 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                {showCheckSection?  <React.Fragment> 
                 
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    {/* <InputLabel id="demo-select-small">Check Section</InputLabel>
-                    <Select
-                    labelId="demo-select-small"
-                    id="demo-select-small"
-                    required
-                    value={checkSectionSelected}
-                    title="Check Section"
-                    variant='standard'
-                    label="Check Section"
-                    onChange={(e) => {
-                        setCheckSectionSelected(e.target.value)
-                        setSelectedVoilationOld([])
-                    }}
-                    >
-                    {checkSections?.map((item, i) => {
-                        return (
-                            <MenuItem value={item}>{item}</MenuItem>
-                        );
-                    })}
-                    
-                     </Select> */}
 
                 <Autocomplete
                     disablePortal
@@ -463,7 +492,6 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     onChange={(event, newValue) => {
                         console.log('newvalue', newValue)
                         setCheckSectionSelected(newValue)
-                        setSelectedVoilationOld([])
                       }}
 
                     renderInput={(params) => <TextField  variant="standard"  {...params} label="Check Section" />}
@@ -504,6 +532,18 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 </React.Fragment> 
 
                 : "" }
+
+                {type === "suppression" ?  <FormControl sx={{ m: 1 }}  size="mediam">
+                <TextField
+                variant='standard'
+                id="outlined-name"
+                title='Voilation Regular Expression'
+                label="Violation Regex."
+                value={suppressionRegularExp}
+                required
+                onChange={(e) => setSuppressionRegularExp(e.target.value)}
+                />
+                </FormControl> : ""}
 
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Risk *</InputLabel>
@@ -567,30 +607,33 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     />
                     <br />  <br />
 
+                    {type === "calibration" ? 
+                        <span>
+                                Policy Parameters:  <br />
+                                {policyParamsKeyValue?.map((element, j) => {
+                                    return (
+                                    <span  style={{marginBottom: '-5px'}} >  
+                                        <InputLabel>{j+1}. {element?.name}: 
+                                        &nbsp;
 
-                    {type === "calibration" ? "Policy Parameters:" : ""}   <br />
-                   
-                    {policyParamsKeyValue?.map((element, j) => {
-                        return (
-                         <span  style={{marginBottom: '-5px'}} >  
-                            <InputLabel>{j+1}. {element?.name}: 
-                            &nbsp;
-
-                            <TextField
-                            variant='standard'
-                            id="outlined-name"
-                           // label="Value"
-                            style={{marginTop: '-5px'}}
-                            name={element?.name}
-                            value={element?.value}
-                            onChange={handlePolicyParams}
-                            />
-                            </InputLabel>
-                          </span>  
-                        );
-                    })}
+                                        <TextField
+                                        variant='standard'
+                                        id="outlined-name"
+                                    // label="Value"
+                                        style={{marginTop: '-5px'}}
+                                        name={element?.name}
+                                        value={element?.value}
+                                        onChange={handlePolicyParams}
+                                        />
+                                        </InputLabel>
+                                    </span>  
+                                    );
+                                })}
+                        </span>
+                    
+                     : ""}
                 <br />
-                {type === "calibration" ? <span>  Violations: 
+                {type === "calibration" || type === "suppression" ? <span>  Violations: 
                     <Table> <TableHead> 
                         <TableRow> 
                             <TableCell> 
@@ -609,7 +652,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
 
                         <TableRow> 
                             <TableCell>
-                                <InputLabel>{i+1}. {element?.hostname}   </InputLabel>
+                                {i+1}. {element?.hostname} 
                             </TableCell>
                         <TableCell> 
                             {element?.violation?.message}
