@@ -224,7 +224,7 @@ const headCellsCalibration = [
     editable: true,
     headerName: 'Check Section',
     valueGetter: (params) =>
-    `${params.row?.type === 'calibration' ? params.row?.calibration?.section : params.row?.type === 'suppression' ? params.row?.suppression?.section : ''}`,
+    `${params.row?.type === 'calibration' ? params.row?.calibration?.section : params.row?.type === 'suppression' || params.row?.type === 'false positive' ? params.row?.suppression?.section : ''}`,
   },
   {
     field: 'patterns', 
@@ -233,7 +233,7 @@ const headCellsCalibration = [
     editable: true,
     headerName: 'Hostname Pattern',
     valueGetter: (params) =>
-    `${params.row?.type === 'calibration' ? params.row?.calibration?.pattern : params.row?.type === 'suppression' ? params.row?.suppression?.pattern : ''}`,
+    `${params.row?.type === 'calibration' ? params.row?.calibration?.pattern : params.row?.type === 'suppression' || params.row?.type === 'false positive' ? params.row?.suppression?.pattern : ''}`,
   },
   {
     field: 'violation_patterns', 
@@ -251,7 +251,7 @@ const headCellsCalibration = [
     editable: true,
     headerName: 'Priority',
     valueGetter: (params) =>
-    `${params.row?.type === 'calibration' ? params.row?.calibration?.priority : params.row?.type === 'suppression' ? params.row?.suppression?.priority : ''}`,
+    `${params.row?.type === 'calibration' ? params.row?.calibration?.priority : params.row?.type === 'suppression' || params.row?.type === 'false positive' ? params.row?.suppression?.priority : ''}`,
 
   },
   {
@@ -395,7 +395,7 @@ export default function ScannedReportsDataGrid() {
       } 
     });
 
-    let viewOnly = (currentRow.type === "calibration" || currentRow.type === "suppression")? 'ok' : "";
+    let viewOnly = (currentRow?.type === "calibration" || currentRow?.type === "suppression"  || currentRow?.type === 'false positive' )? 'ok' : "";
      return currentRow?.unassigned_violations > 0 ?   <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(usedVoilation) )} >  {currentRow?.unassigned_violations} Violations </Button>: <div> 
        <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id + "&uid="+ JSON.stringify(otherUsedVid) + "&vO=" + viewOnly )} >{currentRow?.violations?.length} Voilations </Button>
      </div>
@@ -418,7 +418,7 @@ export default function ScannedReportsDataGrid() {
       } 
     });
 
-    let viewOnly = (currentRow.type === "calibration" || currentRow.type === "suppression")? 'ok' : "";
+    let viewOnly = (currentRow?.type === "calibration" || currentRow?.type === "suppression" || currentRow?.type === 'false positive' )? 'ok' : "";
 
      return currentRow?.unassigned_violations > 0 ?   <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(usedVoilation) )} >  {currentRow?.unassigned_violations} Violations </Button>: <div> 
        <Button size='small' title="Manage Voilations" variant="outlined" onClick={() => window.open("#/hc-details-view?hc="+urlHCcycle+"&f=violations"+"&vid=" + JSON.stringify(vid)+"&cid="+currentRow.id + "&uid="+ JSON.stringify(otherUsedVid) + "&vO=" + viewOnly )} >{currentRow?.violations?.length} Voilations </Button>
@@ -499,7 +499,7 @@ export default function ScannedReportsDataGrid() {
         </Grid>
 
         <DataGrid         
-        rows={ rows?.filter( object => object?.type === "calibration" || object?.type === "suppression") }
+        rows={ rows?.filter( object => object?.type === "calibration" || object?.type === "suppression" || object?.type === 'false positive') }
         columns={headCellsCalibration}
         //checkboxSelection
         autoPageSize

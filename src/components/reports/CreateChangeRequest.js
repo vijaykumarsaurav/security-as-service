@@ -232,7 +232,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 "policyParameters": policyParamsForSubmit
             }
           }
-          if(type  === 'suppression'){
+          if(type  === 'suppression' || type  === 'false positive'){
             param.suppression = {
                 "pattern": regularExp,    
                 "priority": priority,
@@ -240,6 +240,10 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 "policy": policy,
                 "violation": suppressionRegularExp,
                 "type": "string",
+               
+            }
+            if (type  === 'false positive'){
+                param.suppression.type = "False Positive"
             }
           }
         if(actionType === 'Create'){
@@ -254,7 +258,8 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                   setOpen(false);
                 }
               }).catch((error) => {
-                console.log("error", error)
+                console.log("error", error.response.data?.message)
+                alert(error.response.data?.message);
                 Notify.showError("Error" + error); 
               });
         }else{
@@ -266,8 +271,9 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                   setOpen(false);
                   window.location.reload(true)
                 }
-              }).catch((error) => {
-                console.log("error", error)
+              }).catch((error, message) => {
+                console.log("error", error, message?.message)
+                alert(error.response.data?.message);
                 Notify.showError("Error" + error); 
               });
         }
@@ -370,7 +376,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
     React.useEffect(()=> {
         console.log("setPolicyParamsKeyValue", currentRow)
         setPolicyParamsKeyValue(currentRow?.calibration?.policyParameters); 
-        setShowCheckSection(currentRow?.type === "calibration" || currentRow?.type === "suppression" ? true : false)
+        setShowCheckSection(currentRow?.type === "calibration" || currentRow?.type === "suppression" || currentRow?.type === "false positive" ? true : false)
 
         if(currentRow?.type === 'calibration'){
             setCheckSectionSelected(currentRow?.calibration?.section)  
@@ -380,7 +386,11 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
 
             console.log('currentRow?.calibration?.policyParameters', currentRow?.calibration?.policyParameters)
 
-        }else if(currentRow?.type === 'suppression'){
+        }else if(currentRow?.type === 'suppression' || currentRow?.type === 'false positive'){
+
+            if(currentRow?.type === 'false positive'){
+                console.log('false positive', currentRow?.suppression)
+            }
             setCheckSectionSelected(currentRow?.suppression?.section)  
             setPriority(currentRow?.suppression?.priority)
             setPolicy(currentRow?.suppression?.policy)
@@ -438,7 +448,6 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 open={open}
               //  size="small"
                  fullWidth
-                
             >
                 <BootstrapDialogTitle id="customized-dialog-title" onClose={handleClose}>
                 {actionType} Change Ticket
@@ -459,7 +468,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     onChange={(e) => {
                         setType(e.target.value);
 
-                        if(e.target.value  === 'calibration' || e.target.value  === 'suppression'){
+                        if(e.target.value  === 'calibration' || e.target.value  === 'suppression' || e.target.value === 'false positive'){
                             setShowCheckSection(true);
                             setCheckSectionSelected('')
                         }else{
@@ -478,7 +487,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     </Select>
                 </FormControl>
 
-               {showCheckSection?  <React.Fragment> 
+               {showCheckSection? <React.Fragment> 
                 
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
 
@@ -511,29 +520,30 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 </FormControl>
                 
                 <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-                    <InputLabel id="demo-select-small">Priority *</InputLabel>
-                    <Select
+                    {/* <InputLabel id="demo-select-small">Priority *</InputLabel> */}
+                    <TextField
                     labelId="demo-select-small"
                     id="demo-select-small"
                     value={priority}
+                    type={"number"}
                     required
                     title="Priority"
                     variant='standard'
                     label="Priority"
                     onChange={(e) => setPriority(e.target.value)}
-                    > 
-                     <MenuItem value={1}>1</MenuItem>
+                    /> 
+                     {/* <MenuItem value={1}>1</MenuItem>
                      <MenuItem value={2}>2</MenuItem>
                      <MenuItem value={3}>3</MenuItem>
                      <MenuItem value={4}>4</MenuItem>
                      <MenuItem value={5}>5</MenuItem>
-                    </Select>
+                    </Select> */}
                 </FormControl>
                 </React.Fragment> 
 
                 : "" }
 
-                {type === "suppression" ?  <FormControl sx={{ m: 1 }}  size="mediam">
+                {type === "suppression" || type  === 'false positive' ?  <FormControl sx={{ m: 1 }}  size="mediam">
                 <TextField
                 variant='standard'
                 id="outlined-name"
@@ -633,7 +643,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     
                      : ""}
                 <br />
-                {type === "calibration" || type === "suppression" ? <span>  Violations: 
+                {type === "calibration" || type === "suppression" || type  === 'false positive' ? <span>  Violations: 
                     <Table> <TableHead> 
                         <TableRow> 
                             <TableCell> 
