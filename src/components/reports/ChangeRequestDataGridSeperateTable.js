@@ -178,6 +178,9 @@ const headCellsCalibration = [
     sortable: true,
     editable: true,
     headerName: 'Risk',
+    valueGetter: (params) =>
+    `${params.row?.type !== 'false positive' ? params.row?.risk : 'N/A'}`,
+
   },
   {
     field: 'short_description',
@@ -200,12 +203,8 @@ const headCellsCalibration = [
     sortable: true,
     editable: true,
     headerName: 'Reason For Change',
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return <Tooltip title={currentRow?.reason_for_change}>
-      <span> {currentRow?.reason_for_change}</span>
-    </Tooltip>
-    }
+    valueGetter: (params) =>
+    `${params.row?.type !== 'false positive' ? params.row?.reason_for_change : 'N/A'}`,
   },
 
   {
@@ -215,6 +214,8 @@ const headCellsCalibration = [
     sortable: true,
     editable: true,
     headerName: 'Assignment Group',
+    valueGetter: (params) =>
+    `${params.row?.type !== 'false positive' ? params.row?.assignment_group : 'N/A'}`,
   },
   {
     field: 'section',
@@ -451,7 +452,7 @@ export default function ScannedReportsDataGrid() {
 
      
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-              <Typography color="primary" style={{padding: "5px"}}> Change Request for {hcName}</Typography>
+              <Typography color="primary" style={{padding: "5px"}}> 'Remediation' Change Request for {hcName}</Typography>
           </Grid>
 
    
@@ -463,7 +464,7 @@ export default function ScannedReportsDataGrid() {
         </Grid>
 
         <DataGrid         
-          rows={ rows?.filter( object => object?.type !== "calibration")  }
+          rows={ rows?.filter( object => object?.type === "remediation")  }
           columns={headCells}
           //checkboxSelection
           autoPageSize
@@ -491,7 +492,7 @@ export default function ScannedReportsDataGrid() {
 
      
       <Grid xs display="flex" justifyContent="left" alignItems="left">
-            <Typography color="primary" style={{padding: "5px"}}> 'Calibration' & 'Suppression' Change Request for {hcName}</Typography>
+            <Typography color="primary" style={{padding: "5px"}}> Health Check Cycle Exceptions for {hcName}</Typography>
         </Grid>
 
 

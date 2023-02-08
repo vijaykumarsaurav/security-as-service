@@ -189,7 +189,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             alert("Type regular expression for hostname!"); 
             return; 
         }
-        if(!risk){
+        if(type !== 'false positive' && !risk){
             alert("Select Risk!"); 
             return; 
         }
@@ -197,7 +197,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
             alert("Type some Short Description!"); 
             return; 
         }
-        if(!reasonForChange){
+        if(type !== 'false positive' && !reasonForChange){
             alert("Type Reason For Change!"); 
             return; 
         }
@@ -460,7 +460,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     labelId="demo-select-small"
                     id="demo-select-small"
                     required
-                    disabled={actionType === 'Edit' &&  (type === 'calibration' || type === 'suppression') ? true : false}
+                    disabled={actionType === 'Edit' &&  (type === 'calibration' || type === 'suppression' || type === 'false positive') ? true : false}
                     value={type}
                     title="Type"
                     variant='standard'
@@ -555,7 +555,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                 />
                 </FormControl> : ""}
 
-                <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+               {type  !== 'false positive' ? <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
                     <InputLabel id="demo-select-small">Risk *</InputLabel>
                     <Select
                     labelId="demo-select-small"
@@ -571,7 +571,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                      <MenuItem value={'medium'}>Medium</MenuItem>
                      <MenuItem value={'high'}>High</MenuItem>
                     </Select>
-                </FormControl>
+                </FormControl> : ""} 
 
 
                     <TextField
@@ -596,7 +596,7 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     />
                     <br />
              
-                <TextField
+                    {type  !== 'false positive' ? <span> <TextField
                     variant='standard'
                     id="outlined-name"
                     label="Reason for change"
@@ -614,7 +614,9 @@ export default function CustomizedDialogs({setReloadCTcycle, urlHCcycle, actionT
                     required
                     fullWidth
                     onChange={(e) => setAssignmentGroup(e.target.value)}
-                    />
+                    /></span> 
+
+                    : ""}
                     <br />  <br />
 
                     {type === "calibration" ? 
