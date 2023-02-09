@@ -21,6 +21,17 @@ class UserService {
         return axios.get(apiConstant.GET_HC_CYCLES, '');
     }
 
+    async getCalibrations() {
+        return axios.get(apiConstant.GET_CALIBRATIONS, '');
+    }
+
+    async getSuppressions() {
+        return axios.get(apiConstant.GET_SUPPRESSIONS, '');
+    }
+    async getFalsePositive() {
+        return axios.get(apiConstant.GET_FALSE_POSITIVE, '');
+    }
+
     async getChangeTickets(hc_cycle) {
         return axios.get(apiConstant.GET_CHANGE_REQUEST+"?hc_cycle="+hc_cycle, '');
     }

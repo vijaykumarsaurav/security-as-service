@@ -2,6 +2,10 @@ export const BASE_URL =  'https://9.212.148.153:8443';
 export const GET_DEVIATIONS = BASE_URL + '/api/deviations/zz1/policy/';
 
 export const GET_HC_CYCLES = BASE_URL + '/api/zz1/health-check-cycles';
+export const GET_CALIBRATIONS = BASE_URL + '/api/zz1/calibrations';
+export const GET_SUPPRESSIONS = BASE_URL + '/api/zz1/suppressions';
+export const GET_FALSE_POSITIVE = BASE_URL + '/api/zz1/false-positives';
+
 export const GET_SCANNED_DATES = BASE_URL + '/api/zz1/scans?hc_cycle=none';
 export const GET_CYCLE_DETAILS = BASE_URL + '/api/deviations/zz1/hcc/';
 export const GET_CYCLE_HOSTNAMES = BASE_URL + '/api/zz1/health-check-cycle/';

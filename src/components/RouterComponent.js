@@ -8,6 +8,8 @@ import DashboardUnscannedDetailsView from './reports/DashboardUnscannedDetailsVi
 import LoginComponent from './login/LoginComponent';
 
 import Dashboard from './reports/Dashboard';
+import Exceptions from './reports/Exceptions';
+
 import ChangeRequestDataGrid from './reports/ChangeRequestDataGrid';
 import ChangeRequestDataGridSeperateTable from './reports/ChangeRequestDataGridSeperateTable';
 
@@ -28,6 +30,9 @@ const AppRouter = () => {
 
                     
                     
+
+                    <Route path="/exceptions" component={Exceptions}/>
+
                     <Route path="/dashboard" component={Dashboard}/>
                     <Route path="/change-request" component={ChangeRequestDataGrid}/>
                     <Route path="/change-request-seperate-table" component={ChangeRequestDataGridSeperateTable}/>
