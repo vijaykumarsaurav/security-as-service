@@ -9,18 +9,10 @@ import InputBase from '@mui/material/InputBase';
 import Badge from '@mui/material/Badge';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MailIcon from '@mui/icons-material/Mail';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import TableRowsIcon from '@mui/icons-material/TableRows';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-
-import Autocomplete from '@mui/material/Autocomplete';
 import {UserContext} from '../index'
 
 const Search = styled('div')(({ theme }) => ({
@@ -117,15 +109,9 @@ export default function PrimarySearchAppBar(props) {
     >
       <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
       <MenuItem onClick={() => window.location.replace('#/dashboard')}>Dashboard</MenuItem>
-      <MenuItem onClick={() => window.location.replace('#/change-request')}>Change Request</MenuItem>
 
-      <MenuItem onClick={() => window.location.replace('#/scanned-reports-datagrid')}>Deviations Reports (Finalized)</MenuItem>
-
-      <MenuItem onClick={() => window.location.replace('#/scanned-reports-duplicate')}>Reports - Will Delete</MenuItem>
-      <MenuItem onClick={() => window.location.replace('#/scanned-reports')}>Unique Report - Will Delete</MenuItem>
       <MenuItem onClick={() => window.location.replace('#/login')}>Logout</MenuItem>
 
-      
     </Menu>
   );
 
@@ -184,7 +170,7 @@ export default function PrimarySearchAppBar(props) {
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
-           KEMistry
+          Semicolon | Security as Service
           </Typography>
          
           <Box sx={{ flexGrow: 1 }} />

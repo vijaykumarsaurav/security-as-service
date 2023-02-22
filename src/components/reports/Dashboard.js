@@ -4,28 +4,14 @@ import {
   DataGrid,
   GridToolbarContainer,
   GridToolbarDensitySelector,
+  GridToolbarExport,
 } from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
-import UserService from '../service/UserService';
-import DashboardDialog from './DashboardDialog';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import { Select, Button, Typography, Paper, Grid } from '@mui/material';
-import Notify from '../utils/Notify';
-import HCcyclesSelect from './HCcyclesSelect';
-import ScanDateSelect from './ScanDateSelect';
-import PolicySelect from './PolicySelect';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import ScansAssignToHCCycle from './ScansAssignToHCCycle';
-import MergetoHCcycles from './MergetoHCcycles';
-import EditHCcycles from './EditHCcycles';
-import UpdateHCcycles from './UpdateHCcycles';
-import DeleteIcon from '@mui/icons-material/Delete';
-import ManageHistoryIcon from '@mui/icons-material/ManageHistory';
+import DashboardDialog from './DashboardDialog'
+
+import {  Typography, Paper, Grid } from '@mui/material';
+
 import Tooltip from '@mui/material/Tooltip';
-import moment from 'moment';
 const headCells = [
   {
     field: 'id',
@@ -36,496 +22,295 @@ const headCells = [
     headerName: 'Id',
   },
   {
-    field:  'name',
+    field:  'title',
     numeric: true,
     width: 150,
     sortable: true,
     editable: true,
-    headerName: 'Cycle Name',
+    headerName: 'Title',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Tooltip title={currentRow?.name}>
-      <span> {currentRow?.name}</span>
+      return <Tooltip title={currentRow?.title}>
+      <span> {currentRow?.title}</span>
     </Tooltip>
     }
   },
   {
-    field: 'policies',
+    field: 'description',
     numeric: true,
-    minWidth: 175,
+    minWidth: 375,
     
     sortable: true,
     editable: true,
-    headerName: 'Policies',
+    headerName: 'Description', 
+    valueGetter: (params) =>
+      `${params.row?.description || ''}`,
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Tooltip title={currentRow?.policies}>
-      <span> {currentRow?.policies?.join()}</span>
-    </Tooltip>//<bigTextDisplay policies={currentRow?.policies} />
-    }
-    // valueGetter: (params) =>
-    //   `${params.row?.policy?.join() || ''}`,
-  },
-  {
-    field: 'scanRange',
-    numeric: true,
-    width: 185,
-    sortable: true,
-    editable: true,
-    headerName: 'Scan Range',
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return   <Tooltip title={currentRow?.scanRange}>
-      <span> {currentRow?.scanRange}</span>
+      return <Tooltip title={currentRow?.description}>
+      <span> {currentRow?.description}</span>
     </Tooltip>
-    }
+    } 
   },
   {
-    field: 'status',
+    field: 'pubDate',
     numeric: true,
     width: 150,
     sortable: true,
     editable: true,
-    headerName: 'Status',
+    headerName: 'pubDate',
   },
   {
-    field: 'hostname',
-    width: 85,
-    sortable: true,
-    editable: true,
-    headerName: 'Hostnames',
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return <a size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.hostnames}</a>
-    // }
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.hostnames} id={currentRow?.id} title="Hostnames" />
-    }
-    ,
-  },
-  {
-    field: 'ADPS',
-    width: 75,
-    sortable: true,
-    editable: true,
-    headerName: 'ADPS',
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return   <a href="#/dashboard" >{currentRow?.ADPS }</a>
-    // }
-     valueGetter: (params) =>
-      `${params.row?.statistic?.adps || ''}`,
-  },
-  {
-    id: 'checks',
-    width: 75,
-    sortable: true,
-    editable: true,
-    headerName: 'Results',
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return <a href="#/dashboard" >{currentRow?.statistic?.checks}</a>
-    // }
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return <Button size='small' variant="outlined" target={'_blank'} href={"#/hc-details-view?hc="+currentRow?.id+"&f=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
-    }
-  },
-  {
-    field: 'violations',
-    width: 75,
-    sortable: true,
-    editable: true,
-    headerName: 'Violations',
-    valueGetter: (params) =>
-      `${params.row.violations || ''}`,
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return <Button size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.violations}</Button>
-    // }
-    renderCell: (param) => {
-      const currentRow = param.row;
-       return <Button size='small' variant="outlined" target={'_blank'} href={"#/hc-details-view?hc="+currentRow?.id+"&f=violations" } >{currentRow?.statistic?.violations}</Button>
-      //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
-    }
-  },
-  {
-    field: 'dueDate',
-    width: 150,
-    sortable: true,
-    editable: true,
-    headerName: 'Due Date',
-    valueGetter: (params) =>
-    `${moment(params.row.dueDate).format('DD-MM-YYYY') || ''}`,
-
-  },
-  {
-    field: 'assignee',
-    width: 100,
-    sortable: true,
-    editable: true,
-    headerName: 'Assignee',
-  },
-  {
-    field: 'Edit',
-    width: 100,
-    sortable: true,
-    editable: true,
-    headerName: 'Edit',
-    renderCell: (param) => {
-      const currentRow = param.row;
-       return  <div>  <UpdateHCcycles currentRow={currentRow} />  
-      
-       </div> //<EditHCcycles currentRow={currentRow} />
-    }
-  },
-  {
-    field: 'Delete',
-    width: 100,
-    sortable: true,
-    editable: true,
-    headerName: 'Delete',
-    renderCell: (param) => {
-      const currentRow = param.row;
-       return  <div> 
-       <Button size='small' variant="outlined"  onClick={() => handleDelete(currentRow.id)} > <DeleteIcon /></Button>
-       </div> //<EditHCcycles currentRow={currentRow} />
-    }
-  },
-  {
-    field: 'ManageCT',
-    width: 100,
-    sortable: true,
-    editable: true,
-    headerName: 'Manage Change Ticket',
-    renderCell: (param) => {
-      const currentRow = param.row;
-       return <Button size='small' title="Manage Change Ticket" variant="outlined" target={'_blank'} href={"#/change-request-seperate-table?hc="+currentRow?.id+"&v="+ currentRow?.statistic?.violations + "&hcName=" + currentRow?.name } ><ManageHistoryIcon /></Button>
-    }
-  },
-];
-
-const handleDelete = (id) => {
-  
-  if(window.confirm("Are you sure to delete HC cycle?"))
-  UserService.deleteHCCycle(id).then((results) => {
-      let data = results.data; 
-      if (data.ok) {
-          alert(data.message);
-           window.location.reload(true)
-      }
-    }).catch((error) => {
-      console.log("error", error)
-      alert(error);
-    });
-
-  
-};
-const headCellsUnassignedScan = [
-  {
-    field: 'jobId',
-    numeric: false,
-    width: 80,
-    sortable: true,
-    editable: true,
-    headerName: 'Job Id',
-  },
-  {
-    field: 'name',
+    field: 'link',
     numeric: true,
-    width: 280,
+    width: 385,
     sortable: true,
     editable: true,
-    headerName: 'Ansible Job',
-  },
-  {
-    field: 'policies',
-    numeric: true,
-    width: 150,
-    sortable: true,
-    editable: true,
-    headerName: 'Policies',
+    headerName: 'link',
     renderCell: (param) => {
       const currentRow = param.row;
-      return <Tooltip title={currentRow?.policies}>
-      <span> {currentRow?.policies}</span>
+      return <Tooltip title={currentRow?.link}>
+      <a href={currentRow.link}> {currentRow.link}</a>
     </Tooltip>
     }
   },
-  
-  {
-    field: 'date',
-    numeric: true,
-    width: 180,
-    sortable: true,
-    editable: true,
-    headerName: 'Scan Date',
-    valueGetter: (params) =>
-      `${moment(params.row.scan_date).format('DD-MM-YYYY hh:mm A') || ''}`,
-    
-   
-  },
-  {
-    field: 'hostname',
-    width: 85,
-    sortable: true,
-    editable: true,
-    headerName: 'Hostnames',
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return <a size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.hostnames}</a>
-    // }
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return <DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.hostnames} id={currentRow?.id} title="Hostnames" dashboardType={"unassignedScan"} />
-    }
-    ,
-  },
-  {
-    id: 'checks',
-    width: 75,
-    sortable: true,
-    editable: true,
-    headerName: 'Results',
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return <a href="#/dashboard" >{currentRow?.statistic?.checks}</a>
-    // }
-    renderCell: (param) => {
-      const currentRow = param.row;
-      return <Button size='small' variant="outlined" target={'_blank'} href={"#/unscanned-details-view?sid="+currentRow?.id+"&sort=checks"} >{currentRow?.statistic?.checks}</Button>//<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.checks} id={currentRow?.id} title="Checks" />
-    }
-  },
-  {
-    field: 'violations',
-    width: 75,
-    sortable: true,
-    editable: true,
-    headerName: 'Violations',
-    valueGetter: (params) =>
-      `${params.row.violations || ''}`,
-    // renderCell: (param) => {
-    //   const currentRow = param.row;
-    //   return <Button size='small' variant="outlined" href="#/dashboard" >{currentRow?.statistic?.violations}</Button>
-    // }
-    renderCell: (param) => {
-      const currentRow = param.row;
-       return <Button size='small' variant="outlined" target={'_blank'} href={"#/unscanned-details-view?sid="+currentRow?.id+"&sort=violations" } >{currentRow?.statistic?.violations}</Button>
-      //<DashboardDialog cycle_name={currentRow?.name} count={currentRow?.statistic?.violations} id={currentRow?.id} title="Violations" />
-    }
-  },
-];
-
-const bigTextDisplay = ({ array }) => {
-
-  // let policiesList = []
-  //   policies.forEach(element => {
-  //     policiesList.push(<Button style={{padding: "5px"}}> {element}</Button>)
-  // });
-
-  // return policiesList; 
-
-  return (
-
-    <Tooltip title={array.join()}>
-      <span> {array.join()}</span>
-    </Tooltip>
-
-    // <Stack title={policies.join()} direction="row" spacing={1}>
-    //   {policies.map(policy => <Chip label={policy} />  )}
-    // </Stack>
-
-  )
-
-
-}
-
-const duplicateDeviationsData = (devData, setRows, setLoader) => {
-  let tempDevData = [];
-  let id = 0;
-  console.log("tempDevData", devData)
-
-
-  for (let index = 0; index < devData.length; index++) {
-    const element = devData[index];
-    element?.hosts.forEach(host => {
-      let hostData = {
-        check_section: element.check_section,
-        check_description: element.check_description,
-        severity: element.severity,
-        hostname: host.hostname,
-        check_status: host.check_status,
-        ip: host.ip,
-        scan_date: host.scan_date,
-        violation1: host.measure_values,
-        measure_values: host.measure_values,
-        policy_parameters: host.policy_parameters,
-        id: id
-      }
-
-      if (host.check_status === 'OK') {
-        tempDevData.push(hostData);
-        id++;
-      }
-      else if (host.check_status === 'KO') {
-        host.violations.forEach(violation => {
-          let seperateHostdata = { ...hostData };
-          seperateHostdata.id = id;
-          seperateHostdata.violation1 = violation.message;
-          tempDevData.push(seperateHostdata);
-          id++;
-        })
-      }
-
-    });
-
-  }
-
-  setRows(tempDevData);
-  setLoader(false);
-};
-
-const getPolicies = (scan, policiesList) => {
-  scan?.policies.forEach(element => {
-    let policyName = element.name.split('-'); 
-    policiesList.push(`${policyName[0]} ${policyName[1]} v${policyName[3]}`);
-  });
-  return policiesList; 
-}
  
+ 
+];
+
 export default function ScannedReportsDataGrid() {
-  const [rows, setRows] = React.useState([]);
-  const [rowsUnassignedScan, setRowsUnassignedScan] = React.useState([]);
-  const [hccycleName, setHccycleName] = React.useState('');
-  const [policies, setPolicies] = React.useState([]);
-  const [policyName, setPolicyName] = React.useState('');
+  const [cveRows, setCveRows] = React.useState([]);
+
   const [hcrows, setHcrows] = React.useState([]);
-  const [scansRows, setScansRows] = React.useState([]);
-  const [scanDate, setScanDate] = React.useState('');
   const [loader, setLoader] = React.useState(false);
-  const [loaderScan, setLoaderScan] = React.useState(false);
-
-  const [reloadHCcycle, setReloadHCcycle] = React.useState(false);
-  const [reloadScanApi, setReloadScanApi] = React.useState(false);
-
-  const [selectionModel, setSelectionModel] = React.useState([]);
    
   React.useEffect(() => {
     setLoader(true); 
 
-    UserService.getHCCycles().then((results) => {
-      if (results.status === 200) {
-        let hcList = results.data; 
-        hcList.forEach(hcCycle => {
-          let scanDates = []; 
-          let policiesList = []; 
-          hcCycle?.scans.forEach(scan => {
-            scanDates.push(moment(scan.date).format('DD-MMM-YYYY hh:mm:ss')); 
-            hcCycle.policies =  [...new Set(getPolicies(scan, policiesList))];
-          })
-          scanDates.sort((a, b)=> moment(a) - moment(b)); 
-          hcCycle.scanRange = scanDates[0] + " " + scanDates[scanDates.length-1];  
-        })
 
-        setHcrows(hcList);
-        setLoader(false)
+    // UserService.getApi().then((results) => {
+    //   if (results.status === 200) {
+    //     let hcList = results.data;
+
+    //     setHcrows(hcList);
+    //     setLoader(false)
+    //   }
+    // }).catch((error) => {
+    //   console.log("error", error)
+    //   alert("Fail to connect get HC API " + error);
+    // });
+
+    let cveData = {
+      "rss": { 
+        "channel": {
+          "title": "Latest security vulnerabilities Microsoft products  (CVSS score &gt;= 10)",
+          "link": "http://www.cvedetails.com",
+          "description": "Security vulnerability feeds by http://www.cvedetails.com",
+          "language": "en-us",
+          "item": [
+            {
+              "title": "CVE-2022-30136",
+              "description": "Windows Network File System Remote Code Execution Vulnerability. (CVSS:10.0) (Last Update:2022-06-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2022-30136/",
+              "pubDate": "2022-06-15", 
+            },
+            {
+              "title": "CVE-2022-26809",
+              "description": "Remote Procedure Call Runtime Remote Code Execution Vulnerability. This CVE ID is unique from CVE-2022-24492, CVE-2022-24528. (CVSS:10.0) (Last Update:2022-04-19)",
+              "link": "http://www.cvedetails.com/cve/CVE-2022-26809/",
+              "pubDate": "2022-04-15",
+            },
+            {
+              "title": "CVE-2022-21907",
+              "description": "HTTP Protocol Stack Remote Code Execution Vulnerability. (CVSS:10.0) (Last Update:2022-08-26)",
+              "link": "http://www.cvedetails.com/cve/CVE-2022-21907/",
+              "pubDate": "2022-01-11"
+            },
+            {
+              "title": "CVE-2022-21898",
+              "description": "DirectX Graphics Kernel Remote Code Execution Vulnerability. This CVE ID is unique from CVE-2022-21912. (CVSS:10.0) (Last Update:2022-05-23)",
+              "link": "http://www.cvedetails.com/cve/CVE-2022-21898/",
+              "pubDate": "2022-01-11"
+            },
+            {
+              "title": "CVE-2022-21874",
+              "description": "Windows Security Center API Remote Code Execution Vulnerability. (CVSS:10.0) (Last Update:2022-05-23)",
+              "link": "http://www.cvedetails.com/cve/CVE-2022-21874/",
+              "pubDate": "2022-01-11"
+            },
+            {
+              "title": "CVE-2021-43907",
+              "description": "Visual Studio Code WSL Extension Remote Code Execution Vulnerability (CVSS:10.0) (Last Update:2022-01-01)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-43907/",
+              "pubDate": "2021-12-15"
+            },
+            {
+              "title": "CVE-2021-42313",
+              "description": "Microsoft Defender for IoT Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-41365, CVE-2021-42310, CVE-2021-42311, CVE-2021-42314, CVE-2021-42315, CVE-2021-43882, CVE-2021-43889. (CVSS:10.0) (Last Update:2021-12-30)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-42313/",
+              "pubDate": "2021-12-15"
+            },
+            {
+              "title": "CVE-2021-42311",
+              "description": "Microsoft Defender for IoT Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-41365, CVE-2021-42310, CVE-2021-42313, CVE-2021-42314, CVE-2021-42315, CVE-2021-43882, CVE-2021-43889. (CVSS:10.0) (Last Update:2022-07-12)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-42311/",
+              "pubDate": "2021-12-15"
+            },
+            {
+              "title": "CVE-2021-34473",
+              "description": "Microsoft Exchange Server Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-31196, CVE-2021-31206. (CVSS:10.0) (Last Update:2022-07-12)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-34473/",
+              "pubDate": "2021-07-14"
+            },
+            {
+              "title": "CVE-2021-28481",
+              "description": "Microsoft Exchange Server Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-28480, CVE-2021-28482, CVE-2021-28483. (CVSS:10.0) (Last Update:2021-04-14)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-28481/",
+              "pubDate": "2021-04-13"
+            },
+            {
+              "title": "CVE-2021-28480",
+              "description": "Microsoft Exchange Server Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-28481, CVE-2021-28482, CVE-2021-28483. (CVSS:10.0) (Last Update:2021-04-14)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-28480/",
+              "pubDate": "2021-04-13"
+            },
+            {
+              "title": "CVE-2021-26897",
+              "description": "Windows DNS Server Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-26877, CVE-2021-26893, CVE-2021-26894, CVE-2021-26895. (CVSS:10.0) (Last Update:2021-09-13)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-26897/",
+              "pubDate": "2021-03-11"
+            },
+            {
+              "title": "CVE-2021-26895",
+              "description": "Windows DNS Server Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-26877, CVE-2021-26893, CVE-2021-26894, CVE-2021-26897. (CVSS:10.0) (Last Update:2021-03-18)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-26895/",
+              "pubDate": "2021-03-11"
+            },
+            {
+              "title": "CVE-2021-26894",
+              "description": "Windows DNS Server Remote Code Execution Vulnerability This CVE ID is unique from CVE-2021-26877, CVE-2021-26893, CVE-2021-26895, CVE-2021-26897. (CVSS:10.0) (Last Update:2021-09-13)",
+              "link": "http://www.cvedetails.com/cve/CVE-2021-26894/",
+              "pubDate": "2021-03-11"
+            },
+            {
+              "title": "CVE-2020-17118",
+              "description": "Microsoft SharePoint Remote Code Execution Vulnerability This CVE ID is unique from CVE-2020-17121. (CVSS:10.0) (Last Update:2021-03-03)",
+              "link": "http://www.cvedetails.com/cve/CVE-2020-17118/",
+              "pubDate": "2020-12-10"
+            },
+            {
+              "title": "CVE-2020-17105",
+              "description": "AV1 Video Extension Remote Code Execution Vulnerability (CVSS:10.0) (Last Update:2020-11-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2020-17105/",
+              "pubDate": "2020-11-11"
+            },
+            {
+              "title": "CVE-2020-17051",
+              "description": "Windows Network File System Remote Code Execution Vulnerability (CVSS:10.0) (Last Update:2020-11-23)",
+              "link": "http://www.cvedetails.com/cve/CVE-2020-17051/",
+              "pubDate": "2020-11-11"
+            },
+            {
+              "title": "CVE-2020-1350",
+              "description": "A remote code execution vulnerability exists in Windows Domain Name System servers when they fail to properly handle requests, aka &#039;Windows DNS Server Remote Code Execution Vulnerability&#039;. (CVSS:10.0) (Last Update:2022-07-12)",
+              "link": "http://www.cvedetails.com/cve/CVE-2020-1350/",
+              "pubDate": "2020-07-14"
+            },
+            {
+              "title": "CVE-2020-0690",
+              "description": "An elevation of privilege vulnerability exists when DirectX improperly handles objects in memory, aka &#039;DirectX Elevation of Privilege Vulnerability&#039;. (CVSS:10.0) (Last Update:2021-07-21)",
+              "link": "http://www.cvedetails.com/cve/CVE-2020-0690/",
+              "pubDate": "2020-03-12"
+            },
+            {
+              "title": "CVE-2020-0610",
+              "description": "A remote code execution vulnerability exists in Windows Remote Desktop Gateway (RD Gateway) when an unauthenticated attacker connects to the target system using RDP and sends specially crafted requests, aka &#039;Windows Remote Desktop Gateway (RD Gateway) Remote Code Execution Vulnerability&#039;. This CVE ID is unique from CVE-2020-0609. (CVSS:10.0) (Last Update:2021-07-21)",
+              "link": "http://www.cvedetails.com/cve/CVE-2020-0610/",
+              "pubDate": "2020-01-14"
+            },
+            {
+              "title": "CVE-2020-0609",
+              "description": "A remote code execution vulnerability exists in Windows Remote Desktop Gateway (RD Gateway) when an unauthenticated attacker connects to the target system using RDP and sends specially crafted requests, aka &#039;Windows Remote Desktop Gateway (RD Gateway) Remote Code Execution Vulnerability&#039;. This CVE ID is unique from CVE-2020-0610. (CVSS:10.0) (Last Update:2021-07-21)",
+              "link": "http://www.cvedetails.com/cve/CVE-2020-0609/",
+              "pubDate": "2020-01-14"
+            },
+            {
+              "title": "CVE-2019-1449",
+              "description": "A security feature bypass vulnerability exists in the way that Office Click-to-Run (C2R) components handle a specially crafted file, which could lead to a standard user, any AppContainer sandbox, and Office LPAC Protected View to escalate privileges to SYSTEM.To exploit this bug, an attacker would have to run a specially crafted file, aka &#039;Microsoft Office ClickToRun Security Feature Bypass Vulnerability&#039;. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-1449/",
+              "pubDate": "2019-11-12"
+            },
+            {
+              "title": "CVE-2019-1372",
+              "description": "An remote code execution vulnerability exists when Azure App Service/ Antares on Azure Stack fails to check the length of a buffer prior to copying memory to it.An attacker who successfully exploited this vulnerability could allow an unprivileged function run by the user to execute code in the context of NT AUTHORITY\\system thereby escaping the Sandbox.The security update addresses the vulnerability by ensuring that Azure App Service sanitizes user inputs., aka &#039;Azure App Service Remote Code Execution Vulnerability&#039;. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-1372/",
+              "pubDate": "2019-10-10"
+            },
+            {
+              "title": "CVE-2019-1226",
+              "description": "A remote code execution vulnerability exists in Remote Desktop Services â€“ formerly known as Terminal Services â€“ when an unauthenticated attacker connects to the target system using RDP and sends specially crafted requests, aka &#039;Remote Desktop ServicesÂ Remote Code Execution Vulnerability&#039;. This CVE ID is unique from CVE-2019-1181, CVE-2019-1182, CVE-2019-1222. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-1226/",
+              "pubDate": "2019-08-14"
+            },
+            {
+              "title": "CVE-2019-1222",
+              "description": "A remote code execution vulnerability exists in Remote Desktop Services â€“ formerly known as Terminal Services â€“ when an unauthenticated attacker connects to the target system using RDP and sends specially crafted requests, aka &#039;Remote Desktop ServicesÂ Remote Code Execution Vulnerability&#039;. This CVE ID is unique from CVE-2019-1181, CVE-2019-1182, CVE-2019-1226. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-1222/",
+              "pubDate": "2019-08-14"
+            },
+            {
+              "title": "CVE-2019-1182",
+              "description": "A remote code execution vulnerability exists in Remote Desktop Services â€“ formerly known as Terminal Services â€“ when an unauthenticated attacker connects to the target system using RDP and sends specially crafted requests, aka &#039;Remote Desktop ServicesÂ Remote Code Execution Vulnerability&#039;. This CVE ID is unique from CVE-2019-1181, CVE-2019-1222, CVE-2019-1226. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-1182/",
+              "pubDate": "2019-08-14"
+            },
+            {
+              "title": "CVE-2019-1181",
+              "description": "A remote code execution vulnerability exists in Remote Desktop Services â€“ formerly known as Terminal Services â€“ when an unauthenticated attacker connects to the target system using RDP and sends specially crafted requests, aka &#039;Remote Desktop ServicesÂ Remote Code Execution Vulnerability&#039;. This CVE ID is unique from CVE-2019-1182, CVE-2019-1222, CVE-2019-1226. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-1181/",
+              "pubDate": "2019-08-14"
+            },
+            {
+              "title": "CVE-2019-0708",
+              "description": "A remote code execution vulnerability exists in Remote Desktop Services formerly known as Terminal Services when an unauthenticated attacker connects to the target system using RDP and sends specially crafted requests, aka &#039;Remote Desktop Services Remote Code Execution Vulnerability&#039;. (CVSS:10.0) (Last Update:2021-06-03)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-0708/",
+              "pubDate": "2019-05-16"
+            },
+            {
+              "title": "CVE-2019-0586",
+              "description": "A remote code execution vulnerability exists in Microsoft Exchange software when the software fails to properly handle objects in memory, aka &quot;Microsoft Exchange Memory Corruption Vulnerability.&quot; This affects Microsoft Exchange Server. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2019-0586/",
+              "pubDate": "2019-01-08"
+            },
+            {
+              "title": "CVE-2018-8626",
+              "description": "A remote code execution vulnerability exists in Windows Domain Name System (DNS) servers when they fail to properly handle requests, aka &quot;Windows DNS Server Heap Overflow Vulnerability.&quot; This affects Windows Server 2012 R2, Windows Server 2019, Windows Server 2016, Windows 10, Windows 10 Servers. (CVSS:10.0) (Last Update:2020-08-24)",
+              "link": "http://www.cvedetails.com/cve/CVE-2018-8626/",
+              "pubDate": "2018-12-12"
+            }
+          ]
+        }
       }
-    }).catch((error) => {
-      console.log("error", error)
-      alert("Fail to connect get HC API " + error);
-    });
-  }, [reloadScanApi, reloadHCcycle]);
+  }; 
 
-  React.useEffect(() => {
-    setLoaderScan(true)
+  cveData.rss?.channel?.item.forEach((element, i) => {
+    element.id = i+1; 
+  });
 
-    let policiesList = []; 
+  console.log('cvedata', cveData.rss?.channel?.item)
+  setCveRows(cveData.rss?.channel?.item)
+  setLoader(false); 
 
-    UserService.getScannedDates().then((results) => {
-      if (results.status === 200) {
-        results.data.forEach(scan => {
-          scan.policies =  [...new Set(getPolicies(scan, policiesList))];;
-        });
-        setScansRows(results.data);
-        setLoaderScan(false)
-      }
-    }).catch((error) => {
-      console.log("error", error)
-      alert("Error" + error);
-      alert("Fail to connect get Scan Dates API " + error);
-    });
+  }, []); 
 
-  }, [reloadScanApi, reloadHCcycle]);
-
-  React.useEffect(() => {
-    console.log("hccycleName", hccycleName);
-    if (hccycleName) {
-      let allPolicies = [];
-      let hcCycle = hcrows.filter((item) => item.name === hccycleName);
-      hcCycle.forEach(scan => {
-        scan?.scans.forEach(scan => {
-          scan?.policies.forEach(element => {
-            allPolicies.push(element.name);
-          });
-        })
-      })
-      allPolicies = allPolicies.filter((value, index, self) => {
-        return self.indexOf(value) === index;
-      });
-      setPolicies(allPolicies)
-      if (allPolicies?.length === 1) {
-        setPolicyName(allPolicies[0])
-      }
-    }
-  }, [hccycleName]);
-
-  React.useEffect(() => {
-    if (scanDate) {
-      let allPolicies = [];
-      let scansRow = scansRows.filter((item) => item.jobId === scanDate);
-      scansRow.forEach(scan => {
-        scan?.policies.forEach(element => {
-          allPolicies.push(element.name);
-        });
-      })
-      allPolicies = allPolicies.filter((value, index, self) => {
-        return self.indexOf(value) === index;
-      });
-      setPolicies(allPolicies)
-      if (allPolicies?.length === 1) {
-        setPolicyName(allPolicies[0])
-      }
-    }
-  }, [scanDate]);
-
-  // React.useEffect(() => {
-  //     console.log("hccycleName", hccycleName);
-  //     console.log("policyName", policyName);
-
-  //   if((hccycleName || scanDate) && policyName){
-  //     setLoader(true);
-  //     UserService.getDeviations(hccycleName, scanDate, policyName).then((results) => {
-  //       if (results.status === 200) {
-  //         duplicateDeviationsData(results.data, setRows,  setLoader);
-  //       }
-  //     }).catch((error) => {
-  //       console.log("error", error)
-  //      // alert("Error" + error);
-  //       Notify.showError('Error' + error)
-
-  //     });
-  //   }
-  // }, [hccycleName, scanDate, policyName]);
-
-  // headCells[headCells.length-3].renderCell = (param) => {
-  //   const currentRow = param.row;
-  //    return <div>  <UpdateHCcycles setReloadScanApi={setReloadScanApi} setReloadHCcycle={setReloadHCcycle} currentRow={currentRow} />  
-  //      </div>; 
-  // }
-
-  console.log("scanDate", headCells[headCells.length-1]);
-
+  function CustomToolbarExport() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarDensitySelector />
+        <GridToolbarExport />
+      </GridToolbarContainer>
+    );
+  }
 
   return (
 
@@ -533,61 +318,38 @@ export default function ScannedReportsDataGrid() {
       <HeaderNavbar />
       <br />
       
-      <Paper  style={{  height: '50%', width: '99%', paddingBottom: "25px" }}>
+      <Paper  style={{  height: '80%', width: '99%', paddingBottom: "30px", paddingLeft: "5px"  }}>
 
         <Grid container >
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-          <Typography color="primary" style={{padding: "5px"}}>  Health Check Cycles</Typography>
+          <Typography color="primary" style={{padding: "5px"}}> CVE Datails </Typography>
           </Grid>
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">
           
-          <MergetoHCcycles setReloadScanApi={setReloadScanApi}  setReloadHCcycle={setReloadHCcycle}/>
           </Grid>
         </Grid>
 
         <DataGrid
         
-          rows={hcrows}
-          columns={headCells}
-          autoPageSize
-          loading={loader}
-          disableSelectionOnClick
-          experimentalFeatures={{ newEditingApi: true }}
-          density="compact"
-        />
+        rows={cveRows}
+        columns={headCells}
+        loading={loader}    
+        autoPageSize
+        disableSelectionOnClick
+        experimentalFeatures={{ newEditingApi: true }}
+        density="compact"
+        components={{
+          Toolbar:  CustomToolbarExport 
+        }}
 
+      />
       </Paper>
 
       <br />
-      <Paper style={{ paddingLeft: "10px", height:"250px", paddingBottom: "25px", width: '99%' }}>
+      <DashboardDialog />
 
-        <Grid justify="space-between" container>
 
-          <Grid item>
-            <Typography style={{padding: "5px"}} color="primary">Unassigned Scans</Typography>
-          </Grid>
-          {/* <Grid xs display="flex" justifyContent="right" alignItems="right">
-          
-          <ScansAssignToHCCycle setReloadScanApi={setReloadScanApi} scansRows={scansRows} selectionModel={selectionModel} hcrows={hcrows}/>
-          </Grid> */}
-        </Grid>
-
-        <DataGrid
-          rows={scansRows}
-          columns={headCellsUnassignedScan}
-          autoPageSize
-          loading={loaderScan}
-          disableSelectionOnClick
-         // checkboxSelection
-          onSelectionModelChange={(newSelectionModel) => {
-            setSelectionModel(newSelectionModel);
-          }}
-          experimentalFeatures={{ newEditingApi: true }}
-          density="compact"
-        />
-
-      </Paper>
     </Box>
   );
 }
