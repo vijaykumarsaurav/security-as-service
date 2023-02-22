@@ -27,7 +27,7 @@ class LoginComponent extends React.Component{
                 <Container maxWidth="sm">
                      <br/><br/><br/> 
 
-                    <Typography variant="h4" style={styles.label}>  KEMistry Login</Typography>
+                    <Typography variant="h4" style={styles.label}>  Security as service | Login</Typography>
                     
                     <form style={styles.formStyle}>
                         <TextField type="text"  required={true} label="User Id" fullWidth margin="normal" name="userName" value={this.state.userName}  onChange={this.onChange}/>
