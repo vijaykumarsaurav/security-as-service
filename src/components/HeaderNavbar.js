@@ -180,10 +180,10 @@ export default function PrimarySearchAppBar(props) {
               size="large"
               aria-label="Added product"
               color="inherit"
-              title="Scan exceptions"
+              title="Scan dashboard"
              >
 
-            <Badge onClick={() => window.location.replace('#/exceptions')} badgeContent={props.totalItem || cartList.length} color="error">
+            <Badge onClick={() => window.location.replace('#/dashboard')} badgeContent={props.totalItem || cartList.length} color="error">
               <TableRowsIcon />
             </Badge>
         
