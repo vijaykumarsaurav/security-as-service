@@ -110,7 +110,7 @@ export default function PrimarySearchAppBar(props) {
       <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
       <MenuItem onClick={() => window.location.replace('#/dashboard')}>Dashboard</MenuItem>
 
-      <MenuItem onClick={() => window.location.replace('#/login')}>Logout</MenuItem>
+      {/* <MenuItem onClick={() => window.location.replace('#/login')}>Logout</MenuItem> */}
 
     </Menu>
   );
