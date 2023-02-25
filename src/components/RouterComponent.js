@@ -4,6 +4,7 @@ import LoginComponent from './login/LoginComponent';
 import Histograms from './reports/Histograms';
 
 import Dashboard from './reports/Dashboard';
+import CveDetails from './reports/CveDetails';
 
 
 const AppRouter = () => {
@@ -16,7 +17,8 @@ const AppRouter = () => {
                     <Route path="/login" exact component={LoginComponent}/>
                     <Route path="/histogram" exact component={Histograms}/>
                     <Route path="/dashboard" component={Dashboard}/>
-             
+                    <Route path="/cve-details" component={CveDetails}/>
+
                     <Route path="*" component={Dashboard} />
                      
                 </Switch>

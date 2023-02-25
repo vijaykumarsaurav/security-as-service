@@ -123,7 +123,7 @@ function Histograms() {
 	}
 ]
 	const options = {
-	"title": "Histogram (linear)",
+	"title": "CVEs and APT groups",
 	"axes": {
 		"bottom": {
 			"title": "APT groups",

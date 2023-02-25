@@ -7,10 +7,7 @@ import {
   GridToolbarExport,
 } from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
-import DashboardDialog from './DashboardDialog'
-import PieChart from './PieChart'
 import {  Typography, Paper, Grid } from '@mui/material';
-import Histograms from './Histograms'
 
 
 import Tooltip from '@mui/material/Tooltip';
@@ -321,35 +318,34 @@ export default function ScannedReportsDataGrid() {
       <br />
       
 
-
-      <Paper  style={{  height: '80%', width: '99%', paddingBottom: "30px", paddingLeft: "5px"  }}>
+      <Paper style={{  height: '80%', width: '99%', paddingBottom: "30px", paddingLeft: "5px"  }}>
 
         <Grid container >
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-            <PieChart chartType={"PieChart"}/>
+          <Typography id="cve-details" variant='h6' color="primary" style={{padding: "5px"}}> CVE Details </Typography>
           </Grid>
-
+        
           <Grid xs display="flex" justifyContent="right" alignItems="right">
-            <PieChart chartType={"ColumnChart"}/>
+          
           </Grid>
-
         </Grid>
 
-        <Grid container >
-          <Grid xs display="flex" justifyContent="left" alignItems="left">
-          <Histograms />
-          </Grid>
+        <DataGrid 
+        
+        rows={cveRows}
+        columns={headCells}
+        loading={loader}    
+        autoPageSize
+        disableSelectionOnClick
+        experimentalFeatures={{ newEditingApi: true }}
+        density="compact"
+        components={{
+          Toolbar:  CustomToolbarExport 
+        }}
 
-          {/* <Grid xs display="flex" justifyContent="right" alignItems="right">
-            <PieChart chartType={"ColumnChart"}/>
-          </Grid> */}
+      />
+      </Paper>
 
-        </Grid>
-
-       
-        </Paper>
-
-      
 
     </Box>
   );

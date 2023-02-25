@@ -188,7 +188,8 @@ export default function PrimarySearchAppBar(props) {
               title="Scan dashboard"
              >
 
-            <Badge onClick={() => scrollPage()} badgeContent={props.totalItem || cartList.length} color="error">
+            <Badge onClick={() => window.location.replace('#/cve-details')}  badgeContent={props.totalItem || cartList.length} color="error">
+            {/* onClick={() => scrollPage()} */}
               <TableRowsIcon />
             </Badge>
         
