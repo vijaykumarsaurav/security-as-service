@@ -45,9 +45,6 @@ class LoginComponent extends React.Component{
                     </form>
                 </Container>
 
-                {/* New Login UI */}
-                {/* <LoginNewUI loginProps={ {onChange : this.onChange, login: this.login,   userName: this.state.userName, password:  this.state.password ,totp :this.state.totp } }/>
-                 */}
                 <Grid container justify="space-around">
                     <Grid justify={"center"} container  xs={12} sm={10}>
                             {this.state.isDasable ? <InputLabel variant="subtitle1" style={styles.waitMessage}> Please wait...</InputLabel> :""} 
@@ -65,7 +62,7 @@ class LoginComponent extends React.Component{
       const userTokens =   window.localStorage.getItem("userTokens"); 
       if(userTokens){
       //  const lastUrl = localStorage.getItem("lastUrl"); 
-        this.props.history.push('home');
+        this.props.history.push('dashboard');
       }
 
       if(document.location.href.includes('logout')){
@@ -112,26 +109,6 @@ class LoginComponent extends React.Component{
             password: this.state.password ,
 
         };
-        UserService.login(loginPayload)
-            .then(loginRes => {
-              //  Notify.showError("Olms Id and password is required.");
-            //  alert(JSON.stringify(res));
-         //   console.log("res",loginRes); 
-
-              loginRes  = loginRes && loginRes.data; 
-            //  console.log("resdata",loginRes); 
-              if(loginRes.status && loginRes.message !== 'SUCCESS'){
-                this.setState({ isError: loginRes.message });
-              }
-                this.setState({ isDasable: false });
-
-                if(loginRes.data){
-                    window.localStorage.setItem("userTokens",JSON.stringify(loginRes.data));
-                   
-                    window.location.replace('#/dashboard')
-
-                }
-            });
 
            
     }

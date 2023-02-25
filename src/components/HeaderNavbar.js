@@ -81,6 +81,11 @@ export default function PrimarySearchAppBar(props) {
     window.location.replace('#/homepage')
   }
 
+ const scrollPage = () => {
+  document.getElementById('cve-details').scrollIntoView({
+    behavior: 'smooth'
+  });
+  }
 
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
@@ -170,7 +175,7 @@ export default function PrimarySearchAppBar(props) {
             component="div"
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
-          Semicolon | Security as Service
+          Semicolon | CyberTrail
           </Typography>
          
           <Box sx={{ flexGrow: 1 }} />
@@ -183,7 +188,7 @@ export default function PrimarySearchAppBar(props) {
               title="Scan dashboard"
              >
 
-            <Badge onClick={() => window.location.replace('#/dashboard')} badgeContent={props.totalItem || cartList.length} color="error">
+            <Badge onClick={() => scrollPage()} badgeContent={props.totalItem || cartList.length} color="error">
               <TableRowsIcon />
             </Badge>
         

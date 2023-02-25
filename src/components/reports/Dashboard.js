@@ -8,6 +8,8 @@ import {
 } from '@mui/x-data-grid';
 import HeaderNavbar from '../HeaderNavbar'
 import DashboardDialog from './DashboardDialog'
+import PieChart from './PieChart'
+import { Chart } from "react-google-charts";
 
 import {  Typography, Paper, Grid } from '@mui/material';
 
@@ -318,11 +320,27 @@ export default function ScannedReportsDataGrid() {
       <HeaderNavbar />
       <br />
       
+
+
       <Paper  style={{  height: '80%', width: '99%', paddingBottom: "30px", paddingLeft: "5px"  }}>
 
         <Grid container >
           <Grid xs display="flex" justifyContent="left" alignItems="left">
-          <Typography color="primary" style={{padding: "5px"}}> CVE Datails </Typography>
+            <PieChart chartType={"PieChart"}/>
+          </Grid>
+
+          <Grid xs display="flex" justifyContent="right" alignItems="right">
+            <PieChart chartType={"ColumnChart"}/>
+          </Grid>
+        </Grid>
+
+        </Paper>
+
+      <Paper style={{  height: '80%', width: '99%', paddingBottom: "30px", paddingLeft: "5px"  }}>
+
+        <Grid container >
+          <Grid xs display="flex" justifyContent="left" alignItems="left">
+          <Typography id="cve-details" variant='h6' color="primary" style={{padding: "5px"}}> CVE Details </Typography>
           </Grid>
         
           <Grid xs display="flex" justifyContent="right" alignItems="right">
@@ -330,7 +348,7 @@ export default function ScannedReportsDataGrid() {
           </Grid>
         </Grid>
 
-        <DataGrid
+        <DataGrid 
         
         rows={cveRows}
         columns={headCells}
