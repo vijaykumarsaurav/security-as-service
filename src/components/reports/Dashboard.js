@@ -1,126 +1,221 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarDensitySelector,
-  GridToolbarExport,
-} from '@mui/x-data-grid';
-import HeaderNavbar from '../HeaderNavbar'
-import DashboardDialog from './DashboardDialog'
-import PieChart from './PieChart'
-import ColumnGraph from './ColumnGraph'
-import APTGroup from './APTGroup'
-
-import {  Typography, Paper, Grid } from '@mui/material';
-import Histograms from './Histograms'
+import React from 'react';
+import "@carbon/charts/styles.css";
 import UserService from '../service/UserService'
+import { Button, Checkbox, DataTable, TableContainer, Table, TableHead, TableRow, TableHeader, TableBody, TableCell, TableToolbar, TableBatchActions, TableBatchAction, TableToolbarContent, TableToolbarSearch, TableToolbarMenu, TableToolbarAction, TableSelectAll, TableSelectRow, Pagination } from '@carbon/react';
+import 'carbon-components/scss/globals/scss/styles.scss';
+import { Download, OrderDetails } from '@carbon/react/icons';
+import './carbonStyle.scss'; 
+import { loginRedirect } from "../utils/AuthErrorHandler";
+import moment from 'moment';
 
-export default function ScannedReportsDataGrid() {
-  const [cveRows, setCveRows] = React.useState([]);
-  const [cveAffectedComputer, setCveAffectedComputer] = React.useState([]);
-  const [aptData, setAptData] = React.useState([]);
+import HeaderNavbar from '../HeaderNavbar';
+import DownloadCSV from './DownloadCSV';
 
-  const [loader, setLoader] = React.useState(false);
-   
-  React.useEffect(() => {
-    setLoader(true); 
+export default function Dashboard() {
 
-    UserService.getCveBreakdown().then((results) => {
-      if (results.status === 200) {
-        setCveRows(results.data);
-        setLoader(false)
-      }
-    }).catch((error) => {
-      console.log("error", error)
-      alert("Fail to connect get  API " + error);
-    });
+	const [rowData, setRowData] = React.useState([]);
+	const [downloadReportFlag, setDownloadReportFlag] = React.useState(false);
 
-    return () => {
-      setCveRows([]); // This worked for me
-    };
+	// React.useEffect(()=> {
+	//   setSelectedOrg(localStorage.getItem('selectedOrg'))
+	//   setSelectedAvalablePolicy(window.localStorage.getItem('selectedAvalablePolicy'))
+	// }, [])
 
-  }, []); 
+	React.useEffect(() => {
+		let orgName = localStorage.getItem('selectedOrg')
+		if (orgName) {
+			UserService.getScannedDates(orgName).then((results) => {
+				if (results.status === 200) {
+					results.data.forEach(scan => {
+						console.log("console", scan)
+						let allPoliciesList = [];
+						scan.policies.forEach(element => {
+							allPoliciesList.push(element?.name)
+						});
+						let uniquePolics = [...new Set(allPoliciesList)];
 
-  React.useEffect(() => {
-    setLoader(true); 
+						scan.policies = uniquePolics.join();
+						scan.checks = scan.statistic?.checks;
+						scan.hostnames = scan.statistic?.hostnames;
+						scan.violations = scan.statistic?.violations;
+						scan.scanDate = moment(scan.scanDate).format('DD-MM-YYYY');
 
-    UserService.getCveAffectedComputers().then((results) => {
-      if (results.status === 200) {
-        setCveAffectedComputer(results.data);
-        setLoader(false)
-      }
-    }).catch((error) => {
-      console.log("error", error)
-      alert("Fail to connect get  API " + error);
-    });
+						// scan.policies =  [...new Set(getPolicies(scan))];
+					});
 
-    return () => {
-      setCveAffectedComputer([]); // This worked for me
-    };
+					setRowData(results.data);
+				}
+			}).catch((error) => {
+				console.log("error", error)
+				loginRedirect(error);
+				//alert("Error" + error);
+				//alert("Fail to connect get Scan Dates API " + error);
+			});
+		}
+	}, []);
 
-  }, []); 
+	const headerData = [
+		{
+			header: 'Job Id',
+			key: 'jobId',
+		},
+		{
+			header: 'Ansible Job',
+			key: 'name',
+		},
+		{
+			header: 'Policies',
+			key: 'policies',
+		},
+		{
+			header: 'Scan Date',
+			key: 'scanDate',
+		},
+		{
+			header: 'Hostnames',
+			key: 'hostnames',
+		},
+		{
+			header: 'Results',
+			key: 'checks',
+		},
+		{
+			header: 'Violations',
+			key: 'violations',
+			cell: (record) => {
+				return (
+
+					<button
+						className="btn btn-primary btn-sm"
+
+					>
+						Edit
+					</button>
+
+				);
+			},
+		}
+	];
+
+	const hitTheAction = (row, header ) => {
+
+		console.log('idddd', header)
+		window.open('#/dashboard-details?q=q&policyName=' + '' + "&id="+ row.id + "&viewType=" + header, "_blank");
+
+	   // window.location.replace('#/scans-exceptions?q=q&policyName=' + '' + "&id="+ row.id )
+
+	}
 
 
-  
-	React.useEffect(() => {	
-		UserService.getCveGroups().then((results) => {
-		  if (results.status === 200) {
-			let cveGroups1 = results.data;
-			setAptData(cveGroups1)
-		  }
-		}).catch((error) => {
-		  console.log("error", error)
-		  alert("Fail to connect get  API " + error);
-		});
-	  }, []); 
+	document.title = "Carbon Data Table"
 
-  return (
+	return (
+		<div>
+
+			<HeaderNavbar  />
+			<br /><br />
+			<DataTable rows={rowData} headers={headerData} isSortable >
+				{({
+					rows,
+					headers,
+					getHeaderProps,
+					getRowProps,
+					getSelectionProps,
+					getBatchActionProps,
+					onInputChange,
+					selectedRows,
+				}) => (
+					<TableContainer title="Available Scans">
+						<TableToolbar>
+							<TableBatchActions {...getBatchActionProps()}>
+								<TableBatchAction
+									tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
+									renderIcon={Download}
+									onClick={() =>window.open('#/dashboard-combind-report?q=q&policyName=' + '' + "&id="+ selectedRows.map(item => item.id), "_blank")}
+								>
+									Report Details
+								</TableBatchAction>
+								<TableBatchAction
+									tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
+									renderIcon={OrderDetails}
+									onClick={() =>window.location.replace('#/exceptions?q=q&policyName=' + '' + "&id="+ selectedRows.map(item => item.id))}
+								>
+									Exceptions
+								</TableBatchAction>
+								{/* <TableBatchAction
+									tabIndex={getBatchActionProps().shouldShowBatchActions ? 0 : -1}
+									renderIcon={Download}
+									onClick={() => console.log('download clicked')}
+								>
+									Download
+								</TableBatchAction> */}
+							</TableBatchActions>
+							<TableToolbarContent>
+								<TableToolbarSearch
+									tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+									onChange={onInputChange}
+								/>
+								<TableToolbarMenu
+									tabIndex={getBatchActionProps().shouldShowBatchActions ? -1 : 0}
+								>
+									<TableToolbarAction primaryFocus onClick={() => alert('Alert 1')}>
+										Action 1
+									</TableToolbarAction>
+									<TableToolbarAction onClick={() => alert('Alert 2')}>
+										Action 2
+									</TableToolbarAction>
+								
+								</TableToolbarMenu>
+								<DownloadCSV setDownloadReportFlag={setDownloadReportFlag} downloadReportFlag={downloadReportFlag} data={rowData}  />
+							</TableToolbarContent>
+						</TableToolbar>
+						<Table useZebraStyles={false} >
+							<TableHead>
+								<TableRow>
+									<TableSelectAll {...getSelectionProps()} />
+									{headers.map((header) => (
+										<TableHeader {...getHeaderProps({ header })}>
+											{header.header}
+										</TableHeader>
+									))}
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{rows.map((row) => (
+									<TableRow {...getRowProps({ row })}>
+										<TableSelectRow {...getSelectionProps({ row })} />
+										{row.cells.map((cell) => (
+
+											<TableCell key={cell.id} >{cell.info.header === 'hostnames' || cell.info.header === 'checks' || cell.info.header === 'violations' ? <Button onClick={() => hitTheAction(row, cell?.info?.header)} size='sm' kind='tertiary' >{cell.value}</Button> : cell.value}</TableCell>
+
+										))}
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
+
+						{/* <Pagination
+							backwardText="Previous page"
+							forwardText="Next page"
+							itemsPerPageText="Items per page:"
+							page={1}
+							pageNumberText="Page Number"
+							pageSize={10}
+							pageSizes={[
+								10,
+								20,
+								30,
+								40,
+								50
+							]}
+							totalItems={rows.length}
+							disabled={false} isLastPage={false} pagesUnknown={false} /> */}
+					</TableContainer>
+				)}
+			</DataTable>
 
 
-    <Box sx={{ height: 500, width: '100%',   }}>
-      <HeaderNavbar />
-      <br />
-      
+		</div>
 
-
-      <Paper  style={{  height: '80%', width: '99%', paddingBottom: "30px", paddingLeft: "5px"  }}>
-
-        <Grid container >
-          <Grid xs display="flex" justifyContent="center" alignItems="left">
-            <PieChart chartType={"PieChart"} cveRows={cveRows}/>
-          </Grid>
-
-        
-        </Grid>
-
-        <Grid container >
-
-          <Grid xs display="flex" justifyContent="right" alignItems="right">
-           
-          {cveAffectedComputer  ?<ColumnGraph chartType={"ColumnChart"} cveAffectedComputer={cveAffectedComputer}/> : ""}
-             
-          </Grid>
-
-        </Grid>
-
-        <Grid container >
-
-        
-          <Grid xs display="flex" justifyContent="left" alignItems="left">
-           {/* <Histograms/> */}
-
-           {aptData ? <APTGroup chartType={"ColumnChart"} aptData={aptData}/> : ""}
-
-          </Grid>
-
-        </Grid>
-
-       
-        </Paper>
-
-      
-
-    </Box>
-  );
+	);
 }

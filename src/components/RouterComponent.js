@@ -1,10 +1,12 @@
 import { HashRouter as Router, Route, Switch} from 'react-router-dom'
 import React from "react";
 import LoginComponent from './login/LoginComponent';
-import Histograms from './reports/Histograms';
+import DataTable from './reports/DataTable';
 
 import Dashboard from './reports/Dashboard';
-import CveDetails from './reports/CveDetails';
+import DashboardDetails from './reports/DashboardDetails';
+import DashboardCombindReport from './reports/DashboardCombindReport';
+import Exceptions from './reports/Exceptions';
 
 
 const AppRouter = () => {
@@ -15,9 +17,11 @@ const AppRouter = () => {
                 <Switch>
                     <Route path="/" exact component={Dashboard}/>
                     <Route path="/login" exact component={LoginComponent}/>
-                    <Route path="/histogram" exact component={Histograms}/>
+                    <Route path="/datatable" exact component={DataTable}/>
                     <Route path="/dashboard" component={Dashboard}/>
-                    <Route path="/cve-details" component={CveDetails}/>
+                    <Route path="/dashboard-details" component={DashboardDetails}/>
+                    <Route path="/dashboard-combind-report" component={DashboardCombindReport}/>
+                    <Route path="/exceptions" component={Exceptions}/>
 
                     <Route path="*" component={Dashboard} />
                      

@@ -1,0 +1,35 @@
+ @import "node_modules/carbon-components/scss/globals/scss/styles.scss";
+
+// .App {
+//   width: 100%;
+//   height: 100%;
+//   background-color: $ui-01;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+// }
+
+.LoginPage {
+  justify-content: center;
+  align-items: center;
+  margin-left: 10cqb;
+  max-width: 400px;
+  background-color: 'white';
+  padding: 32px;
+  border-radius: 8px;
+ // box-shadow: $shadow-4xl;
+}
+
+// .LoginPage h1 {
+//   font-size: $type-3xl;
+//   font-weight: $font-weight-bold;
+//   margin-bottom: 16px;
+// }
+
+// .LoginPage .bx--form-item {
+//   margin-bottom: 16px;
+// }
+
+// .LoginPage .bx--btn {
+//   margin-top: 16px;
+// }

@@ -1,7 +1,7 @@
 import React from 'react'; 
 import './App.css';
 import AppRouter from "./components/RouterComponent";
-import Histograms from "./components/reports/Histograms"
+import Histograms from "./components/reports/DataTable"
 
 
 function App() {

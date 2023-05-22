@@ -1,0 +1,9 @@
+@use '@carbon/styles';
+@use '@carbon/grid';
+
+// Emit the flex-grid styles
+@include grid.flex-grid();
+// @use '@carbon/styles/scss/reset';
+// @use '@carbon/styles/scss/components/accordion';
+// @use '@carbon/styles/scss/components/button';
+// @use '@carbon/styles/scss/components/checkbox';

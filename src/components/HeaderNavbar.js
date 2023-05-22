@@ -1,241 +1,195 @@
-import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
-import Badge from '@mui/material/Badge';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MoreIcon from '@mui/icons-material/MoreVert';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import TableRowsIcon from '@mui/icons-material/TableRows';
-import {UserContext} from '../index'
+// ------------------------------------------------
+// PLEASE DO NOT EDIT. FORK IF YOU NEED TO MODIFY.
+// ------------------------------------------------
 
-const Search = styled('div')(({ theme }) => ({
-  position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    marginLeft: theme.spacing(3),
-    width: 'auto',
-  },
-}));
+import React from "react";
+import { render } from "react-dom";
+import { Search, Notification, Switcher, Logout, Report, UserAvatar } from "@carbon/react/icons";
+import {
+  Select,
+  SelectItem,
+  Content,
+  Header,
+  HeaderContainer,
+  HeaderMenuButton,
+  HeaderName,
+  HeaderGlobalBar,
+  HeaderGlobalAction,
+  SkipToContent,
+  SideNav,
+  SideNavItems,
+  SideNavLink,
+  SideNavMenu,
+  SideNavMenuItem,
+  Theme
+} from "@carbon/react";
+import UserService from "./service/UserService";
+import { loginRedirect } from "./utils/AuthErrorHandler";
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: '100%',
-  position: 'absolute',
-  pointerEvents: 'none',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
+const Fade16 = () => (
+  <svg
+    width="16"
+    height="16"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 32 32"
+    aria-hidden="true"
+  >
+    <path d="M8.24 25.14L7 26.67a14 14 0 0 0 4.18 2.44l.68-1.88a12 12 0 0 1-3.62-2.09zm-4.05-7.07l-2 .35A13.89 13.89 0 0 0 3.86 23l1.73-1a11.9 11.9 0 0 1-1.4-3.93zm7.63-13.31l-.68-1.88A14 14 0 0 0 7 5.33l1.24 1.53a12 12 0 0 1 3.58-2.1zM5.59 10L3.86 9a13.89 13.89 0 0 0-1.64 4.54l2 .35A11.9 11.9 0 0 1 5.59 10zM16 2v2a12 12 0 0 1 0 24v2a14 14 0 0 0 0-28z" />
+  </svg>
+);
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
-  '& .MuiInputBase-input': {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create('width'),
-    width: '100%',
-    [theme.breakpoints.up('md')]: {
-      width: '35ch',
-    },
-  },
-}));
+const logout = () => {
 
-export default function PrimarySearchAppBar(props) {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  if (window.confirm('Are you sure? Logging out!')) {
 
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+    UserService.logout()
+      .then(result => {
 
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
+        console.log('listorg', result.data)
+        if (result.status === 200) {
+          localStorage.clear();
+          window.location.replace('#/login?loggedout=true')
+        }
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const gotoHomepage =()=>{
-    //console.log('proops', props)
-    //props.history.push('/homepage');
-    window.location.replace('#/homepage')
+      }).catch(error => {
+        loginRedirect(error);
+      });
   }
 
- const scrollPage = () => {
-  document.getElementById('cve-details').scrollIntoView({
-    behavior: 'smooth'
-  });
-  }
 
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
+};
 
-  let cartList = localStorage.getItem('cartList') ? JSON.parse(localStorage.getItem('cartList')) : []; 
+const App = () => {
+  const [orgList, setOrgList] = React.useState([]);
+  const [selectedOrg, setSelectedOrg] = React.useState('');
+  
 
-  const name = React.useContext(UserContext); 
-
-  const menuId = 'primary-search-account-menu';
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile({name})</MenuItem>
-      <MenuItem onClick={() => window.location.replace('#/dashboard')}>Dashboard</MenuItem>
-
-      {/* <MenuItem onClick={() => window.location.replace('#/login')}>Logout</MenuItem> */}
-
-    </Menu>
-  );
-
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-    
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={props.totalItem || cartList.length} color="error">
-          <AssignmentIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile({name})</p>
-      </MenuItem>
-    </Menu>
-  );
+  React.useEffect(()=> {
+    setSelectedOrg(localStorage.getItem('selectedOrg'));
+    setOrgList(localStorage.getItem('orgList') && JSON.parse(localStorage.getItem('orgList')))
+  },[])
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: 'none', sm: 'block' } }}
-          >
-          Semicolon | CyberTrail
-          </Typography>
-         
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-           
-            <IconButton
-              size="large"
-              aria-label="Added product"
-              color="inherit"
-              title="Scan dashboard"
-             >
+    <div className="container">
+      <HeaderContainer
+        render={({ isSideNavExpanded, onClickSideNavExpand }) => (
+          <>
+            <Theme theme="g90">
+              <Header aria-label="IBM Platform Name">
+                <SkipToContent />
+                <HeaderMenuButton
+                  aria-label="Open menu"
+                  onClick={onClickSideNavExpand}
+                  isActive={isSideNavExpanded}
+                />
+                <HeaderName href="#" prefix="">
+                  KEMistry
+                </HeaderName>
+                <HeaderGlobalBar>
+                  {/* <HeaderGlobalAction aria-label="Search" onClick={() => {}}>
+                  <Search />
+                </HeaderGlobalAction>
+                <HeaderGlobalAction
+                  aria-label="Notifications"
+                  onClick={() => {}}
+                >
+                  <Notification />
+                </HeaderGlobalAction> */}
+                  <HeaderGlobalAction
+                    aria-label="Organization"
+                    style={{width: "150px"}}
+                  >
+                  <Select
+                    id="selectedOrg"
+                    inline
+                    labelText=""
+                    value={selectedOrg}
+                    onChange={(e) => {
+                     setSelectedOrg( e.target.value)
+                     localStorage.setItem('selectedOrg', e.target.value)
+                     window.location.reload(true)
+                    }}
+                    >
+                    <SelectItem
+                      text="Choose an Org"
+                      value=""
+                    />
+                
+              {/* {orgList?.length > 1 ? <SelectItem text={'Select an Org'} disabled={true} selected value={''} />  : ''  } */}
+              
+              {orgList?.map((item) => {  return( <SelectItem value={item} text={item} />)})}
 
-            <Badge onClick={() => window.location.replace('#/cve-details')}  badgeContent={props.totalItem || cartList.length} color="error">
-            {/* onClick={() => scrollPage()} */}
-              <TableRowsIcon />
-            </Badge>
-        
-            </IconButton>
+                  </Select>
+                  </HeaderGlobalAction>
 
-            <IconButton
-              size="large"
-              aria-label="Added product"
-              color="inherit"
-              title="Dashboard"
-             >
+                  &nbsp;&nbsp;
 
-            <Badge onClick={() => window.location.replace('#/dashboard')} badgeContent={props.totalItem || cartList.length} color="error">
-              <AssignmentIcon/>
-            </Badge>
-        
-            </IconButton>
+                  <HeaderGlobalAction
+                    aria-label="Dashboard"
+                    onClick={() => window.location.replace('#/dashboard')}
+                  >
+                    <Report />
+                  </HeaderGlobalAction>
 
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
-    </Box>
+                  &nbsp;&nbsp;
+                  <HeaderGlobalAction
+                    aria-label="Click to Logout"
+                    onClick={() => logout()}
+                  >
+                    {/* <UserAvatar />  */}
+                    {localStorage.getItem('userName')}
+                  </HeaderGlobalAction>
+                   &nbsp;&nbsp;
+                  {/* <HeaderGlobalAction
+                    aria-label="Logout"
+                    onClick={() => logout()}
+                  >
+                    <Logout />
+                  </HeaderGlobalAction> */}
+
+
+
+                </HeaderGlobalBar>
+                {/* <SideNav
+                aria-label="Side navigation"
+                expanded={isSideNavExpanded}
+              >
+                <SideNavItems>
+                  <SideNavMenu renderIcon={Fade16} title="Category title">
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                    <SideNavMenuItem aria-current="page" href="#">
+                      Link
+                    </SideNavMenuItem>
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                  </SideNavMenu>
+                  <SideNavMenu renderIcon={Fade16} title="Category title">
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                  </SideNavMenu>
+                  <SideNavMenu renderIcon={Fade16} title="Category title">
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                    <SideNavMenuItem href="#">Link</SideNavMenuItem>
+                  </SideNavMenu>
+                  <SideNavLink renderIcon={Fade16} href="#">
+                    Link
+                  </SideNavLink>
+                  <SideNavLink renderIcon={Fade16} href="#">
+                    Link
+                  </SideNavLink>
+                </SideNavItems>
+              </SideNav> */}
+              </Header>
+            </Theme>
+
+          </>
+        )}
+      />
+    </div>
   );
+
+
+
 }
+export default App; 

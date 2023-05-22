@@ -4,14 +4,12 @@ class AuthService {
         localStorage.getItem("UserInfo");
     }
 
-    getHeader() {
-        return { 'headers': {'RequestToken': localStorage.getItem("requestToken") } }
-        //return { 'headers': { 'X-Server-Key': '8786gfhy' } }
+    getAuthHeader(base64String){
+        return { 'headers': {'Authorization': base64String}, 'withCredentials': true}
     }
 
-    getImageHeader() {
-        return { 'headers': {'token': localStorage.getItem("token")}}
-        //return { 'headers': { 'X-Server-Key': '8786gfhy' } }
+    getRequestedCookie(){
+        return {  'withCredentials': true }
     }
 
     // logout() {
